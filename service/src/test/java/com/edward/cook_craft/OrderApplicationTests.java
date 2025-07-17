@@ -1,4 +1,4 @@
-package com.edward.pharmacy;
+package com.edward.cook_craft;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

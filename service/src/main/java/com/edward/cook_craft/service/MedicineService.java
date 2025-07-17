@@ -1,4 +1,4 @@
-package com.edward.pharmacy.service;
+package com.edward.cook_craft.service;
 
 import org.springframework.stereotype.Service;
 

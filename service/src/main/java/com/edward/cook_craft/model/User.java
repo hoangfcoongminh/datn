@@ -1,6 +1,6 @@
-package com.edward.pharmacy.model;
+package com.edward.cook_craft.model;
 
-import com.edward.pharmacy.enums.Role;
+import com.edward.cook_craft.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

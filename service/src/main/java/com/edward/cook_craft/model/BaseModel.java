@@ -1,4 +1,4 @@
-package com.edward.pharmacy.model;
+package com.edward.cook_craft.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -1,11 +1,12 @@
-package com.edward.pharmacy.model;
+package com.edward.cook_craft.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+/**
+ * BẢNG DANH MỤC
+ */
 
 @Entity
 @Getter
@@ -13,13 +14,14 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Table(name = "categories")
 public class Category extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String categoryName;
+    private String name;
 
     private String description;
 }

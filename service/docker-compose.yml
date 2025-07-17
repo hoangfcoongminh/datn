@@ -3,21 +3,21 @@ version: '3.8'
 services:
   mysql:
     image: mysql
-    container_name: mysql-pharmacy
+    container_name: mysql-cook-craft
     restart: always
     environment:
-      MYSQL_DATABASE: pharmacy_db         # Tên database khởi tạo
+      MYSQL_DATABASE: cook_craft_db         # Tên database khởi tạo
       MYSQL_ROOT_PASSWORD: root           # Mật khẩu cho user root
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - pharmacy-net
+      - cook-craft-net
 
 volumes:
   mysql_data:
 
 networks:
-  pharmacy-net:
+  cook-craft-net:
     driver: bridge
