@@ -1,6 +1,7 @@
 package com.edward.cook_craft.model;
 
-import com.edward.cook_craft.enums.IngredientUnit;
+import com.edward.cook_craft.dto.request.IngredientRequest;
+import com.edward.cook_craft.dto.response.IngredientResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +26,22 @@ public class Ingredient extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long unitId;
+
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private IngredientUnit unit;
+    public static Ingredient of(IngredientRequest request) {
+        return Ingredient.builder()
+                .name(request.getName())
+                .unitId(request.getUnitId())
+                .build();
+    }
+
+    public static IngredientResponse toResponse(Ingredient ingredient) {
+        return IngredientResponse.builder()
+                .id(ingredient.getId())
+                .name(ingredient.getName())
+                .unitId(ingredient.getUnitId())
+                .build();
+    }
 }

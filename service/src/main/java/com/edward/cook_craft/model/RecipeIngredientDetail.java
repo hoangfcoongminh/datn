@@ -1,6 +1,5 @@
 package com.edward.cook_craft.model;
 
-import com.edward.cook_craft.enums.IngredientUnit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +12,7 @@ import java.math.BigDecimal;
 /**
  * BẢNG CHI TIẾT CÔNG THỨC_NGUYÊN LIỆU
  */
+
 @Entity
 @Getter
 @Setter
@@ -30,8 +30,8 @@ public class RecipeIngredientDetail extends BaseModel{
 
     private Long ingredientId;
 
+    private Long actualUnitId;
+
     private BigDecimal quantity;
 
-    @Enumerated(EnumType.STRING)
-    private IngredientUnit unitOverride;
 }
