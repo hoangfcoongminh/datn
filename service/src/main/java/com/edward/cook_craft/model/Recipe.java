@@ -1,5 +1,7 @@
 package com.edward.cook_craft.model;
 
+import com.edward.cook_craft.dto.request.RecipeRequest;
+import com.edward.cook_craft.dto.response.RecipeResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +30,7 @@ public class Recipe extends BaseModel {
 
     private Long categoryId;
 
-    private Long authorId;
+    private Long authorId;  // ID of the user who created the recipe
 
     private String title;
 
@@ -38,5 +40,30 @@ public class Recipe extends BaseModel {
 
     private Duration cookTime;
 
-    private Integer servings;
+    private Integer servings;   //Serve for how many people
+
+    public static Recipe of(RecipeRequest request) {
+        return Recipe.builder()
+                .categoryId(request.getCategoryId())
+                .authorId(request.getAuthorId())
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .prepTime(request.getPrepTime())
+                .cookTime(request.getCookTime())
+                .servings(request.getServings())
+                .build();
+    }
+
+    public static RecipeResponse toResponse(Recipe recipe) {
+        return RecipeResponse.builder()
+                .id(recipe.getId())
+                .categoryId(recipe.getCategoryId())
+                .authorId(recipe.getAuthorId())
+                .title(recipe.getTitle())
+                .description(recipe.getDescription())
+                .prepTime(recipe.getPrepTime())
+                .cookTime(recipe.getCookTime())
+                .servings(recipe.getServings())
+                .build();
+    }
 }
