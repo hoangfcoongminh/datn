@@ -6,6 +6,7 @@ import com.edward.cook_craft.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +21,24 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = "Get all categories", description = "Retrieve a list of all categories")
     public ResponseEntity<?> getAll() {
-        try {
+//        try {
             return ResponseEntity.ok(ApiResponse.success(service.getAll()));
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
+    }
+
+    @PostMapping("/filter")
+    @Operation(summary = "Filter category", description = "Filter all category")
+    public ResponseEntity<?> filter(
+            @RequestBody CategoryRequest categoryRequest,
+            Pageable pageable
+    ) {
+//        try {
+            return ResponseEntity.ok(ApiResponse.success(service.filter(categoryRequest, pageable)));
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
     }
 
     @PostMapping
@@ -32,10 +46,10 @@ public class CategoryController {
     public ResponseEntity<?> create(
             @RequestBody CategoryRequest request
     ) {
-       try {
+//       try {
            return ResponseEntity.ok(ApiResponse.success(service.create(request)));
-       } catch (Exception e) {
-           return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-       }
+//       } catch (Exception e) {
+//           return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//       }
     }
 }

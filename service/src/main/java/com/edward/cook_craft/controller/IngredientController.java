@@ -20,11 +20,11 @@ public class IngredientController {
     @GetMapping
     @Operation(summary = "Get all ingredients", description = "Retrieve a list of all ingredients")
     public ResponseEntity<?> getAll() {
-        try {
+//        try {
             return ResponseEntity.ok(ApiResponse.success(service.getAll()));
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
     }
 
     @PostMapping
@@ -32,10 +32,10 @@ public class IngredientController {
     public ResponseEntity<?> create(
             @RequestBody IngredientRequest request
     ) {
-        try {
+//        try {
             return ResponseEntity.ok(ApiResponse.success(service.create(request)));
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
     }
 }

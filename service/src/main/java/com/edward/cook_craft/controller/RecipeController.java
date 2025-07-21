@@ -19,11 +19,11 @@ public class RecipeController {
     @GetMapping
     @Operation(summary = "Get all recipes", description = "Retrieve a list of all recipes")
     public ApiResponse<?> getAll() {
-        try {
+//        try {
             return ApiResponse.success(service.getAll());
-        } catch (Exception e) {
-            return ApiResponse.failure(e.getMessage());
-        }
+//        } catch (Exception e) {
+//            return ApiResponse.failure(e.getMessage());
+//        }
     }
 
     @PostMapping
@@ -31,10 +31,10 @@ public class RecipeController {
     public ApiResponse<?> create(
             @RequestBody RecipeRequest request
     ) {
-        try {
+//        try {
             return ApiResponse.success(service.create(request));
-        } catch (Exception e) {
-            return ApiResponse.failure(e.getMessage());
-        }
+//        } catch (Exception e) {
+//            return ApiResponse.failure(e.getMessage());
+//        }
     }
 }

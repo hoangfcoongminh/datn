@@ -20,11 +20,11 @@ public class UnitController {
     @GetMapping
     @Operation(summary = "Get all units", description = "Retrieve a list of all units")
     public ResponseEntity<?> getAll() {
-        try {
+//        try {
             return ResponseEntity.ok(ApiResponse.success(service.getAll()));
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
     }
 
     @PostMapping
@@ -32,10 +32,10 @@ public class UnitController {
     public ResponseEntity<?> create(
             @RequestBody UnitRequest request
     ) {
-        try {
+//        try {
             return ResponseEntity.ok(ApiResponse.success(service.create(request)));
-        } catch (Exception e) {
-            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-        }
+//        } catch (Exception e) {
+//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
+//        }
     }
 }
