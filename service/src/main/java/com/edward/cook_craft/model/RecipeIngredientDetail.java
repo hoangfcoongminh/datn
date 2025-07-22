@@ -1,5 +1,7 @@
 package com.edward.cook_craft.model;
 
+import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
+import com.edward.cook_craft.dto.response.RecipeIngredientDetailResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,4 +36,22 @@ public class RecipeIngredientDetail extends BaseModel{
 
     private BigDecimal quantity;
 
+    public static RecipeIngredientDetail of(RecipeIngredientDetailRequest request) {
+        return RecipeIngredientDetail.builder()
+                .recipeId(request.getRecipeId())
+                .ingredientId(request.getIngredientId())
+                .actualUnitId(request.getActualUnitId())
+                .quantity(request.getQuantity())
+                .build();
+    }
+
+    public static RecipeIngredientDetailResponse toResponse(RecipeIngredientDetail data) {
+        return RecipeIngredientDetailResponse.builder()
+                .id(data.getId())
+                .recipeId(data.getRecipeId())
+                .ingredientId(data.getIngredientId())
+                .actualUnitId(data.getActualUnitId())
+                .quantity(data.getQuantity())
+                .build();
+    }
 }

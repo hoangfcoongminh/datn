@@ -1,11 +1,11 @@
 package com.edward.cook_craft.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class UnitResponse {
+@SuperBuilder
+public class UnitResponse extends BaseResponse {
 
     private Long id;
     private String name;

@@ -1,12 +1,17 @@
 package com.edward.cook_craft.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
 public class CustomException extends RuntimeException {
 
-    private final Integer status;
+    private String title;
+    private final int status;
 
     public CustomException(String message) {
         super(message);
-        this.status = 400; // default Bad Request
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR.value();
     }
 
     public CustomException(String message, int status) {
@@ -14,7 +19,4 @@ public class CustomException extends RuntimeException {
         this.status = status;
     }
 
-    public int getStatus() {
-        return status;
-    }
 }

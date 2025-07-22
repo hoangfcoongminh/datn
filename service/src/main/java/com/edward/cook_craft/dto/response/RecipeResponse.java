@@ -1,15 +1,15 @@
 package com.edward.cook_craft.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
 
 @Getter
 @Setter
-@Builder
-public class RecipeResponse {
+@SuperBuilder
+public class RecipeResponse extends BaseResponse {
 
     private Long id;
 

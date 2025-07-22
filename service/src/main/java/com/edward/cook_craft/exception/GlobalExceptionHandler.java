@@ -15,19 +15,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<?>> handleApiException(CustomException ex) {
         return ResponseEntity.status(ex.getStatus())
-                .body(ApiResponse.failure(ex.getMessage()));
+                .body(ApiResponse.failure(ex.getStatus(), ex.getTitle(), ex.getMessage()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleEntityNotFound(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.failure(ex.getMessage()));
+                .body(ApiResponse.failure(HttpStatus.NOT_FOUND.value(), ex.getClass().getName(), ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponse<?>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         return ResponseEntity.badRequest()
-                .body(ApiResponse.failure("Invalid parameter type: " + ex.getName()));
+                .body(ApiResponse.failure(Integer.getInteger(ex.getErrorCode()), ex.getClass().getName(), "Invalid parameter type: " + ex.getName()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,12 +37,12 @@ public class GlobalExceptionHandler {
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation error");
-        return ResponseEntity.badRequest().body(ApiResponse.failure(message));
+        return ResponseEntity.badRequest().body(ApiResponse.failure(ex.getStatusCode().value(), ex.getClass().getName(), message));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.failure("Internal Server Error: " + ex.getMessage()));
+                .body(ApiResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error",  ex.getMessage()));
     }
 }

@@ -1,9 +1,9 @@
 package com.edward.cook_craft.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Version;
+import com.edward.cook_craft.enums.EntityStatus;
+import com.edward.cook_craft.utils.DateTimeUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,19 +28,21 @@ public abstract class BaseModel {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
+    @JsonFormat(pattern = DateTimeUtils.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "modified_at")
+    @JsonFormat(pattern = DateTimeUtils.DATE_TIME_FORMAT)
     private LocalDateTime modifiedAt;
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    private Long createdBy;
+    private String createdBy;
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    private Long modifiedBy;
+    private String modifiedBy;
 
     @Column(name = "status")
     private Integer status;
@@ -48,4 +50,10 @@ public abstract class BaseModel {
     @Version
     @Column(name = "version")
     private Long version;
+
+    @PrePersist
+    public void prePersist() {
+        this.status = EntityStatus.ACTIVE.getStatus();
+        this.createdBy = "system";
+    }
 }
