@@ -1,15 +1,15 @@
 package com.edward.cook_craft.dto.response;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
-@Builder
-public class RecipeIngredientDetailResponse {
+@SuperBuilder
+public class RecipeIngredientDetailResponse extends BaseResponse {
 
     private Long id;
 

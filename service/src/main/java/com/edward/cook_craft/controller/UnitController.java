@@ -1,8 +1,8 @@
 package com.edward.cook_craft.controller;
 
 import com.edward.cook_craft.dto.request.UnitRequest;
-import com.edward.cook_craft.dto.response.ApiResponse;
 import com.edward.cook_craft.service.UnitService;
+import com.edward.cook_craft.utils.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class UnitController {
     @Operation(summary = "Get all units", description = "Retrieve a list of all units")
     public ResponseEntity<?> getAll() {
 //        try {
-            return ResponseEntity.ok(ApiResponse.success(service.getAll()));
+            return ResponseUtils.handleSuccess(service.getAll());
 //        } catch (Exception e) {
 //            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
 //        }
@@ -33,7 +33,7 @@ public class UnitController {
             @RequestBody UnitRequest request
     ) {
 //        try {
-            return ResponseEntity.ok(ApiResponse.success(service.create(request)));
+            return ResponseUtils.handleSuccess(service.create(request));
 //        } catch (Exception e) {
 //            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
 //        }

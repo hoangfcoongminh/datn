@@ -1,16 +1,16 @@
 package com.edward.cook_craft.enums;
 
 public enum EntityStatus {
-    ACTIVE(1L),
-    IN_ACTIVE(0L);
+    ACTIVE(1),
+    IN_ACTIVE(0);
 
-    private final Long status;
+    private final Integer status;
 
-    EntityStatus(Long status) {
+    EntityStatus(Integer status) {
         this.status = status;
     }
 
-    public Long getStatus() {
+    public Integer getStatus() {
         return status;
     }
 }
