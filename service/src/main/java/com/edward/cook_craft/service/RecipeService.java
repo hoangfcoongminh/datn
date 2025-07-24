@@ -13,6 +13,7 @@ import com.edward.cook_craft.repository.UserRepository;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class RecipeService {
                 .map(recipeMapper::toResponse).toList();
     }
 
+    @Transactional
     public RecipeResponse create(RecipeRequest request) {
         validateRecipeRequest(request);
         Recipe recipe = recipeMapper.of(request);
@@ -40,6 +42,7 @@ public class RecipeService {
         return recipeMapper.toResponse(repository.save(recipe));
     }
 
+    @Transactional
     public RecipeResponse update(RecipeRequest request) {
         validateRecipeRequest(request);
         Recipe recipe = repository.findById(request.getId()).get();
