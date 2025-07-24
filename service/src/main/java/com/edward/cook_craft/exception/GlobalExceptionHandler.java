@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation error");
-        return ResponseEntity.badRequest().body(ApiResponse.failure(ex.getStatusCode().value(), ex.getClass().getName(), message));
+        return ResponseEntity.badRequest().body(ApiResponse.failure(ex.getStatusCode().value(), ex.getBody().getDetail(), message));
     }
 
     @ExceptionHandler(Exception.class)
