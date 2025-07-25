@@ -1,4 +1,4 @@
-package com.edward.cook_craft.service;
+package com.edward.cook_craft.security;
 
 import com.edward.cook_craft.dto.request.LoginRequest;
 import com.edward.cook_craft.dto.request.SignupRequest;
@@ -13,7 +13,6 @@ import com.edward.cook_craft.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +29,7 @@ public class AuthenticService {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailService customUserDetailService;
     private final JwtService jwtService;
+    private final BlackListTokenService blackListTokenService;
 
     public LoginResponse login(LoginRequest request) {
         validateLogin(request);
@@ -65,8 +65,10 @@ public class AuthenticService {
         }
 
         String token = authHeader.substring(7);
+        long expirationTimeMillis = jwtService.getExpirationMillis(token);
+        blackListTokenService.insertBlackListToken(token, expirationTimeMillis);
 
-        return "success";
+        return "logout.successful";
     }
 
     private void validateSignup(SignupRequest request) {

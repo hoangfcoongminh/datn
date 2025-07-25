@@ -25,7 +25,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/swagger-resources",
-                                "/swagger-ui/**").permitAll()
+                                "/swagger-ui/**",
+                                "/api/authentic/**",
+                                "/api/categories/**",
+                                "/api/ingredients/**",
+                                "/api/recipes/**",
+                                "/api/units/**").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                         .build();

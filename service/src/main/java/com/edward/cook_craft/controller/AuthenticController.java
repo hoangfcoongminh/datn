@@ -2,7 +2,7 @@ package com.edward.cook_craft.controller;
 
 import com.edward.cook_craft.dto.request.LoginRequest;
 import com.edward.cook_craft.dto.request.SignupRequest;
-import com.edward.cook_craft.service.AuthenticService;
+import com.edward.cook_craft.security.AuthenticService;
 import com.edward.cook_craft.utils.ResponseUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

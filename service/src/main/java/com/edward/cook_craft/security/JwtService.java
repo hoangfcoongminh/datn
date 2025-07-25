@@ -1,6 +1,8 @@
-package com.edward.cook_craft.service;
+package com.edward.cook_craft.security;
 
 import com.edward.cook_craft.model.CustomUserDetails;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,5 +54,32 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(getSignKey())
                 .compact();
+    }
+
+    private Jws<Claims> parseToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getSignKey())
+                .build()
+                .parseSignedClaims(token);
+    }
+
+    public long getExpirationMillis(String token) {
+        Date expiration = parseToken(token).getPayload().getExpiration();
+        Date issuedAt = parseToken(token).getPayload().getIssuedAt();
+        return expiration.getTime() - issuedAt.getTime();
+    }
+
+    public String extractUsername(String token) {
+        return parseToken(token).getPayload().getSubject();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public boolean isTokenExpired(String token) {
+        Date expiration = parseToken(token).getPayload().getExpiration();
+        return expiration.before(new Date());
     }
 }

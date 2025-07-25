@@ -1,4 +1,4 @@
-package com.edward.cook_craft.service;
+package com.edward.cook_craft.security;
 
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.model.CustomUserDetails;
