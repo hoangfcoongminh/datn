@@ -14,3 +14,18 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  redis-cook-craft:
+    port: 6379           # Cổng mặc định của Redis server
+    host: localhost      # Địa chỉ Redis (ở đây là máy local)
+    timeout: 2000        # Timeout (miliseconds) cho kết nối Redis (ở đây là 2 giây)
+    database: 0          # Redis có 16 DB (0–15). 0 là mặc định.
+    pool:
+      maxIdle: 50        # Số lượng kết nối "nhàn rỗi" (idle) tối đa trong pool
+      minIdle: 10        # Số lượng kết nối "nhàn rỗi" tối thiểu (pool sẽ duy trì)
+      maxTotal: 50       # Tổng số kết nối Redis tối đa (đang được sử dụng + idle)
+
+jwt:
+  secret: X7kP9mL2qA4rT6yU8iO0pJ3wE6vY9nB1cD4fG7hJ2kL5mN8xP0qR3tV6yU9iO2wE
+  access-token-expiration-ms: 600000 # 10 phút
+  refresh-token-expiration-ms: 864000 # 14.4 phút

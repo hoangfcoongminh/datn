@@ -15,8 +15,18 @@ services:
     networks:
       - cook-craft-net
 
+  redis:
+    image: redis:7.0
+    container_name: redis-cook-craft
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   mysql_data:
+  redis-data:
 
 networks:
   cook-craft-net:

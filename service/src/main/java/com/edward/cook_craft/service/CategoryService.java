@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class CategoryService {
         return pageMapper.map(data, mapper::toResponse);
     }
 
+    @Transactional
     public CategoryResponse create(CategoryRequest request) {
         User currentUser = SecurityUtils.getCurrentUser();
         Category c = mapper.of(request);
@@ -50,6 +52,7 @@ public class CategoryService {
         return mapper.toResponse(repository.save(c));
     }
 
+    @Transactional
     public CategoryResponse update(CategoryRequest request) {
         User currentUser = SecurityUtils.getCurrentUser();
 
