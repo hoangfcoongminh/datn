@@ -1,9 +1,12 @@
 package com.edward.cook_craft.service;
 
+import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
+import com.edward.cook_craft.dto.response.PagedResponse;
 import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
+import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.User;
@@ -12,6 +15,8 @@ import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.UserRepository;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +31,16 @@ public class RecipeService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
+    private final PageMapper pageMapper;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
                 .map(recipeMapper::toResponse).toList();
+    }
+
+    public PagedResponse<?> filter(RecipeFilterRequest request, Pageable pageable) {
+        Page<Recipe> data = repository.filter(request, pageble);
+        return pageMapper.map(data, recipeMapper::toResponse);
     }
 
     @Transactional
