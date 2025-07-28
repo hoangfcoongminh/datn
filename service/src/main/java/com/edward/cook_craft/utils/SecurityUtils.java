@@ -12,9 +12,37 @@ public final class SecurityUtils {
     public static User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return Optional.ofNullable(authentication.getPrincipal())
-                .map(principal -> (CustomUserDetails) principal)
-                .map(CustomUserDetails::getUser)
-                .orElse(null);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        // Kiểm tra đúng type
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getUser();
+        }
+
+        // Nếu là String (username), có thể load user từ database nếu cần
+        // Nhưng trong trường hợp signup, không nên có authentication
+        return null;
+    }
+
+    public static String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            return "system";
+        }
+
+        return null;
     }
 }

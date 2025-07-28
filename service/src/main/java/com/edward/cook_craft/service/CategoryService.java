@@ -44,26 +44,22 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse create(CategoryRequest request) {
-        User currentUser = SecurityUtils.getCurrentUser();
         Category c = mapper.of(request);
         c.setId(null);
-        c.setCreatedBy(currentUser.getUsername());
+        c = repository.save(c);
 
-        return mapper.toResponse(repository.save(c));
+        return mapper.toResponse(c);
     }
 
     @Transactional
     public CategoryResponse update(CategoryRequest request) {
-        User currentUser = SecurityUtils.getCurrentUser();
-
         Category existed = validate(request.getId());
 
         existed.setName(request.getName());
         existed.setDescription(request.getDescription());
-        existed.setModifiedBy(currentUser.getUsername());
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
-
-        return mapper.toResponse(repository.save(existed));
+        existed = repository.save(existed);
+        return mapper.toResponse(existed);
     }
 
     private Category validate(Long id) {

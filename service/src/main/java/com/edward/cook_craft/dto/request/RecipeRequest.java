@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 
 @Getter
@@ -24,9 +25,9 @@ public class RecipeRequest {
 
     private String description;
 
-    private Duration prepTime;
+    private BigDecimal prepTime;
 
-    private Duration cookTime;
+    private BigDecimal cookTime;
 
     private Integer servings;   //Serve for how many people
 

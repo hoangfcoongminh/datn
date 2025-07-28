@@ -31,30 +31,29 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(UserDetails userDetails) {
-        return buildToken(userDetails, accessTokenExpirationMs,"access");
+    public String generateAccessToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, accessTokenExpirationMs, "access");
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(userDetails, refreshTokenExpirationMs,"refresh");
+    public String generateRefreshToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, refreshTokenExpirationMs, "refresh");
     }
 
-    private String buildToken(UserDetails userDetails, long expirationMillis, String type) {
-        CustomUserDetails customUser = (CustomUserDetails) userDetails;
-
+    private String buildToken(CustomUserDetails userDetails, long expirationMillis, String type) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", type);
-        claims.put("userId", customUser.getId());
-        claims.put("role", customUser.getUser().getRole().name());
+        claims.put("userId", userDetails.getId());
+        claims.put("role", userDetails.getUser().getRole().name());
 
         return Jwts.builder()
-                .subject(customUser.getUsername())
+                .subject(userDetails.getUsername())
                 .claims(claims)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(getSignKey())
                 .compact();
     }
+
 
     private Jws<Claims> parseToken(String token) {
         return Jwts.parser()

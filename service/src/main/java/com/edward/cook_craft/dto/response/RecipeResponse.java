@@ -1,14 +1,19 @@
 package com.edward.cook_craft.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 
 @Getter
 @Setter
 @SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RecipeResponse extends BaseResponse {
 
     private Long id;
@@ -21,9 +26,9 @@ public class RecipeResponse extends BaseResponse {
 
     private String description;
 
-    private Duration prepTime;
+    private BigDecimal prepTime;
 
-    private Duration cookTime;
+    private BigDecimal cookTime;
 
     private Integer servings;   //Serve for how many people
 }

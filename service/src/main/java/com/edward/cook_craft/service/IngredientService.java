@@ -48,22 +48,18 @@ public class IngredientService {
     @Transactional
     public IngredientResponse create(IngredientRequest request) {
         validate(request);
-        User currentUser = SecurityUtils.getCurrentUser();
         Ingredient i = ingredientMapper.of(request);
         i.setId(null);
-        i.setCreatedBy(currentUser.getUsername());
         return ingredientMapper.toResponse(repository.save(i));
     }
 
     @Transactional
     public IngredientResponse update(IngredientRequest request) {
         validate(request);
-        User currentUser = SecurityUtils.getCurrentUser();
         Ingredient existed = repository.findByIdAndStatus(request.getId(), EntityStatus.ACTIVE.getStatus()).get();
 
         existed.setName(request.getName());
         existed.setUnitId(request.getUnitId());
-        existed.setModifiedBy(currentUser.getUsername());
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus(): request.getStatus());
         return ingredientMapper.toResponse(repository.save(existed));
     }

@@ -15,7 +15,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +33,9 @@ public class AuthenticService {
     public LoginResponse login(LoginRequest request) {
         validateLogin(request);
 
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(request.getUsername());
-        String token = jwtService.generateAccessToken(userDetails);
-        UserResponse userResponse = userMapper.toResponse(((CustomUserDetails) userDetails).getUser());
+        CustomUserDetails customUserDetails = (CustomUserDetails) customUserDetailService.loadUserByUsername(request.getUsername());
+        String token = jwtService.generateAccessToken(customUserDetails);
+        UserResponse userResponse = userMapper.toResponse(customUserDetails.getUser());
 
         return new LoginResponse(token, userResponse);
     }
