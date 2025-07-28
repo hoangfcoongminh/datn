@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/ingredients/")
+@RequestMapping("/api/ingredients")
 @RequiredArgsConstructor
 @Tag(name = "Ingredients", description = "Ingredient management API")
 public class IngredientController {
