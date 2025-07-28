@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/units/")
+@RequestMapping("/api/units")
 @RequiredArgsConstructor
 @Tag(name = "Units", description = "Unit management API")
 public class UnitController {
