@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/recipes/")
+@RequestMapping("/api/recipes")
 @RequiredArgsConstructor
 @Tag(name = "Recipes", description = "Recipe management API")
 public class RecipeController {
@@ -37,6 +37,14 @@ public class RecipeController {
             Pageable pageable
     ) {
         return ResponseUtils.handleSuccess(service.filter(request, pageable));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get detail", description = "Get Detail")
+    public ResponseEntity<?> details(
+            @PathVariable Long id
+    ) {
+        return ResponseUtils.handleSuccess(service.details(id));
     }
 
     @PostMapping

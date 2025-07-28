@@ -53,7 +53,10 @@ public abstract class BaseModel {
 
     @PrePersist
     public void prePersist() {
-        this.status = EntityStatus.ACTIVE.getStatus();
-        this.createdBy = "system";
+        if (this.status == null)
+            this.status = EntityStatus.ACTIVE.getStatus();
+
+        if (this.createdBy == null)
+            this.createdBy = "system";
     }
 }
