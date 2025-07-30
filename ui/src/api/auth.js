@@ -1,3 +1,4 @@
+// Chỉ giữ lại các hàm liên quan xác thực
 // Xử lý API xác thực
 export async function login(username, password) {
   const res = await fetch('http://localhost:8080/api/authentic/login', {
@@ -13,7 +14,6 @@ export async function login(username, password) {
   }
   if (!res.ok || !data.success) {
     let err = { message: 'Đăng nhập thất bại.' };
-    // Nếu trả về nhiều lỗi dạng mảng
     if (Array.isArray(data.message)) {
       err = { message: data.message };
     } else if (data.message) {
@@ -23,11 +23,9 @@ export async function login(username, password) {
     }
     throw err;
   }
-  // Trả về đúng data.data (chứa token, user...)
   return data.data;
 }
 
-// Xử lý API đăng ký
 export async function signup({ username, password, confirmPassword, fullName, email }) {
   const res = await fetch('http://localhost:8080/api/authentic/signup', {
     method: 'POST',
@@ -51,34 +49,22 @@ export async function signup({ username, password, confirmPassword, fullName, em
     }
     throw err;
   }
+  if (data.data && data.data.token) {
+    localStorage.setItem('token', data.data.token);
+  }
   return data.data;
 }
 
-// Xử lý API đăng xuất
-export async function logout(token) {
+// Logout API
+export async function logout() {
+  const token = localStorage.getItem('token');
   const res = await fetch('http://localhost:8080/api/authentic/logout', {
     method: 'POST',
-    headers: { 
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
+    },
   });
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    throw { message: 'Lỗi không xác định từ máy chủ.' };
-  }
-  if (!res.ok || !data.success) {
-    let err = { message: 'Đăng xuất thất bại.' };
-    if (Array.isArray(data.message)) {
-      err = { message: data.message };
-    } else if (data.message) {
-      err = { message: data.message };
-    } else if (data.error) {
-      err = { message: data.error };
-    }
-    throw err;
-  }
-  return data.data;
+  // Không cần xử lý response, chỉ cần gọi
+  return res.ok;
 }

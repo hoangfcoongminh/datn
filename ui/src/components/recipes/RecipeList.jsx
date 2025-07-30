@@ -1,90 +1,287 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './RecipeList.css';
-import { FaUtensils, FaClock, FaStar, FaHeart } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Button, message } from "antd";
+import {
+  FaUtensils,
+  FaClock,
+  FaStar,
+  FaHeart,
+  FaArrowLeft,
+} from "react-icons/fa";
+import { filterRecipes } from "../../api/recipe";
+import { fetchAllCategories } from "../../api/category";
+import { fetchIngredients } from "../../api/ingredient";
+import { Select, Pagination, Input } from "antd";
+import "antd/dist/reset.css";
+import "./RecipeList.css";
+
+const { Option } = Select;
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
 const RecipeList = () => {
-  // Mock data for demonstration
-  const recipes = [
-    {
-      id: 1,
-      title: "Phở Bò Việt Nam",
-      description: "Món phở truyền thống với nước dùng đậm đà và thịt bò tươi ngon",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      time: "45 phút",
-      rating: 4.8,
-      difficulty: "Trung bình",
-      likes: 1250
-    },
-    {
-      id: 2,
-      title: "Bún Chả Hà Nội",
-      description: "Bún chả truyền thống với thịt nướng thơm lừng và nước mắm đặc biệt",
-      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      time: "30 phút",
-      rating: 4.6,
-      difficulty: "Dễ",
-      likes: 980
-    },
-    {
-      id: 3,
-      title: "Cơm Tấm Sài Gòn",
-      description: "Cơm tấm với sườn nướng, chả trứng và các món ăn kèm hấp dẫn",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      time: "60 phút",
-      rating: 4.7,
-      difficulty: "Khó",
-      likes: 1560
+  const location = useLocation();
+  const [recipes, setRecipes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  // Filter state
+  const [keyword, setKeyword] = useState("");
+  const [categoryIds, setCategoryIds] = useState([]);
+  const [ingredientIds, setIngredientIds] = useState([]);
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const categoryIdFromUrl = params.get("categoryId");
+
+    if (categoryIdFromUrl) {
+      setCategoryIds([parseInt(categoryIdFromUrl)]);
+      setPage(0);
     }
-  ];
+    fetchAllCategories()
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => setCategories([]));
+    fetchIngredients()
+      .then((data) => setIngredients(Array.isArray(data) ? data : []))
+      .catch(() => setIngredients([]));
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await filterRecipes({
+        keyword,
+        categoryIds,
+        ingredientIds,
+        page,
+        size: pageSize,
+      });
+      setRecipes(data.content || []);
+      setTotalPages(data.total || 1);
+    } catch (err) {
+      setError(err.message || "Lỗi khi tải công thức");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, [keyword, categoryIds, ingredientIds, page, pageSize]);
 
   return (
-    <div className="recipe-list-container">
-      <div className="recipe-list-header">
-        <h1>Danh sách công thức</h1>
-        <p>Khám phá hàng nghìn công thức nấu ăn ngon từ cộng đồng CookCraft</p>
-      </div>
-      
-      <div className="recipe-grid">
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="recipe-card">
-            <div className="recipe-image">
-              <img src={recipe.image} alt={recipe.title} />
-              <div className="recipe-overlay">
-                <button className="like-button">
-                  <FaHeart />
-                </button>
+    <div className="recipe-list-page">
+      {/* Header Section */}
+
+      {/* Filter Section */}
+      <div className="filter-section">
+        <div className="filter-container">
+          <div className="filter-header" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              type="primary"
+              style={{ background: '#a50034', borderColor: '#a50034', fontWeight: 600 }}
+              onClick={() => {
+                if (user && (user.user.role === 'USER' || user.user.role === 'ADMIN')) {
+                  navigate("/recipes/add");
+                } else {
+                  message.warning({
+                    content: 'Bạn phải đăng nhập để thêm công thức mới!',
+                    duration: 5
+                  });
+                  setTimeout(() => navigate('/login'), 1200);
+                }
+              }}
+            >
+              + Thêm công thức mới
+            </Button>
+          </div>
+          <div className="filter-content border">
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>Danh mục</label>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Chọn danh mục"
+                  value={categoryIds}
+                  onChange={(vals) => {
+                    setCategoryIds(vals);
+                    setPage(0);
+                  }}
+                  optionFilterProp="children"
+                  showSearch
+                >
+                  {categories.map((cat) => (
+                    <Option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </Option>
+                  ))}
+                </Select>
               </div>
-            </div>
-            
-            <div className="recipe-content">
-              <h3 className="recipe-title">{recipe.title}</h3>
-              <p className="recipe-description">{recipe.description}</p>
-              
-              <div className="recipe-meta">
-                <div className="meta-item">
-                  <FaClock />
-                  <span>{recipe.time}</span>
-                </div>
-                <div className="meta-item">
-                  <FaStar />
-                  <span>{recipe.rating}</span>
-                </div>
-                <div className="meta-item">
-                  <FaUtensils />
-                  <span>{recipe.difficulty}</span>
-                </div>
+              <div className="filter-group">
+                <label>Nguyên liệu</label>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Chọn nguyên liệu"
+                  value={ingredientIds}
+                  onChange={(vals) => {
+                    setIngredientIds(vals);
+                    setPage(0);
+                  }}
+                  optionFilterProp="children"
+                  showSearch
+                >
+                  {ingredients.map((ing) => (
+                    <Option key={ing.id} value={ing.id}>
+                      {ing.name}
+                    </Option>
+                  ))}
+                </Select>
               </div>
-              
-              <div className="recipe-footer">
-                <span className="likes-count">{recipe.likes} lượt thích</span>
-                <Link to={`/recipes/${recipe.id}`} className="view-recipe-btn">
-                  Xem công thức
-                </Link>
+              <div className="filter-group search-group">
+                <label>Tìm kiếm</label>
+                {/* <input
+                  allowClear
+                  type="text"
+                  placeholder="Nhập từ khóa tìm kiếm..."
+                  value={keyword}
+                  onChange={e => { setKeyword(e.target.value); setPage(0); }}
+                  className="search-input"
+                /> */}
+                <Input.Search
+                  allowClear
+                  placeholder="Tìm kiếm tên hoặc mô tả..."
+                  value={keyword}
+                  onChange={(e) => {
+                    setPage(0);
+                    setKeyword(e.target.value);
+                  }}
+                  style={{ maxWidth: 320 }}
+                />
               </div>
             </div>
           </div>
-        ))}
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="content-section">
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Đang tải công thức...</p>
+          </div>
+        ) : error ? (
+          <div className="error-state">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="recipes-grid">
+              {recipes.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">🍽️</div>
+                  <h3>Không tìm thấy công thức</h3>
+                  <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                </div>
+              ) : (
+                recipes.map((recipe) => (
+                  <div key={recipe.id} className="recipe-card">
+                    <div className="card-image">
+                      <img
+                        src={
+                          recipe.imgUrl ||
+                          "https://via.placeholder.com/400x250?text=No+Image"
+                        }
+                        alt={recipe.title}
+                      />
+                      <button className="like-button">
+                        <FaHeart />
+                      </button>
+                      <div className="card-overlay">
+                        <Link
+                          to={`/recipes/${recipe.id}`}
+                          className="view-button"
+                        >
+                          Xem chi tiết
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="card-content">
+                      <h3 className="recipe-title">{recipe.title}</h3>
+                      <p className="recipe-description">{recipe.description}</p>
+                      <div className="recipe-meta">
+                        <div className="meta-item">
+                          <FaClock />
+                          <span>{recipe.time}</span>
+                        </div>
+                        <div className="meta-item">
+                          <FaStar />
+                          <span>{recipe.rating}</span>
+                        </div>
+                        <div className="meta-item">
+                          <FaUtensils />
+                          <span>{recipe.difficulty}</span>
+                        </div>
+                      </div>
+                      <div className="card-footer">
+                        <span className="likes-count">
+                          {recipe.likes} lượt thích
+                        </span>
+                        <Link
+                          to={`/recipes/${recipe.id}`}
+                          className="cta-button"
+                        >
+                          Xem công thức
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            <div className="pagination-section">
+              <div className="pagination-info">
+                <span>Hiển thị {pageSize} công thức mỗi trang</span>
+              </div>
+              <div className="pagination-controls">
+                <div className="page-size-selector">
+                  <span>Số dòng/trang:</span>
+                  <Select
+                    value={pageSize}
+                    onChange={(val) => {
+                      setPageSize(val);
+                      setPage(0);
+                    }}
+                  >
+                    {PAGE_SIZE_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+                <Pagination
+                  current={page + 1}
+                  pageSize={pageSize}
+                  total={totalPages}
+                  showSizeChanger={false}
+                  onChange={(p) => setPage(p - 1)}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

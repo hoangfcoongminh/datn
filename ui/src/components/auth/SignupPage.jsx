@@ -18,7 +18,7 @@ const SignupPage = ({ onSignup }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password || !confirmPassword || !email || !fullName) {
+    if (!username || !password || !confirmPassword || !fullName) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
@@ -154,7 +154,7 @@ const SignupPage = ({ onSignup }) => {
               Đã có tài khoản? Đăng nhập
             </Link>
             
-            <Link to="/" className="auth-nav-btn home">
+            <Link to="/home" className="auth-nav-btn home">
               <FaHome />
               Về trang chủ
             </Link>
