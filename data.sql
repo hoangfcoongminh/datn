@@ -63,7 +63,7 @@ VALUES
 -- ========================
 -- RECIPES
 -- ========================
-INSERT INTO recipes (category_id, author_id, title, description, prep_time, cook_time, servings, created_at, created_by, status, version)
+INSERT INTO recipes (category_id, author_username, title, description, prep_time, cook_time, servings, created_at, created_by, status, version)
 VALUES 
   (1, 1, 'Bánh kếp chuối', 'Bánh mềm xốp từ chuối', 0.25, 0.5, 2, NOW(), 'system', 1, 0),
   (2, 3, 'Sữa chua cam', 'Thức uống mát lạnh từ cam và sữa chua', 0.1, 0.0, 1, NOW(), 'system', 1, 0),
