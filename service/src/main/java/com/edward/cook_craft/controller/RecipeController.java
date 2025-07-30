@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -50,10 +53,11 @@ public class RecipeController {
     @PostMapping
     @Operation(summary = "Create a new recipe", description = "Add a new recipe to the system")
     public ResponseEntity<?> create(
-            @RequestBody @Valid RecipeRequest request
+            @RequestPart String jsonRequest,
+            @RequestPart(name = "img", required = false) MultipartFile img
     ) {
 //        try {
-        return ResponseUtils.handleSuccess(service.create(request));
+        return ResponseUtils.handleSuccess(service.create(jsonRequest, img));
 //        } catch (Exception e) {
 //            return ApiResponse.failure(e.getMessage());
 //        }
@@ -62,10 +66,11 @@ public class RecipeController {
     @PutMapping
     @Operation(summary = "Update a recipe", description = "Update a recipe to the system")
     public ResponseEntity<?> update(
-            @RequestBody @Valid RecipeRequest request
+            @RequestPart String jsonRequest,
+            @RequestPart(name = "img", required = false) MultipartFile img
     ) {
 //        try {
-        return ResponseUtils.handleSuccess(service.update(request));
+        return ResponseUtils.handleSuccess(service.update(jsonRequest, img));
 //        } catch (Exception e) {
 //            return ApiResponse.failure(e.getMessage());
 //        }

@@ -24,9 +24,48 @@ services:
     volumes:
       - redis-data:/data
 
+  minio:
+    image: minio/minio
+    container_name: minio-cook-craft
+    ports:
+      - "9000:9000"    # S3 API
+      - "9001:9001"    # Web Console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+
+  createbuckets:
+    image: minio/mc
+    container_name: minio-createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        echo '⏳ Waiting for MinIO...';
+        until mc alias set myminio http://minio:9000 minioadmin minioadmin 2>/dev/null; do
+          echo '❌ MinIO not ready yet. Retrying in 3s...';
+          sleep 3;
+        done;
+        echo '✅ Connected to MinIO';
+
+        echo '📁 Creating bucket: images';
+        mc mb myminio/images || true;
+
+        echo '🌐 Setting public policy...';
+        mc anonymous set download myminio/images;
+
+        echo '✅ Done creating bucket and setting public access';
+        exit 0;
+      "
+    restart: "on-failure"
+
 volumes:
   mysql_data:
   redis-data:
+  minio-data:
 
 networks:
   cook-craft-net:

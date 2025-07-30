@@ -63,7 +63,7 @@ public class CategoryService {
     }
 
     private Category validate(Long id) {
-        Optional<Category> check = repository.findByIdAndStatus(id, EntityStatus.ACTIVE.getStatus());
+        Optional<Category> check = repository.findByIdAndActive(id);
         if (check.isEmpty()) {
             throw new CustomException("category-not-exist");
         }

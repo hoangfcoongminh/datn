@@ -1,26 +1,27 @@
 package com.edward.cook_craft.dto.request;
 
+import com.edward.cook_craft.model.RecipeStep;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 
 @Getter
+@Setter
 @Valid
 public class RecipeRequest {
 
     private Long id;
 
-    @NotNull
     private Long categoryId;
 
-    @NotNull
     private Long authorId;  // ID of the user who created the recipe
 
-    @NotBlank
     private String title;
 
     private String description;
@@ -32,4 +33,8 @@ public class RecipeRequest {
     private Integer servings;   //Serve for how many people
 
     private Integer status;
+
+    private List<RecipeIngredientDetailRequest> ingredients;
+
+    private List<RecipeStepRequest> steps;
 }

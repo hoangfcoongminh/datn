@@ -8,8 +8,9 @@ import java.util.List;
 
 public interface RecipeStepRepository extends JpaRepository<RecipeStep, Long> {
 
-    @Query(value = "SELECT r.id " +
+    @Query(value = "SELECT r " +
             "FROM RecipeStep r " +
-            "WHERE r.recipeId = :recipeId")
-    List<Long> findByRecipeId(Long recipeId);
+            "WHERE r.recipeId = :recipeId " +
+            "AND r.status = 1")
+    List<RecipeStep> findByRecipeId(Long recipeId);
 }
