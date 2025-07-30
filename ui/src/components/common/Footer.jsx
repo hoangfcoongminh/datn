@@ -1,13 +1,21 @@
 import React from 'react';
+import { Layout, Typography } from 'antd';
 import './Footer.css';
 
+const { Footer: AntFooter } = Layout;
+const { Text } = Typography;
+
 const Footer = () => (
-  <footer className="main-footer">
+  <AntFooter className="main-footer" style={{ background: '#a50034', color: '#fff', textAlign: 'center', marginTop: 60, padding: '22px 0 18px 0' }}>
     <div className="footer-content">
-      <span>© {new Date().getFullYear()} CookCraft. All rights reserved.</span>
-      <span>Made with <span style={{color:'#a50034',fontWeight:700}}>&#10084;</span> by Your Team</span>
+      <Text style={{ color: '#fff', fontWeight: 500, fontSize: '1.08rem' }}>
+        © {new Date().getFullYear()} CookCraft. All rights reserved.
+      </Text>
+      <Text style={{ color: '#fff', fontWeight: 500, fontSize: '1.08rem' }}>
+        Made with <span style={{ color: '#fff', fontWeight: 700 }}>&#10084;</span> by Your Team
+      </Text>
     </div>
-  </footer>
+  </AntFooter>
 );
 
 export default Footer;

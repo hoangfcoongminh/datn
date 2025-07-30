@@ -1,17 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaUtensils, FaClock, FaStar, FaHeart, FaArrowLeft } from 'react-icons/fa';
-import { filterRecipes } from '../../api/recipe';
-import { fetchCategories } from '../../api/category';
-import { fetchIngredients } from '../../api/ingredient';
-import { Select, Pagination } from 'antd';
-import 'antd/dist/reset.css';
-import './RecipeList.css';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  FaUtensils,
+  FaClock,
+  FaStar,
+  FaHeart,
+  FaArrowLeft,
+} from "react-icons/fa";
+import { filterRecipes } from "../../api/recipe";
+import { fetchAllCategories } from "../../api/category";
+import { fetchIngredients } from "../../api/ingredient";
+import { Select, Pagination, Input } from "antd";
+import "antd/dist/reset.css";
+import "./RecipeList.css";
 
 const { Option } = Select;
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
 const RecipeList = () => {
+  const location = useLocation();
   const [recipes, setRecipes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [ingredients, setIngredients] = useState([]);
@@ -21,13 +28,20 @@ const RecipeList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   // Filter state
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCategories()
+    const params = new URLSearchParams(location.search);
+    const categoryIdFromUrl = params.get("categoryId");
+
+    if (categoryIdFromUrl) {
+      setCategoryIds([parseInt(categoryIdFromUrl)]);
+      setPage(0);
+    }
+    fetchAllCategories()
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
     fetchIngredients()
@@ -39,11 +53,17 @@ const RecipeList = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await filterRecipes({ keyword, categoryIds, ingredientIds, page, size: pageSize });
+      const data = await filterRecipes({
+        keyword,
+        categoryIds,
+        ingredientIds,
+        page,
+        size: pageSize,
+      });
       setRecipes(data.content || []);
-      setTotalPages(data.totalPages || 1);
+      setTotalPages(data.total || 1);
     } catch (err) {
-      setError(err.message || 'Lỗi khi tải công thức');
+      setError(err.message || "Lỗi khi tải công thức");
     } finally {
       setLoading(false);
     }
@@ -57,28 +77,18 @@ const RecipeList = () => {
   return (
     <div className="recipe-list-page">
       {/* Header Section */}
-      <div className="recipe-header">
-        <div className="header-content">
-          <Link to="/" className="back-link">
-            <FaArrowLeft />
-            <span>Về trang chủ</span>
-          </Link>
-          <div className="header-text">
-            <h1 className="main-title">Danh sách công thức</h1>
-            <p className="subtitle">Khám phá hàng nghìn công thức nấu ăn ngon từ cộng đồng CookCraft</p>
-          </div>
-          <button className="add-recipe-btn" style={{marginLeft: 'auto'}} onClick={() => navigate('/recipes/add')}>
-            + Thêm công thức mới
-          </button>
-        </div>
-      </div>
 
       {/* Filter Section */}
       <div className="filter-section">
         <div className="filter-container">
           <div className="filter-header">
-            <h3>Bộ lọc tìm kiếm</h3>
-            <p>Tìm kiếm công thức theo sở thích của bạn</p>
+            <button
+            className="add-recipe-btn"
+            style={{ marginLeft: "auto" }}
+            onClick={() => navigate("/recipes/add")}
+          >
+            + Thêm công thức mới
+          </button>
           </div>
           <div className="filter-content">
             <div className="filter-row">
@@ -89,12 +99,17 @@ const RecipeList = () => {
                   allowClear
                   placeholder="Chọn danh mục"
                   value={categoryIds}
-                  onChange={vals => { setCategoryIds(vals); setPage(0); }}
+                  onChange={(vals) => {
+                    setCategoryIds(vals);
+                    setPage(0);
+                  }}
                   optionFilterProp="children"
                   showSearch
                 >
-                  {categories.map(cat => (
-                    <Option key={cat.id} value={cat.id}>{cat.name}</Option>
+                  {categories.map((cat) => (
+                    <Option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </Option>
                   ))}
                 </Select>
               </div>
@@ -105,23 +120,39 @@ const RecipeList = () => {
                   allowClear
                   placeholder="Chọn nguyên liệu"
                   value={ingredientIds}
-                  onChange={vals => { setIngredientIds(vals); setPage(0); }}
+                  onChange={(vals) => {
+                    setIngredientIds(vals);
+                    setPage(0);
+                  }}
                   optionFilterProp="children"
                   showSearch
                 >
-                  {ingredients.map(ing => (
-                    <Option key={ing.id} value={ing.id}>{ing.name}</Option>
+                  {ingredients.map((ing) => (
+                    <Option key={ing.id} value={ing.id}>
+                      {ing.name}
+                    </Option>
                   ))}
                 </Select>
               </div>
               <div className="filter-group search-group">
                 <label>Tìm kiếm</label>
-                <input
+                {/* <input
+                  allowClear
                   type="text"
                   placeholder="Nhập từ khóa tìm kiếm..."
                   value={keyword}
                   onChange={e => { setKeyword(e.target.value); setPage(0); }}
                   className="search-input"
+                /> */}
+                <Input.Search
+                  allowClear
+                  placeholder="Tìm kiếm tên hoặc mô tả..."
+                  value={keyword}
+                  onChange={(e) => {
+                    setPage(0);
+                    setKeyword(e.target.value);
+                  }}
+                  style={{ maxWidth: 320 }}
                 />
               </div>
             </div>
@@ -153,12 +184,21 @@ const RecipeList = () => {
                 recipes.map((recipe) => (
                   <div key={recipe.id} className="recipe-card">
                     <div className="card-image">
-                      <img src={recipe.imgUrl || 'https://via.placeholder.com/400x250?text=No+Image'} alt={recipe.title} />
+                      <img
+                        src={
+                          recipe.imgUrl ||
+                          "https://via.placeholder.com/400x250?text=No+Image"
+                        }
+                        alt={recipe.title}
+                      />
                       <button className="like-button">
                         <FaHeart />
                       </button>
                       <div className="card-overlay">
-                        <Link to={`/recipes/${recipe.id}`} className="view-button">
+                        <Link
+                          to={`/recipes/${recipe.id}`}
+                          className="view-button"
+                        >
                           Xem chi tiết
                         </Link>
                       </div>
@@ -181,8 +221,13 @@ const RecipeList = () => {
                         </div>
                       </div>
                       <div className="card-footer">
-                        <span className="likes-count">{recipe.likes} lượt thích</span>
-                        <Link to={`/recipes/${recipe.id}`} className="cta-button">
+                        <span className="likes-count">
+                          {recipe.likes} lượt thích
+                        </span>
+                        <Link
+                          to={`/recipes/${recipe.id}`}
+                          className="cta-button"
+                        >
                           Xem công thức
                         </Link>
                       </div>
@@ -202,19 +247,24 @@ const RecipeList = () => {
                   <span>Số dòng/trang:</span>
                   <Select
                     value={pageSize}
-                    onChange={val => { setPageSize(val); setPage(0); }}
+                    onChange={(val) => {
+                      setPageSize(val);
+                      setPage(0);
+                    }}
                   >
-                    {PAGE_SIZE_OPTIONS.map(opt => (
-                      <Option key={opt} value={opt}>{opt}</Option>
+                    {PAGE_SIZE_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
                     ))}
                   </Select>
                 </div>
                 <Pagination
                   current={page + 1}
                   pageSize={pageSize}
-                  total={totalPages * pageSize}
+                  total={totalPages}
                   showSizeChanger={false}
-                  onChange={p => setPage(p - 1)}
+                  onChange={(p) => setPage(p - 1)}
                 />
               </div>
             </div>

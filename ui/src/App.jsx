@@ -13,6 +13,7 @@ import Loading from './components/common/Loading';
 import { Header, Footer } from './components/common';
 import { AddRecipePage } from './components/recipes';
 import { EditRecipePage } from './components/recipes';
+import { CategoryPage } from './components/category';
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -41,21 +42,21 @@ function AppContent() {
     const userData = { username, ...data };
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    navigate('/');
+    navigate('/home');
   };
 
   const handleSignup = (username, data) => {
     const userData = { username, ...data };
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    navigate('/');
+    navigate('/home');
   };
 
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/');
+    navigate('/home');
   };
 
   const handleLoginClick = () => {
@@ -71,7 +72,7 @@ function AppContent() {
   }
 
   const handleHeaderNavigate = (key) => {
-    if (key === 'home') navigate('/');
+    if (key === 'home') navigate('/home');
     else if (key === 'category') navigate('/categories');
     else if (key === 'ingredient') navigate('/ingredients');
     else if (key === 'recipe') navigate('/recipes');
@@ -92,7 +93,7 @@ function AppContent() {
       />
       <Routes>
         <Route 
-          path="/" 
+          path="/home" 
           element={
             <HomePage 
               user={user} 
@@ -106,7 +107,7 @@ function AppContent() {
           path="/login" 
           element={
             user ? (
-              <Navigate to="/" replace />
+              <Navigate to="/home" replace />
             ) : (
               <LoginPage onLogin={handleLogin} />
             )
@@ -116,12 +117,14 @@ function AppContent() {
           path="/signup" 
           element={
             user ? (
-              <Navigate to="/" replace />
+              <Navigate to="/home" replace />
             ) : (
               <SignupPage onSignup={handleSignup} />
             )
           } 
         />
+        <Route path="/categories" element={<CategoryPage />} />
+        <Route path="/categories" element={<CategoryPage />} />
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />

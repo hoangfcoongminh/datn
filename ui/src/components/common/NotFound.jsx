@@ -10,7 +10,7 @@ const NotFound = () => (
       <p className="not-found-description">
         Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.
       </p>
-      <Link to="/" className="not-found-button">
+      <Link to="/home" className="not-found-button">
         Về trang chủ
       </Link>
     </div>
