@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Button, message } from "antd";
 import {
   FaUtensils,
   FaClock,
@@ -32,6 +33,7 @@ const RecipeList = () => {
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -81,16 +83,26 @@ const RecipeList = () => {
       {/* Filter Section */}
       <div className="filter-section">
         <div className="filter-container">
-          <div className="filter-header">
-            <button
-            className="add-recipe-btn"
-            style={{ marginLeft: "auto" }}
-            onClick={() => navigate("/recipes/add")}
-          >
-            + Thêm công thức mới
-          </button>
+          <div className="filter-header" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              type="primary"
+              style={{ background: '#a50034', borderColor: '#a50034', fontWeight: 600 }}
+              onClick={() => {
+                if (user && (user.user.role === 'USER' || user.user.role === 'ADMIN')) {
+                  navigate("/recipes/add");
+                } else {
+                  message.warning({
+                    content: 'Bạn phải đăng nhập để thêm công thức mới!',
+                    duration: 5
+                  });
+                  setTimeout(() => navigate('/login'), 1200);
+                }
+              }}
+            >
+              + Thêm công thức mới
+            </Button>
           </div>
-          <div className="filter-content">
+          <div className="filter-content border">
             <div className="filter-row">
               <div className="filter-group">
                 <label>Danh mục</label>

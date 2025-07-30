@@ -55,30 +55,16 @@ export async function signup({ username, password, confirmPassword, fullName, em
   return data.data;
 }
 
-export async function logout(token) {
+// Logout API
+export async function logout() {
+  const token = localStorage.getItem('token');
   const res = await fetch('http://localhost:8080/api/authentic/logout', {
     method: 'POST',
-    headers: { 
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
+    },
   });
-  let data;
-  try {
-    data = await res.json();
-  } catch {
-    throw { message: 'Lỗi không xác định từ máy chủ.' };
-  }
-  if (!res.ok || !data.success) {
-    let err = { message: 'Đăng xuất thất bại.' };
-    if (Array.isArray(data.message)) {
-      err = { message: data.message };
-    } else if (data.message) {
-      err = { message: data.message };
-    } else if (data.error) {
-      err = { message: data.error };
-    }
-    throw err;
-  }
-  return data.data;
+  // Không cần xử lý response, chỉ cần gọi
+  return res.ok;
 }

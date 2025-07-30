@@ -17,14 +17,8 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
     { key: 'category', label: 'Category' },
     { key: 'ingredient', label: 'Ingredient' },
     { key: 'recipe', label: 'Recipe' },
+    { key: 'myrecipe', label: 'My Recipe' },
   ];
-
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="account" onClick={onAccount}>Quản lý tài khoản</Menu.Item>
-      <Menu.Item key="logout" onClick={onLogout}>Đăng xuất</Menu.Item>
-    </Menu>
-  );
 
   return (
     <AntHeader className="main-header" style={{ background: '#fff', boxShadow: '0 2px 12px rgba(165,0,52,0.07)', padding: 0 }}>
@@ -54,7 +48,10 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
             <Badge count={0} size="small">
               <Button type="text" icon={<BellOutlined style={{ fontSize: 20, color: '#a50034' }} />} />
             </Badge>
-            <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
+            <Dropdown menu={{ items: [
+              { key: 'account', label: <span onClick={onAccount}>Quản lý tài khoản</span> },
+              { key: 'logout', label: <span onClick={onLogout}>Đăng xuất</span> }
+            ] }} placement="bottomRight" trigger={["click"]}>
               <Button type="text" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Avatar icon={<UserOutlined />} style={{ background: '#a50034' }} />
                 <DownOutlined style={{ color: '#a50034', fontSize: 12 }} />

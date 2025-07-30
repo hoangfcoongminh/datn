@@ -11,6 +11,7 @@ import RecipeDetail from './components/recipes/RecipeDetail';
 import NotFound from './components/common/NotFound';
 import Loading from './components/common/Loading';
 import { Header, Footer } from './components/common';
+import { logout as apiLogout } from './api/auth';
 import { AddRecipePage } from './components/recipes';
 import { EditRecipePage } from './components/recipes';
 import { CategoryPage } from './components/category';
@@ -52,7 +53,10 @@ function AppContent() {
     navigate('/home');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiLogout();
+    } catch {}
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -128,7 +132,7 @@ function AppContent() {
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />
-        <Route path="/recipes/:id/edit" element={<EditRecipePage />} />
+        <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

@@ -31,7 +31,7 @@ const AddRecipePage = () => {
       const user = JSON.parse(localStorage.getItem('user'));
       const recipe = {
         categoryId: values.categoryId,
-        authorId: user?.id || 1,
+        authorUsername: user?.user.username || 'system',
         title: values.title,
         description: values.description,
         prepTime: values.prepTime,

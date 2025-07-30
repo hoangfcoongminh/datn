@@ -48,7 +48,7 @@ const RecipeDetail = () => {
   };
 
   const user = JSON.parse(localStorage.getItem('user'));
-  const isAuthor = user && recipe && recipe.authorId === user.id;
+  const isAuthor = user && recipe && recipe.authorUsername === user.user.username;
 
   if (loading) {
     return <div className="recipe-detail-container"><div className="loading-state">Đang tải chi tiết công thức...</div></div>;
@@ -89,7 +89,9 @@ const RecipeDetail = () => {
               </div>
             </div>
             {isAuthor && (
-              <Button type="primary" style={{ marginTop: 16 }} onClick={() => navigate(`/recipes/${id}/edit`)}>
+              <Button type="primary" 
+              style={{ background: '#a50034', borderColor: '#a50034', fontWeight: 600, width: 'fit-content', marginTop: 16 }}
+              onClick={() => navigate(`/recipes/edit/${id}`)}>
                 Sửa công thức
               </Button>
             )}

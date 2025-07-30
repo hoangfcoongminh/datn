@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Form, Input, InputNumber, Button, Select, Space, Card } from 'antd';
-import { fetchCategories } from '../../api/category';
+import { fetchAllCategories } from '../../api/category';
 import { fetchIngredients } from '../../api/ingredient';
 import { fetchUnits } from '../../api/unit';
 import { getRecipeDetail, updateRecipe } from '../../api/recipe';
@@ -27,7 +27,7 @@ const EditRecipePage = () => {
       try {
         const [recipe, cats, ings, uns] = await Promise.all([
           getRecipeDetail(id),
-          fetchCategories(),
+          fetchAllCategories(),
           fetchIngredients(),
           fetchUnits()
         ]);
@@ -37,22 +37,24 @@ const EditRecipePage = () => {
           setError('Bạn không có quyền sửa công thức này.');
         } else {
           setCanEdit(true);
-          // Đổ dữ liệu vào form
-          form.setFieldsValue({
-            ...recipe,
-            ingredients: (recipe.recipeIngredients || []).map(ing => ({
-              ingredientId: ing.ingredientId,
-              actualUnitId: ing.actualUnitId,
-              quantity: ing.quantity
-            })),
-            steps: (recipe.recipeSteps || []).sort((a, b) => a.stepNumber - b.stepNumber).map(step => ({
-              stepInstruction: step.stepInstruction
-            }))
-          });
+          // Đổ dữ liệu vào form, chỉ khi form đã mount và recipe hợp lệ
+          if (form && recipe) {
+            form.setFieldsValue({
+              ...recipe,
+              ingredients: (recipe.recipeIngredients || []).map(ing => ({
+                ingredientId: ing.ingredientId,
+                actualUnitId: ing.actualUnitId,
+                quantity: ing.quantity
+              })),
+              steps: (recipe.recipeSteps || []).sort((a, b) => a.stepNumber - b.stepNumber).map(step => ({
+                stepInstruction: step.stepInstruction
+              }))
+            });
+          }
         }
-        setCategories(cats);
-        setIngredients(ings);
-        setUnits(uns);
+        setCategories(Array.isArray(cats) ? cats : []);
+        setIngredients(Array.isArray(ings) ? ings : []);
+        setUnits(Array.isArray(uns) ? uns : []);
       } catch (err) {
         setError(err.message || 'Lỗi khi tải dữ liệu.');
       } finally {
@@ -71,7 +73,7 @@ const EditRecipePage = () => {
       const recipe = {
         id: Number(id),
         categoryId: values.categoryId,
-        authorId: user?.id,
+        authorUsername: user?.username,
         title: values.title,
         description: values.description,
         prepTime: values.prepTime,
@@ -112,7 +114,7 @@ const EditRecipePage = () => {
           </Form.Item>
           <Form.Item label="Danh mục" name="categoryId" required>
             <Select placeholder="Chọn danh mục">
-              {categories.map(cat => (
+              {Array.isArray(categories) && categories.map(cat => (
                 <Option key={cat.id} value={cat.id}>{cat.name}</Option>
               ))}
             </Select>

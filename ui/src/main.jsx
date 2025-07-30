@@ -3,9 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import 'antd/dist/reset.css'
 import App from './App.jsx'
+import { ConfigProvider } from 'antd';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  // <StrictMode>
+    <ConfigProvider>
+      <App />
+    </ConfigProvider>,
+  {/* </StrictMode>, */}
 )
