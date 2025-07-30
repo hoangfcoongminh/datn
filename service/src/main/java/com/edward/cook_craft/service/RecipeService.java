@@ -18,6 +18,7 @@ import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +26,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
@@ -58,10 +61,10 @@ public class RecipeService {
         String keyword = request.getKeyword() == null || request.getKeyword().isEmpty() ? null : request.getKeyword().toLowerCase();
         List<Long> categoryIds = request.getCategoryIds() == null || request.getCategoryIds().isEmpty() ? null : request.getCategoryIds();
         List<Long> ingredientIds = request.getIngredientIds() == null || request.getIngredientIds().isEmpty() ? null : request.getIngredientIds();
-        List<Long> authorIds = request.getAuthorIds() == null || request.getAuthorIds().isEmpty() ? null : request.getAuthorIds();
+        List<String> authorUsernames = request.getAuthorUsernames() == null || request.getAuthorUsernames().isEmpty() ? null : request.getAuthorUsernames();
 
         Page<Recipe> data = repository.filter(
-                keyword, categoryIds, ingredientIds, authorIds, pageable);
+                keyword, categoryIds, ingredientIds, authorUsernames, pageable);
         return pageMapper.map(data, recipeMapper::toResponse);
     }
 
@@ -130,7 +133,10 @@ public class RecipeService {
     public RecipeResponse update(String jsonRequest, MultipartFile file) {
         RecipeRequest request = recipeMapper.mapStringRequest(jsonRequest);
         validateRecipeRequest(request);
-        if (Objects.equals(Objects.requireNonNull(SecurityUtils.getCurrentUser()).getId(), request.getAuthorId())) {
+//        log.info("Username now: " + SecurityUtils.getCurrentUsername());
+        log.info("Ingredients received: {}", request.getIngredients().size());
+        log.info("Steps received: {}", request.getSteps().size());
+        if (!Objects.equals(SecurityUtils.getCurrentUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();
@@ -148,7 +154,7 @@ public class RecipeService {
             throw new CustomException("category.cannot.null.or.not.found");
         }
 
-        if (request.getAuthorId() == null || userRepository.findByIdAndActive(request.getAuthorId()).isEmpty()) {
+        if (request.getAuthorUsername() == null || userRepository.findByUsername(request.getAuthorUsername()).isEmpty()) {
             throw new CustomException("user.not.found");
         }
 
@@ -163,12 +169,15 @@ public class RecipeService {
             } else {
                 existIngredients.add(i.getIngredientId());
             }
+            if (i.getQuantity() == null || i.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new CustomException("ingredient.quantity.cannot.empty");
+            }
         });
+
     }
 
     private void updateRecipeData(Recipe r, RecipeRequest request, MultipartFile file) {
         r.setCategoryId(request.getCategoryId());
-        r.setAuthorId(request.getAuthorId());
         r.setTitle(request.getTitle());
         r.setDescription(request.getDescription());
         r.setPrepTime(request.getPrepTime());
@@ -185,7 +194,7 @@ public class RecipeService {
         updateRecipeStep(r.getId(), request.getSteps());
     }
 
-    private List<RecipeIngredientDetailResponse> updateRecipeIngredient(Long recipeId, List<RecipeIngredientDetailRequest> ingredients) {
+    private void updateRecipeIngredient(Long recipeId, List<RecipeIngredientDetailRequest> ingredients) {
         var ingredientMap = ingredients.stream().collect(Collectors.toMap(RecipeIngredientDetailRequest::getIngredientId, i -> i));
         List<Long> ingredientIds = ingredients.stream().map(RecipeIngredientDetailRequest::getIngredientId).toList();
 
@@ -213,6 +222,7 @@ public class RecipeService {
 
             var ingredient = recipeIngredientDetailMapper.of(ingredientMap.get(id));
             ingredient.setId(null);
+            ingredient.setRecipeId(recipeId);
             return ingredient;
         }).toList();
         var savedNewIngredients = recipeIngredientDetailRepository.saveAll(newIngredients);
@@ -233,13 +243,9 @@ public class RecipeService {
             return existingIngredient;
         }).toList();
         recipeIngredientDetailRepository.saveAll(deleteIngredients);
-
-        return Stream.concat(savedNewIngredients.stream(), savedUpdateIngredients.stream())
-                .map(recipeIngredientDetailMapper::toResponse)
-                .collect(Collectors.toList());
     }
 
-    private List<RecipeStepResponse> updateRecipeStep(Long recipeId, List<RecipeStepRequest> steps) {
+    private void updateRecipeStep(Long recipeId, List<RecipeStepRequest> steps) {
         List<RecipeStep> existingSteps = recipeStepRepository.findByRecipeId(recipeId);
         steps.sort(Comparator.comparing(RecipeStepRequest::getStepNumber));
         existingSteps.sort(Comparator.comparing(RecipeStep::getStepNumber));
@@ -252,10 +258,18 @@ public class RecipeService {
             if (i + 1 > existingStepCount) {
                 var step = recipeStepMapper.of(steps.get(i));
                 step.setId(null);
+                step.setRecipeId(recipeId);
                 newStep.add(step);
             } else {
                 var step = existingSteps.get(i);
                 step.setStepInstruction(steps.get(i).getStepInstruction());
+                updateStep.add(step);
+            }
+        }
+        if (newStepCount < existingStepCount) {
+            for (int i = newStepCount; i < existingStepCount; i++) {
+                var step = existingSteps.get(i);
+                step.setStatus(EntityStatus.IN_ACTIVE.getStatus());
                 updateStep.add(step);
             }
         }
@@ -267,8 +281,5 @@ public class RecipeService {
         if (!updateStep.isEmpty()) {
             savedUpdateStep = recipeStepRepository.saveAll(updateStep);
         }
-        return Stream.concat(savedNewStep.stream(), savedUpdateStep.stream())
-                .map(recipeStepMapper::toResponse)
-                .collect(Collectors.toList());
     }
 }

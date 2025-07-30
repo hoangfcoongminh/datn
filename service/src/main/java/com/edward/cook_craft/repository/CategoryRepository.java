@@ -19,12 +19,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query(value = "SELECT c " +
             "FROM Category c " +
-            "WHERE (:id IS NULL OR :id = c.id) " +
-            "AND (:name IS NULL OR c.name LIKE CONCAT('%', :name, '%')) " +
-            "AND (:description IS NULL OR c.description LIKE CONCAT('%', :description, '%')) " +
+            "WHERE (:search IS NULL OR LOWER(c.name) LIKE CONCAT('%', :search, '%')) " +
+            "OR (:search IS NULL OR LOWER(c.description) LIKE CONCAT('%', :search, '%')) " +
             "AND c.status = 1")
-    Page<Category> filter(@Param("id") Long id,
-                          @Param("name") String name,
-                          @Param("description") String description,
+    Page<Category> filter(@Param("search") String search,
                           Pageable pageable);
 }

@@ -34,11 +34,10 @@ public class CategoryService {
     }
 
     public PagedResponse<CategoryResponse> filter(CategoryRequest request, Pageable pageable) {
-        Long id = (request.getId() != null) ? request.getId() : null; // ??
-        String name = (request.getName() != null) ? request.getName().toLowerCase() : null;
-        String description = (request.getDescription() != null) ? request.getDescription().toLowerCase() : null;
 
-        Page<Category> data = repository.filter(id, name, description, pageable);
+        String search = (request.getSearch() != null) ? request.getSearch().toLowerCase() : null;
+
+        Page<Category> data = repository.filter(search, pageable);
         return pageMapper.map(data, mapper::toResponse);
     }
 
