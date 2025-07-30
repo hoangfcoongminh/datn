@@ -18,6 +18,7 @@ import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,11 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
+
+    @Value("${minio.url}")
+    private String minioUrl;
+    @Value("${minio.bucket}")
+    private String minioBucket;
 
     private final RecipeRepository repository;
     private final CategoryRepository categoryRepository;
@@ -90,6 +96,8 @@ public class RecipeService {
         recipe.setId(null);
         if (file != null && !file.isEmpty()) {
             recipe.setImgUrl(minioService.uploadFile(file));
+        } else {
+            recipe.setImgUrl(minioUrl + "/" + minioBucket + "/default.jpg");
         }
         Recipe finalRecipe = repository.save(recipe);
 
