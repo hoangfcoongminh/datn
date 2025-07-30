@@ -31,4 +31,6 @@ public class RecipeResponse extends BaseResponse {
     private BigDecimal cookTime;
 
     private Integer servings;   //Serve for how many people
+
+    private String imgUrl;
 }

@@ -1,25 +1,32 @@
 package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
+import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
-import com.edward.cook_craft.dto.response.PagedResponse;
-import com.edward.cook_craft.dto.response.RecipeDetailResponse;
-import com.edward.cook_craft.dto.response.RecipeResponse;
+import com.edward.cook_craft.dto.request.RecipeStepRequest;
+import com.edward.cook_craft.dto.response.*;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.PageMapper;
+import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
+import com.edward.cook_craft.mapper.RecipeStepMapper;
 import com.edward.cook_craft.model.Recipe;
+import com.edward.cook_craft.model.RecipeIngredientDetail;
+import com.edward.cook_craft.model.RecipeStep;
 import com.edward.cook_craft.repository.*;
+import com.edward.cook_craft.service.minio.MinioService;
+import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +39,9 @@ public class RecipeService {
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
     private final PageMapper pageMapper;
+    private final MinioService minioService;
+    private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
+    private final RecipeStepMapper recipeStepMapper;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
@@ -57,45 +67,98 @@ public class RecipeService {
         Recipe recipeData = recipe.get();
         RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
 
-        List<Long> recipeIngredientIds = recipeIngredientDetailRepository.findByRecipeId(id);
-        List<Long> recipeStepIds = recipeStepRepository.findByRecipeId(id);
-        response.setRecipeIngredientIds(recipeIngredientIds);
-        response.setRecipeStepIds(recipeStepIds);
+        List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
+        var recipeIngredientResponses = recipeIngredients.stream()
+                .map(recipeIngredientDetailMapper::toResponse).toList();
+        List<RecipeStep> recipeSteps = recipeStepRepository.findByRecipeId(id);
+        var recipeStepResponses = recipeSteps.stream()
+                .map(recipeStepMapper::toResponse).toList();
+
+        response.setRecipeIngredients(recipeIngredientResponses);
+        response.setRecipeSteps(recipeStepResponses);
         return response;
     }
 
     @Transactional
-    public RecipeResponse create(RecipeRequest request) {
+    public RecipeDetailResponse create(String jsonRequest, MultipartFile file) {
+        RecipeRequest request = recipeMapper.mapStringRequest(jsonRequest);
         validateRecipeRequest(request);
-        Recipe recipe = recipeMapper.of(request);
+        var ingredients = request.getIngredients();
+        var steps = request.getSteps();
 
-        return recipeMapper.toResponse(repository.save(recipe));
+        Recipe recipe = recipeMapper.of(request);
+        recipe.setId(null);
+        if (file != null && !file.isEmpty()) {
+            recipe.setImgUrl(minioService.uploadFile(file));
+        }
+        Recipe finalRecipe = repository.save(recipe);
+
+        var savedIngredients = ingredients.stream().map(i -> {
+            RecipeIngredientDetail ingredient = new RecipeIngredientDetail();
+            ingredient.setRecipeId(finalRecipe.getId());
+            ingredient.setIngredientId(i.getIngredientId());
+            ingredient.setActualUnitId(i.getActualUnitId());
+            ingredient.setQuantity(i.getQuantity());
+
+            return ingredient;
+        }).toList();
+
+        var savedSteps = steps.stream().map(s -> {
+            RecipeStep recipeStep = new RecipeStep();
+            recipeStep.setRecipeId(finalRecipe.getId());
+            recipeStep.setStepNumber(s.getStepNumber());
+            recipeStep.setStepInstruction(s.getStepInstruction());
+
+            return recipeStep;
+        }).toList();
+
+        recipeIngredientDetailRepository.saveAll(savedIngredients);
+        recipeStepRepository.saveAll(savedSteps);
+
+        return details(finalRecipe.getId());
     }
 
     @Transactional
-    public RecipeResponse update(RecipeRequest request) {
+    public RecipeResponse update(String jsonRequest, MultipartFile file) {
+        RecipeRequest request = recipeMapper.mapStringRequest(jsonRequest);
         validateRecipeRequest(request);
-        Recipe recipe = repository.findById(request.getId()).get();
-        setData(recipe, request);
+        if (Objects.equals(Objects.requireNonNull(SecurityUtils.getCurrentUser()).getId(), request.getAuthorId())) {
+            throw new CustomException("you.are.not.authorized");
+        }
+        Recipe recipe = repository.getByIdAndActive(request.getId()).get();
+        updateRecipeData(recipe, request, file);
 
-        return recipeMapper.toResponse(repository.save(recipe));
+        return details(recipe.getId());
     }
 
     private void validateRecipeRequest(RecipeRequest request) {
-        if (request.getId() != null && !repository.existsById(request.getId())) {
+        if (request.getId() != null && repository.getByIdAndActive(request.getId()).isEmpty()) {
             throw new CustomException("recipe-not-found");
         }
 
-        if (categoryRepository.findByIdAndStatus(request.getCategoryId(), EntityStatus.ACTIVE.getStatus()).isEmpty()) {
-            throw new CustomException("category-not-found");
+        if (request.getCategoryId() == null || categoryRepository.findByIdAndActive(request.getCategoryId()).isEmpty()) {
+            throw new CustomException("category.cannot.null.or.not.found");
         }
 
-        if (userRepository.findById(request.getAuthorId()).isEmpty()) {
-            throw new CustomException("user-not-found");
+        if (request.getAuthorId() == null || userRepository.findByIdAndActive(request.getAuthorId()).isEmpty()) {
+            throw new CustomException("user.not.found");
         }
+
+        if (request.getTitle() == null || request.getTitle().isEmpty()) {
+            throw new CustomException("recipe.title.cannot.empty");
+        }
+        var existIngredients = new ArrayList<>();
+        var recipeIngredients = request.getIngredients();
+        recipeIngredients.forEach(i -> {
+            if (existIngredients.contains(i.getIngredientId())) {
+                throw new CustomException("ingredient.cannot.duplicate");
+            } else {
+                existIngredients.add(i.getIngredientId());
+            }
+        });
     }
 
-    private void setData(Recipe r, RecipeRequest request) {
+    private void updateRecipeData(Recipe r, RecipeRequest request, MultipartFile file) {
         r.setCategoryId(request.getCategoryId());
         r.setAuthorId(request.getAuthorId());
         r.setTitle(request.getTitle());
@@ -104,6 +167,100 @@ public class RecipeService {
         r.setCookTime(request.getCookTime());
         r.setServings(request.getServings());
         r.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
+        if (file != null && !file.isEmpty()) {
+            if (r.getImgUrl() != null) {
+                minioService.deleteFile(r.getImgUrl());
+            }
+            r.setImgUrl(minioService.uploadFile(file));
+        }
+        updateRecipeIngredient(r.getId(), request.getIngredients());
+        updateRecipeStep(r.getId(), request.getSteps());
+    }
 
+    private List<RecipeIngredientDetailResponse> updateRecipeIngredient(Long recipeId, List<RecipeIngredientDetailRequest> ingredients) {
+        var ingredientMap = ingredients.stream().collect(Collectors.toMap(RecipeIngredientDetailRequest::getIngredientId, i -> i));
+        List<Long> ingredientIds = ingredients.stream().map(RecipeIngredientDetailRequest::getIngredientId).toList();
+
+        var ingredientList = recipeIngredientDetailRepository.findByRecipeId(recipeId)
+                .stream().collect(Collectors.toMap(RecipeIngredientDetail::getIngredientId, i -> i));
+        var ingredientIdList = new ArrayList<>(ingredientList.keySet());
+
+        var newIngredientIds = new ArrayList<Long>();
+        var updateIngredientIds = new ArrayList<Long>();
+        var deletedIngredientIds = new ArrayList<Long>();
+
+        ingredientIds.forEach(i -> {
+            if (ingredientIdList.contains(i)) {
+                updateIngredientIds.add(i);
+            } else {
+                newIngredientIds.add(i);
+            }
+        });
+        ingredientIdList.forEach(i -> {
+            if (!ingredientIds.contains(i)) {
+                deletedIngredientIds.add(i);
+            }
+        });
+        var newIngredients = newIngredientIds.stream().map(id -> {
+
+            var ingredient = recipeIngredientDetailMapper.of(ingredientMap.get(id));
+            ingredient.setId(null);
+            return ingredient;
+        }).toList();
+        var savedNewIngredients = recipeIngredientDetailRepository.saveAll(newIngredients);
+
+        var updateIngredients = updateIngredientIds.stream().map(id -> {
+
+            var existingIngredient = ingredientList.get(id);
+            var updateIngredient = ingredientMap.get(id);
+            existingIngredient.setActualUnitId(updateIngredient.getActualUnitId());
+            existingIngredient.setQuantity(updateIngredient.getQuantity());
+            return existingIngredient;
+        }).toList();
+        var savedUpdateIngredients = recipeIngredientDetailRepository.saveAll(updateIngredients);
+
+        var deleteIngredients = deletedIngredientIds.stream().map(id -> {
+            var existingIngredient = ingredientList.get(id);
+            existingIngredient.setStatus(EntityStatus.IN_ACTIVE.getStatus());
+            return existingIngredient;
+        }).toList();
+        recipeIngredientDetailRepository.saveAll(deleteIngredients);
+
+        return Stream.concat(savedNewIngredients.stream(), savedUpdateIngredients.stream())
+                .map(recipeIngredientDetailMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    private List<RecipeStepResponse> updateRecipeStep(Long recipeId, List<RecipeStepRequest> steps) {
+        List<RecipeStep> existingSteps = recipeStepRepository.findByRecipeId(recipeId);
+        steps.sort(Comparator.comparing(RecipeStepRequest::getStepNumber));
+        existingSteps.sort(Comparator.comparing(RecipeStep::getStepNumber));
+        int newStepCount = steps.size(), existingStepCount = existingSteps.size();
+
+        var newStep = new ArrayList<RecipeStep>();
+        var updateStep = new ArrayList<RecipeStep>();
+
+        for (int i = 0; i < newStepCount; i++) {
+            if (i + 1 > existingStepCount) {
+                var step = recipeStepMapper.of(steps.get(i));
+                step.setId(null);
+                newStep.add(step);
+            } else {
+                var step = existingSteps.get(i);
+                step.setStepInstruction(steps.get(i).getStepInstruction());
+                updateStep.add(step);
+            }
+        }
+        List<RecipeStep> savedNewStep = new ArrayList<>();
+        if (!newStep.isEmpty()) {
+            savedNewStep = recipeStepRepository.saveAll(newStep);
+        }
+        List<RecipeStep> savedUpdateStep = new ArrayList<>();
+        if (!updateStep.isEmpty()) {
+            savedUpdateStep = recipeStepRepository.saveAll(updateStep);
+        }
+        return Stream.concat(savedNewStep.stream(), savedUpdateStep.stream())
+                .map(recipeStepMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

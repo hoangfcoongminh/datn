@@ -11,7 +11,11 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<Category> findByIdAndStatus(Long id, Integer status);
+    @Query(value = "SELECT c " +
+            "FROM Category c " +
+            "WHERE c.id = :id " +
+            "AND c.status = 1 ")
+    Optional<Category> findByIdAndActive(@Param("id") Long id);
 
     @Query(value = "SELECT c " +
             "FROM Category c " +

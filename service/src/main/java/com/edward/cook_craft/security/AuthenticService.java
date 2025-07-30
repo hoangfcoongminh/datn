@@ -75,12 +75,15 @@ public class AuthenticService {
             throw new CustomException("confirm.password.invalid");
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.findByUsername(request.getUsername()).isEmpty()) {
             throw new CustomException("user.name.exists");
         }
     }
 
     private void validateLogin(LoginRequest request) {
+        if (userRepository.findByUsername(request.getUsername()).isEmpty()) {
+            throw new CustomException("user.not.found");
+        }
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

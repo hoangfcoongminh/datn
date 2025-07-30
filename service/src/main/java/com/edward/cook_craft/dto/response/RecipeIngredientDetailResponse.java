@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @SuperBuilder
-public class RecipeIngredientDetailResponse extends BaseResponse {
+public class RecipeIngredientDetailResponse {
 
     private Long id;
 

@@ -2,11 +2,19 @@ package com.edward.cook_craft.mapper;
 
 import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.dto.response.RecipeResponse;
+import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.model.Recipe;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class RecipeMapper {
+
+    private final ObjectMapper objectMapper;
 
     public RecipeResponse toResponse(Recipe recipe) {
         return RecipeResponse.builder()
@@ -18,6 +26,7 @@ public class RecipeMapper {
                 .prepTime(recipe.getPrepTime())
                 .cookTime(recipe.getCookTime())
                 .servings(recipe.getServings())
+                .imgUrl(recipe.getImgUrl())
                 .createdAt(recipe.getCreatedAt())
                 .createdBy(recipe.getCreatedBy())
                 .modifiedAt(recipe.getModifiedAt())
@@ -37,5 +46,13 @@ public class RecipeMapper {
                 .cookTime(request.getCookTime())
                 .servings(request.getServings())
                 .build();
+    }
+
+    public RecipeRequest mapStringRequest(String jsonRequest) {
+        try {
+            return objectMapper.readValue(jsonRequest, RecipeRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new CustomException("fail.to.map.json " + e.getMessage());
+        }
     }
 }
