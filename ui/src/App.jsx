@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import './App.css';
+// import './App.css';
 
 // Import components
 import LoginPage from './components/auth/LoginPage';
@@ -10,6 +10,9 @@ import RecipeList from './components/recipes/RecipeList';
 import RecipeDetail from './components/recipes/RecipeDetail';
 import NotFound from './components/common/NotFound';
 import Loading from './components/common/Loading';
+import { Header, Footer } from './components/common';
+import { AddRecipePage } from './components/recipes';
+import { EditRecipePage } from './components/recipes';
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -67,43 +70,66 @@ function AppContent() {
     return <Loading />;
   }
 
+  const handleHeaderNavigate = (key) => {
+    if (key === 'home') navigate('/');
+    else if (key === 'category') navigate('/categories');
+    else if (key === 'ingredient') navigate('/ingredients');
+    else if (key === 'recipe') navigate('/recipes');
+  };
+
+  const handleAccount = () => {
+    // Chuyển sang trang quản lý tài khoản (chưa có)
+    navigate('/account');
+  };
+
   return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <HomePage 
-            user={user} 
-            onLoginClick={handleLoginClick}
-            onSignupClick={handleSignupClick}
-            onLogout={handleLogout}
-          />
-        } 
+    <>
+      <Header
+        user={user}
+        onLogout={handleLogout}
+        onAccount={handleAccount}
+        onNavigate={handleHeaderNavigate}
       />
-      <Route 
-        path="/login" 
-        element={
-          user ? (
-            <Navigate to="/" replace />
-          ) : (
-            <LoginPage onLogin={handleLogin} />
-          )
-        } 
-      />
-      <Route 
-        path="/signup" 
-        element={
-          user ? (
-            <Navigate to="/" replace />
-          ) : (
-            <SignupPage onSignup={handleSignup} />
-          )
-        } 
-      />
-      <Route path="/recipes" element={<RecipeList />} />
-      <Route path="/recipes/:id" element={<RecipeDetail />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <HomePage 
+              user={user} 
+              onLoginClick={handleLoginClick}
+              onSignupClick={handleSignupClick}
+              onLogout={handleLogout}
+            />
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <LoginPage onLogin={handleLogin} />
+            )
+          } 
+        />
+        <Route 
+          path="/signup" 
+          element={
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <SignupPage onSignup={handleSignup} />
+            )
+          } 
+        />
+        <Route path="/recipes" element={<RecipeList />} />
+        <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="/recipes/add" element={<AddRecipePage />} />
+        <Route path="/recipes/:id/edit" element={<EditRecipePage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Footer />
+    </>
   );
 }
 
