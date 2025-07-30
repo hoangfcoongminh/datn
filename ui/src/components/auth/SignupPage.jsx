@@ -18,7 +18,7 @@ const SignupPage = ({ onSignup }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password || !confirmPassword || !email || !fullName) {
+    if (!username || !password || !confirmPassword || !fullName) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
