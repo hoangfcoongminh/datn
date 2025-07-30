@@ -14,17 +14,20 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query(value = "SELECT DISTINCT r " +
             "FROM Recipe r " +
-            "LEFT JOIN RecipeIngredientDetail rid " +
-            "ON r.id = rid.recipeId " +
-            "WHERE (:keyword IS NULL OR LOWER(CONCAT(r.title, ' ', r.description)) LIKE CONCAT('%', :keyword, '%')) " +
+//            "LEFT JOIN RecipeIngredientDetail rid " +
+//            "ON r.id = rid.recipeId " +
+            "WHERE (:keyword IS NULL OR LOWER(CONCAT(r.title, '#', COALESCE(r.description, ''))) LIKE CONCAT('%', :keyword, '%')) " +
             "AND (:categoryIds IS NULL OR r.categoryId IN :categoryIds) " +
-            "AND (:ingredientIds IS NULL OR rid.ingredientId IN :ingredientIds) " +
-            "AND (:authorIds IS NULL OR r.authorId IN :authorIds) " +
+            "AND (:authorUsernames IS NULL OR r.authorUsername IN :authorUsernames) " +
+            "AND (:ingredientIds IS NULL OR EXISTS (SELECT 1 " +
+            "                                       FROM RecipeIngredientDetail rid " +
+            "                                       WHERE rid.recipeId = r.id " +
+            "                                       AND rid.ingredientId IN :ingredientIds ))" +
             "AND r.status = 1")
     Page<Recipe> filter(@Param("keyword") String keyword,
                         @Param("categoryIds") List<Long> categoryIds,
                         @Param("ingredientIds") List<Long> ingredientIds,
-                        @Param("authorIds") List<Long> authorIds,
+                        @Param("authorUsernames") List<String> authorUsernames,
                         Pageable pageable);
 
     @Query(value = "SELECT r " +

@@ -29,7 +29,7 @@ public class Recipe extends BaseModel {
 
     private Long categoryId;
 
-    private Long authorId;  // ID of the user who created the recipe
+    private String authorUsername;  // username of the user who created the recipe
 
     private String title;
 
