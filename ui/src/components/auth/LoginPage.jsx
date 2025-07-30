@@ -106,7 +106,7 @@ const LoginPage = ({ onLogin }) => {
               Chưa có tài khoản? Đăng ký
             </Link>
             
-            <Link to="/" className="auth-nav-btn home">
+            <Link to="/home" className="auth-nav-btn home">
               <FaHome />
               Về trang chủ
             </Link>

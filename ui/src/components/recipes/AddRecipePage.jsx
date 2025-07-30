@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Input, InputNumber, Button, Form, Space, Card, Upload, message } from 'antd';
-import { fetchCategories } from '../../api/category';
+import { fetchAllCategories } from '../../api/category';
 import { fetchIngredients } from '../../api/ingredient';
 import { fetchUnits } from '../../api/unit';
 import { Link, useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ const AddRecipePage = () => {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    fetchCategories().then(setCategories).catch(() => setCategories([]));
+    fetchAllCategories().then(setCategories).catch(() => setCategories([]));
     fetchIngredients().then(setIngredients).catch(() => setIngredients([]));
     fetchUnits().then(setUnits).catch(() => setUnits([]));
   }, []);

@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
-import { FaBell, FaUserCircle, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import logo from '../../assets/react.svg'; // Đổi thành logo của bạn nếu có
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Layout, Menu, Dropdown, Avatar, Button, Space, Badge } from 'antd';
+import { BellOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
+import logo from '../../assets/react.svg';
 import './Header.css';
 
+
+const { Header: AntHeader } = Layout;
+
 const Header = ({ user, onLogout, onAccount, onNavigate }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+
+  const menuItems = [
+    { key: 'home', label: 'Trang chủ' },
+    { key: 'category', label: 'Category' },
+    { key: 'ingredient', label: 'Ingredient' },
+    { key: 'recipe', label: 'Recipe' },
+  ];
+
+  const userMenu = (
+    <Menu>
+      <Menu.Item key="account" onClick={onAccount}>Quản lý tài khoản</Menu.Item>
+      <Menu.Item key="logout" onClick={onLogout}>Đăng xuất</Menu.Item>
+    </Menu>
+  );
 
   return (
-    <header className="main-header">
-      <div className="header-left">
+    <AntHeader className="main-header" style={{ background: '#fff', boxShadow: '0 2px 12px rgba(165,0,52,0.07)', padding: 0 }}>
+      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
         <img
           src={logo}
           alt="logo"
@@ -16,27 +36,39 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
           onClick={() => onNavigate('home')}
           style={{ cursor: 'pointer' }}
         />
-        <button className="header-btn" onClick={() => onNavigate('home')}>Trang chủ</button>
-        <button className="header-btn" onClick={() => onNavigate('category')}>Category</button>
-        <button className="header-btn" onClick={() => onNavigate('ingredient')}>Ingredient</button>
-        <button className="header-btn" onClick={() => onNavigate('recipe')}>Recipe</button>
+        <Menu
+          mode="horizontal"
+          selectedKeys={[]}
+          style={{ borderBottom: 'none', fontWeight: 600, fontSize: 16, background: 'transparent' }}
+          items={menuItems.map(item => ({
+            key: item.key,
+            label: (
+              <span onClick={() => onNavigate(item.key)} style={{ color: '#a50034' }}>{item.label}</span>
+            )
+          }))}
+        />
       </div>
-      <div className="header-right">
-        <button className="header-icon-btn" title="Thông báo"><FaBell /></button>
-        <div className="header-user-dropdown">
-          <button className="header-icon-btn" onClick={() => setShowDropdown(v => !v)}>
-            <FaUserCircle style={{ fontSize: 22 }} />
-            {showDropdown ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
-          {showDropdown && (
-            <div className="header-dropdown-list">
-              <button onClick={onAccount}>Quản lý tài khoản</button>
-              <button onClick={onLogout}>Đăng xuất</button>
-            </div>
-          )}
-        </div>
+      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {user ? (
+          <Space size={16}>
+            <Badge count={0} size="small">
+              <Button type="text" icon={<BellOutlined style={{ fontSize: 20, color: '#a50034' }} />} />
+            </Badge>
+            <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
+              <Button type="text" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Avatar icon={<UserOutlined />} style={{ background: '#a50034' }} />
+                <DownOutlined style={{ color: '#a50034', fontSize: 12 }} />
+              </Button>
+            </Dropdown>
+          </Space>
+        ) : (
+          <Space size={12}>
+            <Button type="primary" style={{ background: '#a50034', borderColor: '#a50034' }} onClick={() => navigate('/login')}>Đăng nhập</Button>
+            <Button style={{ color: '#a50034', borderColor: '#a50034' }} onClick={() => navigate('/signup')}>Đăng ký</Button>
+          </Space>
+        )}
       </div>
-    </header>
+    </AntHeader>
   );
 };
 

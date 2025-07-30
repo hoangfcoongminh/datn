@@ -154,7 +154,7 @@ const SignupPage = ({ onSignup }) => {
               Đã có tài khoản? Đăng nhập
             </Link>
             
-            <Link to="/" className="auth-nav-btn home">
+            <Link to="/home" className="auth-nav-btn home">
               <FaHome />
               Về trang chủ
             </Link>
