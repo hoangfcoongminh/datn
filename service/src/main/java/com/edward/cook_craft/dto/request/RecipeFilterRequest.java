@@ -10,5 +10,5 @@ public class RecipeFilterRequest {
     private String keyword;
     private List<Long> categoryIds;
     private List<Long> ingredientIds;
-    private List<Long> authorIds;
+    private List<String> authorUsernames;
 }
