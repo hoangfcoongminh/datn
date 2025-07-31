@@ -23,7 +23,7 @@
   border: 1.5px solid #e9ecef;
   border-radius: 8px;
   font-size: 1.08rem;
-  min-width: 260px;
+  max-width: 1200px;
   outline: none;
   transition: border 0.2s;
 }

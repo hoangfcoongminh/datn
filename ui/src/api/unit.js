@@ -11,7 +11,7 @@ export async function fetchUnits() {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok) {
+  if (!data.success) {
     throw { message: data?.message || 'Lấy đơn vị tính thất bại.' };
   }
   return data.data;

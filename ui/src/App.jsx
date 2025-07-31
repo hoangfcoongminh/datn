@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-// import './App.css';
+import './App.css';
 
 // Import components
 import LoginPage from './components/auth/LoginPage';
@@ -12,9 +12,9 @@ import NotFound from './components/common/NotFound';
 import Loading from './components/common/Loading';
 import { Header, Footer } from './components/common';
 import { logout as apiLogout } from './api/auth';
-import { AddRecipePage } from './components/recipes';
-import { EditRecipePage } from './components/recipes';
-import { CategoryPage } from './components/category';
+import { AddRecipePage, EditRecipePage } from './components/recipes';
+import { AddCategoryPage, CategoryPage } from './components/categories';
+import IngredientList from './components/ingredients/IngredientList';
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -76,7 +76,7 @@ function AppContent() {
   }
 
   const handleHeaderNavigate = (key) => {
-    if (key === 'home') navigate('/home');
+    if (key === 'home' || key === '') navigate('/home');
     else if (key === 'category') navigate('/categories');
     else if (key === 'ingredient') navigate('/ingredients');
     else if (key === 'recipe') navigate('/recipes');
@@ -96,6 +96,7 @@ function AppContent() {
         onNavigate={handleHeaderNavigate}
       />
       <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route 
           path="/home" 
           element={
@@ -128,7 +129,8 @@ function AppContent() {
           } 
         />
         <Route path="/categories" element={<CategoryPage />} />
-        <Route path="/categories" element={<CategoryPage />} />
+        <Route path="/categories/add" element={<AddCategoryPage />} />
+        <Route path="/ingredients" element={<IngredientList />} />
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />

@@ -16,7 +16,7 @@ export async function filterRecipes({ keyword = '', categoryIds = [], ingredient
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Lấy danh sách công thức thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
@@ -51,7 +51,7 @@ export async function createRecipe(recipe, imageFile) {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Tạo công thức thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
@@ -79,7 +79,7 @@ export async function getRecipeDetail(id) {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Lấy chi tiết công thức thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
@@ -114,7 +114,7 @@ export async function updateRecipe(recipe, imageFile) {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Cập nhật công thức thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
