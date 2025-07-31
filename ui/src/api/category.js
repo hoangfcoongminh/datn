@@ -1,3 +1,48 @@
+// Cập nhật category
+export async function updateCategory({ id, name, description, status = 1 }) {
+  const token = localStorage.getItem('token');
+  const res = await fetch('http://localhost:8080/api/categories', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ id, name, description, status })
+  });
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Lỗi không xác định từ máy chủ.');
+  }
+  if (!data.success) {
+    throw new Error(data?.message || 'Lỗi khi cập nhật danh mục');
+  }
+  return data;
+}
+// Thêm mới category
+export async function addCategory({ name, description }) {
+  const token = localStorage.getItem('token');
+  // if (!token) throw new Error('Bạn phải đăng nhập để thêm danh mục!');
+  const res = await fetch('http://localhost:8080/api/categories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ name, description })
+  });
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Lỗi không xác định từ máy chủ.');
+  }
+  if (!data.success) {
+    throw new Error(data?.message || 'Lỗi khi thêm danh mục');
+  }
+  return data;
+}
 // API cho Category
 export async function fetchCategories({ page = 0, size = 5, search = '', sort = 'name,asc' } = {}) {
   const token = localStorage.getItem('token');
@@ -17,7 +62,7 @@ export async function fetchCategories({ page = 0, size = 5, search = '', sort = 
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok) {
+  if (!data.success) {
     throw { message: data?.message || 'Lấy danh mục thất bại.' };
   }
   // Chuẩn hóa trả về: nếu có .data thì lấy .data, nếu không thì lấy luôn data
@@ -41,7 +86,7 @@ export async function fetchAllCategories() {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok) {
+  if (!data.success) {
     throw { message: data?.message || 'Lấy danh mục thất bại.' };
   }
   // Chuẩn hóa trả về: nếu có .data thì lấy .data, nếu không thì lấy luôn data

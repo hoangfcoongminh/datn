@@ -26,19 +26,18 @@ const RecipeList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
+  const [total, setTotal] = useState(10);
   // Filter state
   const [keyword, setKeyword] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const params = new URLSearchParams(location.search);
+  const categoryIdFromUrl = params.get("categoryId");
+  
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const categoryIdFromUrl = params.get("categoryId");
-
     if (categoryIdFromUrl) {
       setCategoryIds([parseInt(categoryIdFromUrl)]);
       setPage(0);
@@ -60,10 +59,10 @@ const RecipeList = () => {
         categoryIds,
         ingredientIds,
         page,
-        size: pageSize,
+        size: size,
       });
       setRecipes(data.content || []);
-      setTotalPages(data.total || 1);
+      setTotal(data.total || 1);
     } catch (err) {
       setError(err.message || "Lỗi khi tải công thức");
     } finally {
@@ -74,28 +73,53 @@ const RecipeList = () => {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [keyword, categoryIds, ingredientIds, page, pageSize]);
+  }, [keyword, categoryIds, ingredientIds, page, size]);
 
   return (
     <div className="recipe-list-page">
       {/* Header Section */}
+      <div
+        className="recipe-list-header"
+        style={{ textAlign: "center", margin: "32px 0 16px 0" }}
+      >
+        <p
+          style={{
+            fontSize: 40,
+            fontWeight: "bold",
+            color: "#a50034",
+            letterSpacing: 2,
+          }}
+        >
+          MÓN ĂN
+        </p>
+      </div>
 
       {/* Filter Section */}
       <div className="filter-section">
         <div className="filter-container">
-          <div className="filter-header" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div
+            className="filter-header"
+            style={{ display: "flex", justifyContent: "flex-start" }}
+          >
             <Button
               type="primary"
-              style={{ background: '#a50034', borderColor: '#a50034', fontWeight: 600 }}
+              style={{
+                background: "#a50034",
+                borderColor: "#a50034",
+                fontWeight: 600,
+              }}
               onClick={() => {
-                if (user && (user.user.role === 'USER' || user.user.role === 'ADMIN')) {
+                if (
+                  user &&
+                  (user.user.role === "USER" || user.user.role === "ADMIN")
+                ) {
                   navigate("/recipes/add");
                 } else {
                   message.warning({
-                    content: 'Bạn phải đăng nhập để thêm công thức mới!',
-                    duration: 5
+                    content: "Bạn phải đăng nhập để thêm công thức mới!",
+                    duration: 5,
                   });
-                  setTimeout(() => navigate('/login'), 1200);
+                  setTimeout(() => navigate("/login"), 1200);
                 }
               }}
             >
@@ -156,7 +180,7 @@ const RecipeList = () => {
                   onChange={e => { setKeyword(e.target.value); setPage(0); }}
                   className="search-input"
                 /> */}
-                <Input.Search
+                <Input
                   allowClear
                   placeholder="Tìm kiếm tên hoặc mô tả..."
                   value={keyword}
@@ -252,31 +276,19 @@ const RecipeList = () => {
             {/* Pagination */}
             <div className="pagination-section">
               <div className="pagination-info">
-                <span>Hiển thị {pageSize} công thức mỗi trang</span>
+                <span>Hiển thị {size} công thức mỗi trang</span>
               </div>
               <div className="pagination-controls">
-                <div className="page-size-selector">
-                  <span>Số dòng/trang:</span>
-                  <Select
-                    value={pageSize}
-                    onChange={(val) => {
-                      setPageSize(val);
-                      setPage(0);
-                    }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map((opt) => (
-                      <Option key={opt} value={opt}>
-                        {opt}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
                 <Pagination
                   current={page + 1}
-                  pageSize={pageSize}
-                  total={totalPages}
-                  showSizeChanger={false}
-                  onChange={(p) => setPage(p - 1)}
+                  pageSize={size}
+                  total={total}
+                  showSizeChanger={true}
+                  pageSizeOptions={PAGE_SIZE_OPTIONS.map(String)}
+                  onChange={(p, ps) => {
+                    setPage(p - 1);
+                    setSize(ps);
+                  }}
                 />
               </div>
             </div>

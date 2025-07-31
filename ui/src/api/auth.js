@@ -12,7 +12,7 @@ export async function login(username, password) {
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Đăng nhập thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
@@ -38,7 +38,7 @@ export async function signup({ username, password, confirmPassword, fullName, em
   } catch {
     throw { message: 'Lỗi không xác định từ máy chủ.' };
   }
-  if (!res.ok || !data.success) {
+  if (!data.success) {
     let err = { message: 'Đăng ký thất bại.' };
     if (Array.isArray(data.message)) {
       err = { message: data.message };
@@ -66,5 +66,5 @@ export async function logout() {
     },
   });
   // Không cần xử lý response, chỉ cần gọi
-  return res.ok;
+  return res;
 }
