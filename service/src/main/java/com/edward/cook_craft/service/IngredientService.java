@@ -35,12 +35,19 @@ public class IngredientService {
                 .map(ingredientMapper::toResponse).toList();
     }
 
-    public PagedResponse<IngredientResponse> filter(IngredientRequest request, Pageable pageable) {
-        String name = null;
-        if (request.getName() != null && !request.getName().isEmpty()) {
-            name = request.getName().toLowerCase();
+    public IngredientResponse details(Long id) {
+        Optional<Ingredient> optional = repository.findById(id);
+        if (optional.isEmpty()) {
+            throw new CustomException("ingredients.not.found");
         }
-        Page<Ingredient> page = repository.filter(name, request.getUnitId(), pageable);
+        return ingredientMapper.toResponse(optional.get());
+    }
+
+    public PagedResponse<IngredientResponse> filter(IngredientRequest request, Pageable pageable) {
+        String search = (request.getSearch() == null || request.getSearch().isEmpty()) ? null : request.getSearch().toLowerCase();
+        List<Long> unitIds = (request.getUnitIds() == null || request.getUnitIds().isEmpty()) ? null : request.getUnitIds();
+
+        Page<Ingredient> page = repository.filter(search, unitIds, pageable);
 
         return pageMapper.map(page, ingredientMapper::toResponse);
     }
@@ -56,11 +63,11 @@ public class IngredientService {
     @Transactional
     public IngredientResponse update(IngredientRequest request) {
         validate(request);
-        Ingredient existed = repository.findByIdAndStatus(request.getId(), EntityStatus.ACTIVE.getStatus()).get();
+        Ingredient existed = repository.findById(request.getId()).get();
 
         existed.setName(request.getName());
         existed.setUnitId(request.getUnitId());
-        existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus(): request.getStatus());
+        existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
         return ingredientMapper.toResponse(repository.save(existed));
     }
 
@@ -69,8 +76,12 @@ public class IngredientService {
             throw new CustomException("ingredient-not-exist");
         }
 
-        if (unitRepository.findById(request.getUnitId()).isEmpty()) {
+        if (unitRepository.existsById(request.getUnitId())) {
             throw new CustomException("unit-not-found");
+        }
+
+        if (repository.checkDuplicateIngredient(request.getName(), request.getUnitId())) {
+            throw new CustomException("ingredient-duplicate");
         }
     }
 }
