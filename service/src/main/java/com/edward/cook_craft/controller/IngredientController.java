@@ -29,6 +29,14 @@ public class IngredientController {
 //        }
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get detail ingredient", description = "Detail of an ingredient")
+    public ResponseEntity<?> details(
+            @PathVariable Long id
+    ) {
+        return ResponseUtils.handleSuccess(service.details(id));
+    }
+
     @PostMapping("/filter")
     @Operation(summary = "Filter ingredients", description = "Filter all ingredients")
     public ResponseEntity<?> filter(

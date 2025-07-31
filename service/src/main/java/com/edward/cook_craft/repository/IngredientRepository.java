@@ -1,6 +1,7 @@
 package com.edward.cook_craft.repository;
 
 import com.edward.cook_craft.model.Ingredient;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,14 +13,38 @@ import java.util.Optional;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
-    Optional<Ingredient> findByIdAndStatus(Long id, Integer status);
+    @NotNull
+    @Query(value = "SELECT i " +
+            "FROM Ingredient i " +
+            "WHERE i.status = 1 ")
+    List<Ingredient> findAll();
+
+    @NotNull
+    @Query(value = "SELECT i " +
+            "FROM Ingredient i " +
+            "WHERE i.id = :id " +
+            "AND i.status = 1 ")
+    Optional<Ingredient> findById(@NotNull @Param("id") Long id);
 
     @Query(value = "SELECT i " +
             "FROM Ingredient i " +
-            "WHERE (:name IS NULL OR i.name LIKE CONCAT('%', :name, '%')) " +
-            "AND (:unitId IS NULL OR i.unitId = :unitId) " +
+            "WHERE (:search IS NULL OR LOWER(i.name) LIKE CONCAT('%', :search, '%')) " +
+            "AND (:unitIds IS NULL OR i.unitId IN :unitIds) " +
             "AND i.status = 1")
-    Page<Ingredient> filter(@Param("name") String name,
-                            @Param("unitId") Long unitId,
+    Page<Ingredient> filter(@Param("search") String search,
+                            @Param("unitIds") List<Long> unitIds,
                             Pageable pageable);
+
+    @Query(value = "SELECT COUNT(i) > 0 " +
+            "FROM Ingredient i " +
+            "WHERE i.id = :id " +
+            "AND i.status = 1")
+    boolean existsById(@NotNull @Param("id") Long id);
+
+    @Query(value = "SELECT COUNT(i) > 0 " +
+            "FROM Ingredient i " +
+            "WHERE i.name = :name " +
+            "AND i.unitId = :unitId " +
+            "AND i.status = 1 ")
+    boolean checkDuplicateIngredient(@Param("name") String name, @Param("unitId") Long unitId);
 }
