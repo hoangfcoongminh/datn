@@ -413,7 +413,7 @@
 .ant-select-selector {
   border-radius: 8px !important;
   border: 2px solid #e9ecef !important;
-  min-height: 44px !important;
+  /* min-height: 44px !important; */
 }
 
 .ant-select-focused .ant-select-selector {
