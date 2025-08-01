@@ -6,23 +6,21 @@ import App from "./App.jsx";
 import { ConfigProvider } from "antd";
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
-  <ConfigProvider
-    theme={{
-      token: {
-        // Seed Token
-        colorPrimary: "#a50034",
-        borderRadius: 2,
+  <StrictMode>
+    <ConfigProvider
+      theme={{
+        token: {
+          // Seed Token
+          colorPrimary: "#a50034",
+          borderRadius: 2,
 
-        // Alias Token
-        // colorBgContainer: '#f6ffed',
-      },
-    }}
-  >
-    <App />
-    
-  </ConfigProvider>,
-  {
-    /* </StrictMode>, */
-  }
+          // Alias Token
+          // colorBgContainer: '#f6ffed',
+        },
+      }}
+    >
+      <App />
+
+    </ConfigProvider>,
+  </StrictMode>,
 );
