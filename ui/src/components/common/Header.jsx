@@ -60,8 +60,8 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
           </Space>
         ) : (
           <Space size={12}>
-            <Button type="primary" style={{ background: '#a50034', borderColor: '#a50034' }} onClick={() => navigate('/login')}>Đăng nhập</Button>
-            <Button style={{ color: '#a50034', borderColor: '#a50034' }} onClick={() => navigate('/signup')}>Đăng ký</Button>
+            <Button type="primary" style={{ background: '#a50034', borderColor: '#a50034', borderRadius: 8 }} onClick={() => navigate('/login')}>Đăng nhập</Button>
+            <Button style={{ color: '#a50034', borderColor: '#a50034', borderRadius: 8 }} onClick={() => navigate('/signup')}>Đăng ký</Button>
           </Space>
         )}
       </div>
