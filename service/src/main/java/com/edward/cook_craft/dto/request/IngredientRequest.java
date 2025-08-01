@@ -25,5 +25,7 @@ public class IngredientRequest {
 
     private List<Long> unitIds;
 
+    private String description;
+
     private Integer status;
 }

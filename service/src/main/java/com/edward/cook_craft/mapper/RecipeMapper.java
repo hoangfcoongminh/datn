@@ -47,12 +47,4 @@ public class RecipeMapper {
                 .servings(request.getServings())
                 .build();
     }
-
-    public RecipeRequest mapStringRequest(String jsonRequest) {
-        try {
-            return objectMapper.readValue(jsonRequest, RecipeRequest.class);
-        } catch (JsonProcessingException e) {
-            throw new CustomException("fail.to.map.json " + e.getMessage());
-        }
-    }
 }

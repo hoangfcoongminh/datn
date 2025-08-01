@@ -25,7 +25,7 @@ public class MinioService {
     @Value("${minio.url}")
     private String url;
 
-    public static final String DEFAULT_IMG_AVT = "default-avt";
+    public static final String DEFAULT_IMG_INGREDIENT = "default-ingredient";
     public static final String DEFAULT_IMG_SEAT = "default-seat";
 
     @PostConstruct
@@ -39,6 +39,10 @@ public class MinioService {
             log.error("Error initializing MinIO bucket {}", e.getMessage());
             throw new RuntimeException("Error initializing MinIO bucket", e);
         }
+    }
+
+    public String getDefaultImgIngredient() {
+        return url + "/" + bucketName + "/" + DEFAULT_IMG_INGREDIENT;
     }
 
     public String uploadFile(MultipartFile file) {
@@ -109,28 +113,28 @@ public class MinioService {
         }
     }
 
-    public void setDefaultImg(String type, MultipartFile img) {
-        try {
-
-            String fileName;
-            if (type.equalsIgnoreCase("avt")) {
-                deleteFile(DEFAULT_IMG_AVT);
-                fileName = DEFAULT_IMG_AVT;
-            } else {
-                deleteFile(DEFAULT_IMG_SEAT);
-                fileName = DEFAULT_IMG_SEAT;
-            }
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .stream(img.getInputStream(), img.getSize(), -1)
-                            .contentType(img.getContentType())
-                            .build()
-            );
-        } catch (Exception e) {
-            throw new CustomException("fail.to.upload.file");
-        }
-    }
+//    public void setDefaultImg(String type, MultipartFile img) {
+//        try {
+//
+//            String fileName;
+//            if (type.equalsIgnoreCase("avt")) {
+//                deleteFile(DEFAULT_IMG_AVT);
+//                fileName = DEFAULT_IMG_AVT;
+//            } else {
+//                deleteFile(DEFAULT_IMG_SEAT);
+//                fileName = DEFAULT_IMG_SEAT;
+//            }
+//
+//            minioClient.putObject(
+//                    PutObjectArgs.builder()
+//                            .bucket(bucketName)
+//                            .object(fileName)
+//                            .stream(img.getInputStream(), img.getSize(), -1)
+//                            .contentType(img.getContentType())
+//                            .build()
+//            );
+//        } catch (Exception e) {
+//            throw new CustomException("fail.to.upload.file");
+//        }
+//    }
 }

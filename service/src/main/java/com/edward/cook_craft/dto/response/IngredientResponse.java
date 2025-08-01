@@ -11,4 +11,6 @@ public class IngredientResponse extends BaseResponse {
     private Long id;
     private Long unitId;
     private String name;
+    private String description;
+    private String imgUrl;
 }

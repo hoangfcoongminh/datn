@@ -28,4 +28,7 @@ public class Ingredient extends BaseModel {
 
     private String name;
 
+    private String description;
+
+    private String imgUrl;
 }
