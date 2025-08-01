@@ -4,7 +4,7 @@ export async function fetchIngredients() {
   const res = await fetch('http://localhost:8080/api/ingredients', {
     headers: {
       'accept': '*/*',
-      'Authorization': `Bearer ${token}`
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     }
   });
   let data;
@@ -26,7 +26,7 @@ export async function filterIngredients({ page, size, sort, search, unitIds }) {
     headers: {
       'accept': '*/*',
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     },
     body: JSON.stringify({
       search: search || undefined,
@@ -67,7 +67,6 @@ export async function detailIngredient(id) {
 
 export async function updateIngredient({ ingredient, imageFile }) {
   const token = localStorage.getItem('token');
-  if (!token) throw new Error('Bạn phải đăng nhập để cập nhật nguyên liệu!');
   const formData = new FormData();
   formData.append('jsonRequest', JSON.stringify(ingredient));
   if (imageFile) {

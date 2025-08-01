@@ -39,8 +39,8 @@ export async function createRecipe(recipe, imageFile) {
   }
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'POST',
-    headers: {
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      headers: {
+        'Authorization': `Bearer ${token}`
       // KHÔNG set Content-Type, để browser tự set boundary cho multipart
     },
     body: formData
@@ -103,7 +103,7 @@ export async function updateRecipe(recipe, imageFile) {
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'PUT',
     headers: {
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      'Authorization': `Bearer ${token}`
       // KHÔNG set Content-Type, để browser tự set boundary cho multipart
     },
     body: formData

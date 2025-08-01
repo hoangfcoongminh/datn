@@ -81,7 +81,7 @@ const RecipeList = () => {
       {/* Header Section */}
       <div
         className="recipe-list-header"
-        style={{ textAlign: "center", margin: "32px 0 16px 0" }}
+        style={{ textAlign: "center", margin: "32px 0 0 0" }}
       >
         <p
           style={{
@@ -89,9 +89,10 @@ const RecipeList = () => {
             fontWeight: "bold",
             color: "#a50034",
             letterSpacing: 2,
+            marginBottom: 0
           }}
         >
-          MÓN ĂN
+          DANH SÁCH CÔNG THỨC
         </p>
       </div>
 
@@ -116,11 +117,8 @@ const RecipeList = () => {
                 ) {
                   navigate("/recipes/add");
                 } else {
-                  toast.warning({
-                    content: "Bạn phải đăng nhập để thêm công thức mới!",
-                    duration: 5,
-                  });
-                  setTimeout(() => navigate("/login"), 1200);
+                  toast.warning("Bạn phải Đăng nhập để thêm Công thức!");
+                  setTimeout(() => navigate("/login"), 1000);
                 }
               }}
             >
