@@ -19,57 +19,57 @@ VALUES
 -- ========================
 INSERT INTO units (name, created_at, created_by, status, version)
 VALUES 
-  ('gram', NOW(), 'system', 1, 0),
-  ('ml', NOW(), 'system', 1, 0),
-  ('muỗng cà phê', NOW(), 'system', 1, 0),
-  ('muỗng canh', NOW(), 'system', 1, 0),
-  ('trái', NOW(), 'system', 1, 0),
-  ('cái', NOW(), 'system', 1, 0),
-  ('gói', NOW(), 'system', 1, 0),
-  ('miếng', NOW(), 'system', 1, 0),
-  ('quả', NOW(), 'system', 1, 0),
-  ('chén', NOW(), 'system', 1, 0);
+  ('Gram', NOW(), 'system', 1, 0),
+  ('Ml', NOW(), 'system', 1, 0),
+  ('Muỗng cà phê', NOW(), 'system', 1, 0),
+  ('Muỗng canh', NOW(), 'system', 1, 0),
+  ('Trái', NOW(), 'system', 1, 0),
+  ('Cái', NOW(), 'system', 1, 0),
+  ('Gói', NOW(), 'system', 1, 0),
+  ('Miếng', NOW(), 'system', 1, 0),
+  ('Quả', NOW(), 'system', 1, 0),
+  ('Chén', NOW(), 'system', 1, 0);
 
 
 
 -- ========================
 -- INGREDIENTS
 -- ========================
-INSERT INTO ingredients (unit_id, name, created_at, created_by, status, version)
+INSERT INTO ingredients (unit_id, name, img_url, created_at, created_by, status, version)
 VALUES 
-  (1, 'Bột mì', NOW(), 'system', 1, 0),
-  (1, 'Đường', NOW(), 'system', 1, 0),
-  (2, 'Sữa tươi', NOW(), 'system', 1, 0),
-  (9, 'Trứng gà', NOW(), 'system', 1, 0),
-  (3, 'Muối', NOW(), 'system', 1, 0),
-  (2, 'Dầu ăn', NOW(), 'system', 1, 0),
-  (9, 'Chuối', NOW(), 'system', 1, 0),
-  (9, 'Cam', NOW(), 'system', 1, 0),
-  (2, 'Nước lọc', NOW(), 'system', 1, 0),
-  (1, 'Bột nở', NOW(), 'system', 1, 0),
-  (7, 'Phô mai', NOW(), 'system', 1, 0),
-  (5, 'Xúc xích', NOW(), 'system', 1, 0),
-  (10, 'Tỏi băm', NOW(), 'system', 1, 0),
-  (3, 'Nước tương', NOW(), 'system', 1, 0),
-  (1, 'Thịt gà', NOW(), 'system', 1, 0),
-  (9, 'Cà rốt', NOW(), 'system', 1, 0),
-  (9, 'Hành tím', NOW(), 'system', 1, 0),
-  (3, 'Tiêu', NOW(), 'system', 1, 0),
-  (1, 'Bơ lạt', NOW(), 'system', 1, 0),
-  (9, 'Khoai tây', NOW(), 'system', 1, 0);
+  (1, 'Bột mì', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (1, 'Đường', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (2, 'Sữa tươi', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Trứng gà', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (3, 'Muối', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (2, 'Dầu ăn', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Chuối', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Cam', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (2, 'Nước lọc', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (1, 'Bột nở', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (7, 'Phô mai', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (5, 'Xúc xích', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (10, 'Tỏi băm', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (3, 'Nước tương', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (1, 'Thịt gà', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Cà rốt', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Hành tím', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (3, 'Tiêu', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (1, 'Bơ lạt', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (9, 'Khoai tây', 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0);
 
 
 
 -- ========================
 -- RECIPES
 -- ========================
-INSERT INTO recipes (category_id, author_username, title, description, prep_time, cook_time, servings, created_at, created_by, status, version)
+INSERT INTO recipes (category_id, author_username, title, description, prep_time, cook_time, servings, img_url, created_at, created_by, status, version)
 VALUES 
-  (1, 1, 'Bánh kếp chuối', 'Bánh mềm xốp từ chuối', 0.25, 0.5, 2, NOW(), 'system', 1, 0),
-  (2, 3, 'Sữa chua cam', 'Thức uống mát lạnh từ cam và sữa chua', 0.1, 0.0, 1, NOW(), 'system', 1, 0),
-  (3, 4, 'Khoai tây chiên', 'Món ăn vặt đơn giản, giòn tan', 0.2, 0.3, 2, NOW(), 'system', 1, 0),
-  (4, 2, 'Salad gà sốt mè', 'Salad thanh mát với gà xé và sốt mè', 0.3, 0.0, 2, NOW(), 'system', 1, 0),
-  (5, 1, 'Cơm chiên trứng xúc xích', 'Món cơm chiên quen thuộc cho bữa sáng', 0.2, 0.4, 2, NOW(), 'system', 1, 0);
+  (1, 1, 'Bánh kếp chuối', 'Bánh mềm xốp từ chuối', 0.25, 0.5, 2, 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (2, 3, 'Sữa chua cam', 'Thức uống mát lạnh từ cam và sữa chua', 0.1, 0.0, 1, 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (3, 4, 'Khoai tây chiên', 'Món ăn vặt đơn giản, giòn tan', 0.2, 0.3, 2, 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (4, 2, 'Salad gà sốt mè', 'Salad thanh mát với gà xé và sốt mè', 0.3, 0.0, 2, 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0),
+  (5, 1, 'Cơm chiên trứng xúc xích', 'Món cơm chiên quen thuộc cho bữa sáng', 0.2, 0.4, 2, 'localhost:9000/images/default.jpg', NOW(), 'system', 1, 0);
 
 
 
