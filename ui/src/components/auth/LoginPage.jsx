@@ -4,6 +4,7 @@ import './Auth.css';
 import { login } from '../../api/auth';
 import { FaUserAlt, FaLock, FaHome, FaUserPlus } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -25,6 +26,7 @@ const LoginPage = ({ onLogin }) => {
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
+      toast.success('Đăng nhập thành công!');
       onLogin && onLogin(username, data);
     } catch (err) {
       if (Array.isArray(err.message)) {
@@ -32,6 +34,7 @@ const LoginPage = ({ onLogin }) => {
       } else {
         setError(err.message || 'Đăng nhập thất bại.');
       }
+      toast.error(err.message || 'Đăng nhập thất bại.');
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Avatar, Button, Space, Badge } from 'antd';
 import { BellOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
-import logo from '../../assets/react.svg';
+import logo from '../../assets/cooking.png';
 import './Header.css';
 
 
@@ -26,9 +26,9 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
         <img
           src={logo}
           alt="logo"
-          className="header-logo"
+          // className="header-logo"
           onClick={() => onNavigate('home')}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', marginLeft: 40, height: 60, width: 'auto', borderRadius: 5, backgroundColor: 'none' }}
         />
         <Menu
           mode="horizontal"

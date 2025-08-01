@@ -119,6 +119,11 @@
   font-size: 1.08rem;
   line-height: 1.5;
 }
+.delete-btn-hover:hover {
+  background-color: #a50034;
+  color: #fff;
+  cursor: pointer;
+}
 @media (max-width: 900px) {
   .category-grid {
     grid-template-columns: 1fr;

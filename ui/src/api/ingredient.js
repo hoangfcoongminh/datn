@@ -64,3 +64,36 @@ export async function detailIngredient(id) {
   }
   return data.data;
 }
+
+export async function updateIngredient({ ingredient, imageFile }) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('Bạn phải đăng nhập để cập nhật nguyên liệu!');
+  const formData = new FormData();
+  formData.append('jsonRequest', JSON.stringify(ingredient));
+  if (imageFile) {
+    formData.append('img', imageFile);
+  }
+  const res = await fetch(`http://localhost:8080/api/ingredients`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+  let data;
+  console.log('4');
+  
+  try {
+    data = await res.json();
+    console.log('5');
+  } catch {
+    console.log('7');
+    throw new Error('Lỗi không xác định từ máy chủ.');
+  }
+  if (!data.success) {
+    console.log('8');
+    throw new Error(data?.message || 'Lỗi khi cập nhật nguyên liệu');
+    
+  }
+  return data.data;
+}

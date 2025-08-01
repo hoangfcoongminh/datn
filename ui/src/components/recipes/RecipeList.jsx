@@ -14,6 +14,7 @@ import { fetchIngredients } from "../../api/ingredient";
 import { Select, Pagination, Input } from "antd";
 import "antd/dist/reset.css";
 import "./RecipeList.css";
+import { toast } from "react-toastify";
 
 const { Option } = Select;
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
@@ -115,7 +116,7 @@ const RecipeList = () => {
                 ) {
                   navigate("/recipes/add");
                 } else {
-                  message.warning({
+                  toast.warning({
                     content: "Bạn phải đăng nhập để thêm công thức mới!",
                     duration: 5,
                   });

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Card, message } from "antd";
 import { fetchAllCategories, updateCategory } from '../../api/category';
+import { toast } from "react-toastify";
 
 const EditCategoryPage = () => {
   const { id } = useParams();
@@ -38,10 +39,11 @@ const EditCategoryPage = () => {
     setError(null);
     try {
       await updateCategory({ id, name: values.name, description: values.description, status: 1 });
-      message.success('Cập nhật danh mục thành công!');
+      toast.success('Cập nhật danh mục thành công!');
       navigate('/categories');
     } catch (err) {
       setError(err.message || 'Có lỗi xảy ra.');
+      toast.error(err.message || 'Có lỗi xảy ra khi cập nhật danh mục.');
     } finally {
       setLoading(false);
     }

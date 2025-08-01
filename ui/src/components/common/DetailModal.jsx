@@ -7,7 +7,6 @@ const DetailModal = ({
   title,
   loading,
   values = {},
-  editable = false,
   onEdit,
   onSave,
   onChange,
@@ -23,49 +22,13 @@ const DetailModal = ({
       centered
       maskClosable={true}
       width={480}
+      // style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)' }}
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: 32 }}><Spin size="large" /></div>
       ) : (
         <>
-          {children ? (
-            children
-          ) : (
-            <Form layout="vertical">
-              <Form.Item label="Tên">
-                <Input
-                  value={values.name || ''}
-                  disabled={!editable}
-                  onChange={e => onChange && onChange({ ...values, name: e.target.value })}
-                />
-              </Form.Item>
-              <Form.Item label="Đơn vị">
-                <Input
-                  value={values.unit?.name || ''}
-                  disabled
-                />
-              </Form.Item>
-              <Form.Item label="Mô tả">
-                <Input.TextArea
-                  value={values.description || ''}
-                  disabled={!editable}
-                  autoSize
-                  onChange={e => onChange && onChange({ ...values, description: e.target.value })}
-                />
-              </Form.Item>
-              <div style={{ textAlign: 'right' }}>
-                {editable ? (
-                  <Button type="primary" onClick={onSave} style={{ minWidth: 80 }}>
-                    Lưu
-                  </Button>
-                ) : (
-                  <Button onClick={onEdit} style={{ minWidth: 80 }}>
-                    Sửa
-                  </Button>
-                )}
-              </div>
-            </Form>
-          )}
+          {children}
         </>
       )}
     </Modal>
