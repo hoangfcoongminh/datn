@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Button,
@@ -32,6 +33,7 @@ import { toast } from "react-toastify";
 const { Option } = Select;
 
 const IngredientList = () => {
+  const navigate = useNavigate();
   const [ingredients, setIngredients] = useState([]);
   const [ingredient, setIngredient] = useState(null);
   const [units, setUnits] = useState([]);
@@ -94,19 +96,24 @@ const IngredientList = () => {
   };
 
   const handleShowToEdit = async (id) => {
-    setDetailOpen(true);
-    setDetailLoading(true);
-    try {
-      const data = await detailIngredient(id);
-      setIngredientDetail(data);
-      setFormData(data);
-      setIsEditing(true);
-    } catch (err) {
-      setIngredientDetail(null);
-      setFormData(null);
-      toast.error(err.message || "Lỗi khi tải chi tiết nguyên liệu");
-    } finally {
-      setDetailLoading(false);
+    if (localStorage.getItem("token")) {
+      setDetailOpen(true);
+      setDetailLoading(true);
+      try {
+        const data = await detailIngredient(id);
+        setIngredientDetail(data);
+        setFormData(data);
+        setIsEditing(true);
+      } catch (err) {
+        setIngredientDetail(null);
+        setFormData(null);
+        toast.error(err.message || "Lỗi khi tải chi tiết nguyên liệu");
+      } finally {
+        setDetailLoading(false);
+      }
+    } else {
+      toast.warning("Bạn phải Đăng nhập để chỉnh sửa nguyên liệu!");
+      setTimeout(() => navigate("/login"), 1000);
     }
   };
 
@@ -121,9 +128,9 @@ const IngredientList = () => {
     const img = selectedFile ? selectedFile : null;
 
     try {
-      
+
       await updateIngredient({ ingredient: jsonRequest, imageFile: img });
-      
+
       toast.success("Cập nhật thành công!");
       // setTimeout(() => {
       //   handleShowDetail(formData.id);
@@ -142,7 +149,7 @@ const IngredientList = () => {
         style={{
           color: "#a50034",
           fontWeight: 700,
-          fontSize: 28,
+          fontSize: 40,
           marginBottom: 24,
           textAlign: "center",
         }}
@@ -213,7 +220,7 @@ const IngredientList = () => {
                       />
                     </Tooltip>
                   }
-                  bodyStyle={{ padding: 18 }}
+                  styles={{ body: { padding: 32 }}}
                 >
                   {item.imgUrl && (
                     <img

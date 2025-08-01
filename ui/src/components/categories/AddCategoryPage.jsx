@@ -56,7 +56,7 @@ const AddCategoryPage = () => {
         </div>
         <Card
           style={{ borderRadius: 18, boxShadow: "0 2px 16px #fbe0ea" }}
-          bodyStyle={{ padding: 32 }}
+          styles={{ body: { padding: 32 } }}
           title={
             <div style={{ textAlign: "center", width: "100%" }}>
               <span

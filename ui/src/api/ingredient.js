@@ -50,7 +50,7 @@ export async function detailIngredient(id) {
   const res = await fetch(`http://localhost:8080/api/ingredients/${id}`, {
     headers: {
       'accept': '*/*',
-      'Authorization': `Bearer ${token}`
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     }
   });
   let data;

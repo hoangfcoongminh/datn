@@ -78,7 +78,7 @@ const CategoryPage = () => {
 
   return (
     <div className="category-page-container">
-      <h1 className="category-title">Danh mục món ăn</h1>
+      <h1 className="category-title" style={{ fontSize: 40 }}>Danh mục món ăn</h1>
       <div
         className="category-search-form"
         style={{
@@ -93,21 +93,18 @@ const CategoryPage = () => {
           style={{
             background: "#a50034",
             borderColor: "#a50034",
-            fontWeight: 600,
+            fontWeight: 500,
+            borderRadius: 6,
           }}
           onClick={() => {
             if (
               user &&
               (user.user.role === "USER" || user.user.role === "ADMIN")
             ) {
-              console.log("user: " + user);
-              console.log("role: " + user.user.role);
               navigate("/categories/add");
             } else {
-              toast.warning("Bạn phải đăng nhập để thêm Danh mục!", {
-                duration: 5,
-              });
-              setTimeout(() => navigate("/login"), 1200);
+              toast.warning("Bạn phải Đăng nhập để thêm Danh mục!");
+              setTimeout(() => navigate("/login"), 1000);
             }
           }}
         >
@@ -117,13 +114,13 @@ const CategoryPage = () => {
           <label>Tìm kiếm</label>
           <Input
             allowClear
-            placeholder="Tìm kiếm tên hoặc mô tả..."
+            placeholder="Nhập từ khóa..."
             value={search}
             onChange={(e) => {
               setPage(0);
               setSearch(e.target.value);
             }}
-            style={{ maxWidth: 320 }}
+            style={{ width: 240, borderRadius: 8 }}
           />
         </div>
       </div>
@@ -161,10 +158,12 @@ const CategoryPage = () => {
                     if (e.target.closest(".delete-category-btn")) return;
                     navigate(`/recipes?categoryId=${cat.id}`);
                   }}
-                  bodyStyle={{
-                    position: "relative",
-                    minHeight: 120,
-                    paddingBottom: 48,
+                  styles={{
+                    body: {
+                      position: "relative",
+                      minHeight: 120,
+                      paddingBottom: 48,
+                    },
                   }}
                 >
                   <div className="category-info">
