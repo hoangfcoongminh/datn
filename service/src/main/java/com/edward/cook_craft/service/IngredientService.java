@@ -11,12 +11,15 @@ import com.edward.cook_craft.model.Ingredient;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.IngredientRepository;
 import com.edward.cook_craft.repository.UnitRepository;
+import com.edward.cook_craft.service.minio.MinioService;
+import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +32,7 @@ public class IngredientService {
     private final UnitRepository unitRepository;
     private final IngredientMapper ingredientMapper;
     private final PageMapper pageMapper;
+    private final MinioService minioService;
 
     public List<IngredientResponse> getAll() {
         return repository.findAll().stream()
@@ -53,34 +57,50 @@ public class IngredientService {
     }
 
     @Transactional
-    public IngredientResponse create(IngredientRequest request) {
+    public IngredientResponse create(String jsonRequest, MultipartFile file) {
+        IngredientRequest request = JsonUtils.jsonMapper(jsonRequest, IngredientRequest.class);
         validate(request);
         Ingredient i = ingredientMapper.of(request);
         i.setId(null);
+        if (file != null && !file.isEmpty()) {
+            i.setImgUrl(minioService.uploadFile(file));
+        } else {
+            i.setImgUrl(minioService.getDefaultImgIngredient());
+        }
         return ingredientMapper.toResponse(repository.save(i));
     }
 
     @Transactional
-    public IngredientResponse update(IngredientRequest request) {
+    public IngredientResponse update(String jsonRequest, MultipartFile file) {
+        IngredientRequest request = JsonUtils.jsonMapper(jsonRequest, IngredientRequest.class);
         validate(request);
         Ingredient existed = repository.findById(request.getId()).get();
 
         existed.setName(request.getName());
         existed.setUnitId(request.getUnitId());
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
+        existed.setDescription(request.getDescription());
+        if (file != null && !file.isEmpty()) {
+            minioService.deleteFile(existed.getImgUrl());
+            existed.setImgUrl(minioService.uploadFile(file));
+        }
         return ingredientMapper.toResponse(repository.save(existed));
     }
 
     private void validate(IngredientRequest request) {
-        if (request.getId() != null && !repository.existsById(request.getId())) {
+        Long id = (request.getId() == null) ?  null : request.getId();
+        if (id != null && !repository.existsById(request.getId())) {
             throw new CustomException("ingredient-not-exist");
         }
-
-        if (unitRepository.existsById(request.getUnitId())) {
-            throw new CustomException("unit-not-found");
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new CustomException("ingredient-name-empty");
         }
 
-        if (repository.checkDuplicateIngredient(request.getName(), request.getUnitId())) {
+        if (request.getUnitId() == null || !unitRepository.existsById(request.getUnitId())) {
+            throw new CustomException("unit-not-valid");
+        }
+
+        if (repository.checkDuplicateIngredient(request.getName(), request.getUnitId(), id)) {
             throw new CustomException("ingredient-duplicate");
         }
     }

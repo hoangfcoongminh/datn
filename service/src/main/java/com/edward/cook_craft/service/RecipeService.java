@@ -16,6 +16,7 @@ import com.edward.cook_craft.model.RecipeIngredientDetail;
 import com.edward.cook_craft.model.RecipeStep;
 import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.minio.MinioService;
+import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,7 @@ public class RecipeService {
 
     @Transactional
     public RecipeDetailResponse create(String jsonRequest, MultipartFile file) {
-        RecipeRequest request = recipeMapper.mapStringRequest(jsonRequest);
+        RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
         var ingredients = request.getIngredients();
         var steps = request.getSteps();
@@ -131,7 +132,7 @@ public class RecipeService {
 
     @Transactional
     public RecipeResponse update(String jsonRequest, MultipartFile file) {
-        RecipeRequest request = recipeMapper.mapStringRequest(jsonRequest);
+        RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
 //        log.info("Username now: " + SecurityUtils.getCurrentUsername());
         log.info("Ingredients received: {}", request.getIngredients().size());
