@@ -18,6 +18,7 @@ import ConfirmModal from "../common/ConfirmModal";
 const user = JSON.parse(localStorage.getItem("user"));
 import "./CategoryPage.css";
 import "antd/dist/reset.css";
+import { toast } from "react-toastify";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
 const { Option } = Select;
@@ -54,15 +55,20 @@ const CategoryPage = () => {
   // Hàm xoá mềm category
   const handleDelete = async (cat) => {
     try {
-      await updateCategory({ id: cat.id, name: cat.name, description: cat.description, status: 0 });
-      message.success('Đã xoá danh mục!');
+      await updateCategory({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+        status: 0,
+      });
+      toast.success("Đã xoá danh mục!");
       // Refetch
       setLoading(true);
       const data = await fetchCategories({ page, size, search });
       setCategories(data?.content || []);
       setTotal(data?.total || 0);
     } catch (err) {
-      message.error(err.message || 'Lỗi khi xoá danh mục');
+      toast.error(err.message || "Lỗi khi xoá danh mục");
     } finally {
       setLoading(false);
       setConfirmOpen(false);
@@ -98,8 +104,7 @@ const CategoryPage = () => {
               console.log("role: " + user.user.role);
               navigate("/categories/add");
             } else {
-              message.warning({
-                content: "Bạn phải đăng nhập để thêm Danh mục!",
+              toast.warning("Bạn phải đăng nhập để thêm Danh mục!", {
                 duration: 5,
               });
               setTimeout(() => navigate("/login"), 1200);
@@ -135,7 +140,7 @@ const CategoryPage = () => {
         ) : (
           <div className="category-grid">
             {categories.map((cat) => (
-              <div key={cat.id} style={{ position: 'relative' }}>
+              <div key={cat.id} style={{ position: "relative" }}>
                 <Card
                   hoverable
                   className="category-card"
@@ -146,50 +151,80 @@ const CategoryPage = () => {
                       className="category-image"
                     />
                   }
-                  style={{ borderRadius: 18, overflow: "hidden", position: 'relative' }}
-                  onClick={e => {
+                  style={{
+                    borderRadius: 18,
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                  onClick={(e) => {
                     // Nếu click vào nút Xoá thì không navigate
-                    if (e.target.closest('.delete-category-btn')) return;
+                    if (e.target.closest(".delete-category-btn")) return;
                     navigate(`/recipes?categoryId=${cat.id}`);
                   }}
-                  bodyStyle={{ position: 'relative', minHeight: 120, paddingBottom: 48 }}
+                  bodyStyle={{
+                    position: "relative",
+                    minHeight: 120,
+                    paddingBottom: 48,
+                  }}
                 >
                   <div className="category-info">
                     <h2>{cat.name}</h2>
                     <p>{cat.description}</p>
                   </div>
-                  {(user && (user.user?.role === 'ADMIN' || user.user?.role === 'USER')) && (
-                    <Button
-                      danger
-                      type="primary"
-                      size="small"
-                      className="delete-category-btn"
-                      style={{ position: 'absolute', right: 12, bottom: 12, zIndex: 2, background: '#fff', color: '#a50034', borderColor: '#a50034', fontWeight: 600 }}
-                      onClick={e => {
-                        e.stopPropagation();
-                        setDeleteCat(cat);
-                        setConfirmOpen(true);
-                      }}
-                    >
-                      Xoá
-                    </Button>
-                  )}
+                  {user &&
+                    (user.user?.role === "ADMIN" ||
+                      user.user?.role === "USER") && (
+                      <Button
+                        danger
+                        type="primary"
+                        size="small"
+                        className="delete-category-btn delete-btn-hover"
+                        style={{
+                          position: "absolute",
+                          right: 12,
+                          bottom: 12,
+                          zIndex: 2,
+                          background: "#fff",
+                          color: "#a50034",
+                          borderColor: "#a50034",
+                          fontWeight: 600,
+                          borderRadius: 4,
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteCat(cat);
+                          setConfirmOpen(true);
+                        }}
+                      >
+                        Xoá
+                      </Button>
+                    )}
                 </Card>
               </div>
             ))}
             <ConfirmModal
               open={confirmOpen}
               onOk={() => deleteCat && handleDelete(deleteCat)}
-              onCancel={() => { setConfirmOpen(false); setDeleteCat(null); }}
+              onCancel={() => {
+                setConfirmOpen(false);
+                setDeleteCat(null);
+              }}
               title="Xác nhận xoá danh mục"
-              content={deleteCat ? `Bạn có chắc chắn muốn xoá danh mục "${deleteCat.name}"?` : ''}
+              content={
+                deleteCat
+                  ? `Bạn có chắc chắn muốn xoá danh mục "${deleteCat.name}"?`
+                  : ""
+              }
               okText="Xoá"
               cancelText="Huỷ"
             />
           </div>
         )}
 
-        <div className="pagination-section" style={{ justifyContent: 'space-evenly' }}>
+        <div
+          className="pagination-section"
+          style={{ justifyContent: "space-evenly" }}
+        >
           <div className="pagination-info">
             <span>Hiển thị {size} công thức mỗi trang</span>
           </div>

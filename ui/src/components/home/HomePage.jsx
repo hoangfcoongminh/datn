@@ -26,25 +26,30 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
   const heroSlides = [
+    {
+      title: "Chia sẻ đam mê",
+      subtitle: "Cộng đồng nấu ăn",
+      description: "Kết nối với những người yêu thích nấu ăn, chia sẻ công thức và kinh nghiệm của bạn.",
+      image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    },
     {
       title: "Khám phá ẩm thực",
       subtitle: "Thế giới món ăn",
       description: "Hàng nghìn công thức nấu ăn từ các đầu bếp chuyên nghiệp và cộng đồng yêu thích ẩm thực.",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+      image: "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "Chia sẻ đam mê",
       subtitle: "Cộng đồng nấu ăn",
       description: "Kết nối với những người yêu thích nấu ăn, chia sẻ công thức và kinh nghiệm của bạn.",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+      image: "https://images.unsplash.com/photo-1528712306091-ed0763094c98?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       title: "Học hỏi mỗi ngày",
       subtitle: "Kỹ năng nấu ăn",
       description: "Từ những món ăn đơn giản đến phức tạp, nâng cao kỹ năng nấu ăn của bạn.",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+      image: "https://images.unsplash.com/photo-1466637574441-749b8f19452f?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     }
   ];
 

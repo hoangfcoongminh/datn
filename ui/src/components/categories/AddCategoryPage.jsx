@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Input, Button, Card, message } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import { addCategory } from "../../api/category";
+import { toast } from "react-toastify";
 
 const AddCategoryPage = () => {
   const [loading, setLoading] = useState(false);
@@ -13,10 +14,11 @@ const AddCategoryPage = () => {
     setError(null);
     try {
       await addCategory({ name: values.name, description: values.description });
-      message.success("Thêm danh mục thành công!");
+      toast.success("Thêm danh mục thành công!");
       navigate("/categories");
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra.");
+      toast.error(err.message || "Có lỗi xảy ra khi thêm danh mục.");
     } finally {
       setLoading(false);
     }
@@ -45,6 +47,7 @@ const AddCategoryPage = () => {
                 padding: 10,
                 background: "#a50034",
                 marginBottom: 14,
+                borderRadius: 8,
               }}
             >
               Quay lại Danh sách
@@ -86,7 +89,7 @@ const AddCategoryPage = () => {
             </Form.Item>
             <Form.Item
               label={
-                <span style={{ color: "#a50034", fontWeight: 600 }}>Mô tả</span>
+                <span style={{ color: "#a50034", fontWeight: 600, marginTop: 10 }}>Mô tả</span>
               }
               name="description"
             >
@@ -99,7 +102,7 @@ const AddCategoryPage = () => {
             {error && (
               <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
             )}
-            <Form.Item style={{ marginTop: 24 }}>
+            <Form.Item style={{ marginTop: 24, textAlign: "center" }}>
               <Button
                 type="primary"
                 htmlType="submit"
@@ -110,6 +113,7 @@ const AddCategoryPage = () => {
                   fontWeight: 600,
                   fontSize: 16,
                   minWidth: 120,
+                  borderRadius: 8,
                 }}
               >
                 Thêm mới

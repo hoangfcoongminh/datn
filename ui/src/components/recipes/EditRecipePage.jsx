@@ -5,6 +5,7 @@ import { fetchAllCategories } from '../../api/category';
 import { fetchIngredients } from '../../api/ingredient';
 import { fetchUnits } from '../../api/unit';
 import { getRecipeDetail, updateRecipe } from '../../api/recipe';
+import { toast } from 'react-toastify';
 
 const { Option } = Select;
 
@@ -91,9 +92,11 @@ const EditRecipePage = () => {
         }))
       };
       await updateRecipe(recipe, imageFile);
+      toast.success('Cập nhật công thức thành công!');
       navigate(`/recipes/${id}`);
     } catch (err) {
       setError(err.message || 'Có lỗi xảy ra khi cập nhật công thức.');
+      toast.error(err.message || 'Có lỗi xảy ra khi cập nhật công thức.');
     } finally {
       setLoading(false);
     }

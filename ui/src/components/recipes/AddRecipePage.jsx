@@ -5,6 +5,7 @@ import { fetchIngredients } from '../../api/ingredient';
 import { fetchUnits } from '../../api/unit';
 import { Link, useNavigate } from 'react-router-dom';
 import { createRecipe } from '../../api/recipe';
+import { toast } from 'react-toastify';
 
 const { Option } = Select;
 
@@ -49,9 +50,11 @@ const AddRecipePage = () => {
         }))
       };
       await createRecipe(recipe, imageFile);
+      toast.success('Thêm công thức thành công!');
       navigate('/recipes');
     } catch (err) {
       setError(err.message || 'Có lỗi xảy ra khi lưu công thức.');
+      toast.error(err.message || 'Có lỗi xảy ra khi lưu công thức.');
     } finally {
       setLoading(false);
     }

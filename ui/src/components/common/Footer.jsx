@@ -12,7 +12,7 @@ const Footer = () => (
         © {new Date().getFullYear()} CookCraft. All rights reserved.
       </Text>
       <Text style={{ color: '#fff', fontWeight: 500, fontSize: '1.08rem' }}>
-        Made with <span style={{ color: '#fff', fontWeight: 700 }}>&#10084;</span> by Your Team
+        Made by hoangfcoongminh
       </Text>
     </div>
   </AntFooter>
