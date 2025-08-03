@@ -75,7 +75,7 @@ public class AuthenticService {
             throw new CustomException("confirm.password.invalid");
         }
 
-        if (userRepository.findByUsername(request.getUsername()).isEmpty()) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new CustomException("user.name.exists");
         }
     }

@@ -30,17 +30,4 @@ public class Unit extends BaseModel {
     private Long id;
 
     private String name;
-
-    public static Unit of(UnitRequest request) {
-        return Unit.builder()
-                .name(request.getName())
-                .build();
-    }
-
-    public static UnitResponse toResponse(Unit unit) {
-        return UnitResponse.builder()
-                .id(unit.getId())
-                .name(unit.getName())
-                .build();
-    }
 }
