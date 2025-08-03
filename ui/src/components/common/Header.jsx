@@ -15,9 +15,9 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
   const menuItems = [
     { key: 'home', label: 'Trang chủ' },
     { key: 'category', label: 'Category' },
-    { key: 'ingredient', label: 'Ingredient' },
     { key: 'recipe', label: 'Recipe' },
-    { key: 'myrecipe', label: 'My Recipe' },
+    { key: 'ingredient', label: 'Ingredient' },
+    { key: 'unit', label: 'Unit' }
   ];
 
   return (
@@ -50,6 +50,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
             </Badge>
             <Dropdown menu={{ items: [
               { key: 'account', label: <span onClick={onAccount}>Quản lý tài khoản</span> },
+              { key: 'myrecipe', label: <span onClick={() => onNavigate('myrecipe')}>Công thức của tôi</span> },
               { key: 'logout', label: <span onClick={onLogout}>Đăng xuất</span> }
             ] }} placement="bottomRight" trigger={["click"]}>
               <Button type="text" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

@@ -81,7 +81,7 @@ const RecipeDetail = () => {
             <div className="recipe-stats">
               <div className="stat-item">
                 <FaClock />
-                <span>{recipe.prepTime + recipe.cookTime} giờ</span>
+                <span>Thời gian: {(Number(recipe.prepTime) + Number(recipe.cookTime)).toFixed(2)} giờ</span>
               </div>
               <div className="stat-item">
                 <FaUsers />
@@ -90,7 +90,7 @@ const RecipeDetail = () => {
             </div>
             {isAuthor && (
               <Button type="primary" 
-              style={{ background: '#a50034', borderColor: '#a50034', fontWeight: 600, width: 'fit-content', marginTop: 16 }}
+              style={{ background: '#a50034', borderColor: '#a50034', borderRadius: 8, fontWeight: 600, width: 'fit-content', marginTop: 16 }}
               onClick={() => navigate(`/recipes/edit/${id}`)}>
                 Sửa công thức
               </Button>

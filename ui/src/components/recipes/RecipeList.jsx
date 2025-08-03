@@ -109,6 +109,7 @@ const RecipeList = () => {
                 background: "#a50034",
                 borderColor: "#a50034",
                 fontWeight: 600,
+                borderRadius: 8,
               }}
               onClick={() => {
                 if (
@@ -187,7 +188,7 @@ const RecipeList = () => {
                     setPage(0);
                     setKeyword(e.target.value);
                   }}
-                  style={{ maxWidth: 320 }}
+                  style={{ maxWidth: 320, borderRadius: 8 }}
                 />
               </div>
             </div>

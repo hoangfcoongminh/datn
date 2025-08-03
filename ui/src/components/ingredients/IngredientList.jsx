@@ -29,6 +29,8 @@ import DetailModal from "../common/DetailModal";
 import "./IngredientList.css";
 import 'antd/dist/reset.css';
 import { toast } from "react-toastify";
+import ModelStatus from "../../enums/modelStatus";
+import ConfirmModal from "../common/ConfirmModal";
 
 const { Option } = Select;
 
@@ -50,6 +52,7 @@ const IngredientList = () => {
   const [previewImg, setPreviewImg] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     fetchUnits().then((data) => setUnits(Array.isArray(data) ? data : []));
@@ -117,16 +120,16 @@ const IngredientList = () => {
     }
   };
 
-  const handleUpdateIngredient = async () => {
+  const handleUpdateIngredient = async (ingredient, file) => {
     const jsonRequest = {
-      id: formData.id,
-      name: formData.name,
-      unitId: formData.unitId,
-      description: formData.description,
-      status: formData.status,
+      id: ingredient.id,
+      name: ingredient.name,
+      unitId: ingredient.unitId,
+      description: ingredient.description,
+      status: ingredient.status,
     };
-    const img = selectedFile ? selectedFile : null;
-
+    const img = file ? file : null;
+    setDetailLoading(true);
     try {
 
       await updateIngredient({ ingredient: jsonRequest, imageFile: img });
@@ -134,14 +137,15 @@ const IngredientList = () => {
       toast.success("Cập nhật thành công!");
       // setTimeout(() => {
       //   handleShowDetail(formData.id);
-      //   fetchData();
+      fetchData();
       // }, 500);
     } catch (err) {
       toast.error(err.message || "Cập nhật thất bại!");
+    } finally {
+      setDetailLoading(false);
+      setConfirmOpen(false);
     }
   };
-
-  // Không dùng columns nữa, chuyển sang card
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
@@ -184,7 +188,7 @@ const IngredientList = () => {
             setKeyword(e.target.value);
             setPage(0);
           }}
-          style={{ width: 240 }}
+          style={{ width: 240, borderRadius: 8 }}
         />
       </Space>
       <div style={{ minHeight: 300 }}>
@@ -220,7 +224,7 @@ const IngredientList = () => {
                       />
                     </Tooltip>
                   }
-                  styles={{ body: { padding: 32 }}}
+                  styles={{ body: { padding: 32 } }}
                 >
                   {item.imgUrl && (
                     <img
@@ -298,7 +302,10 @@ const IngredientList = () => {
                 color: "#d32f2f",
                 transition: "all 0.2s",
               }}
-              onClick={() => toast.info("Ngưng hoạt động")}
+              onClick={(e) => {
+                e.stopPropagation();
+                setConfirmOpen(true);
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#d32f2f";
                 e.currentTarget.style.color = "#fff";
@@ -307,6 +314,30 @@ const IngredientList = () => {
                 e.currentTarget.style.background = "#fff";
                 e.currentTarget.style.color = "#d32f2f";
               }}
+            >
+              Ngưng hoạt động
+            </Button>
+            <ConfirmModal
+              open={confirmOpen}
+              onOk={async () => {
+                const newFormData = { ...formData, status: ModelStatus.INACTIVE };
+                setFormData(newFormData);
+                await handleUpdateIngredient(newFormData, selectedFile);
+                // setConfirmOpen(false);
+                setDetailOpen(false);
+                toast.success("Đã ngưng hoạt động!");
+              }}
+              onCancel={() => {
+                setConfirmOpen(false);
+              }}
+              title="Xác nhận Ngưng hoạt động nguyên liệu"
+              content={
+                formData
+                  ? `Bạn có chắc chắn muốn Ngưng hoạt động nguyên liệu "${formData.name}"?`
+                  : ""
+              }
+              okText="Ngưng hoạt động"
+              cancelText="Huỷ"
             />
             <div style={{ marginBottom: 16 }}>
               <label
@@ -326,7 +357,7 @@ const IngredientList = () => {
                 }}
               />
             </div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16, textAlign: "center" }}>
               {isEditing ? (
                 <>
                   <label
@@ -334,6 +365,7 @@ const IngredientList = () => {
                       fontWeight: 500,
                       marginBottom: 4,
                       display: "block",
+                      textAlign: "left",
                     }}
                   >
                     Chọn ảnh mới:
@@ -356,7 +388,7 @@ const IngredientList = () => {
                   />
                   <Image
                     src={previewImg || ingredientDetail.imgUrl || ""}
-                    style={{ width: "100%", borderRadius: 8 }}
+                    style={{ width: "80%", borderRadius: 8 }}
                   />
                 </>
               ) : (
@@ -366,13 +398,14 @@ const IngredientList = () => {
                       fontWeight: 500,
                       marginBottom: 4,
                       display: "block",
+                      textAlign: "left",
                     }}
                   >
                     Ảnh hiện tại:
                   </label>
                   <Image
                     src={ingredientDetail.imgUrl || ""}
-                    style={{ width: "100%", borderRadius: 8 }}
+                    style={{ width: "80%", borderRadius: 8 }}
                   />
                 </>
               )}
@@ -431,7 +464,7 @@ const IngredientList = () => {
                   type="primary"
                   className="btn-save"
                   icon={<SaveOutlined />}
-                  onClick={handleUpdateIngredient}
+                  onClick={async () => await handleUpdateIngredient(formData, selectedFile)}
                   style={{
                     minWidth: 100,
                     backgroundColor: "#349f4aff",
@@ -454,6 +487,8 @@ const IngredientList = () => {
                     transition: "all 0.2s",
                     borderRadius: 8,
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#184a79ff"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#246badff"; }}
                 >
                   Sửa
                 </Button>
