@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Button, message } from "antd";
+import { Button, Spin } from "antd";
 import {
   FaUtensils,
   FaClock,
@@ -29,7 +29,6 @@ const RecipeList = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(10);
-  // Filter state
   const [keyword, setKeyword] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
@@ -199,11 +198,10 @@ const RecipeList = () => {
       {/* Content Section */}
       <div className="content-section">
         {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Đang tải công thức...</p>
-          </div>
-        ) : error ? (
+            <div style={{ textAlign: "center", margin: "40px 0" }}>
+              <Spin size="large" />
+            </div>
+          ) : error ? (
           <div className="error-state">
             <p>{error}</p>
           </div>

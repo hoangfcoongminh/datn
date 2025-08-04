@@ -1,5 +1,5 @@
 // Cập nhật category
-export async function updateCategory({ id, name, description, status = 1 }) {
+export async function updateCategory({ updatingCategory }) {
   const token = localStorage.getItem('token');
   const res = await fetch('http://localhost:8080/api/categories', {
     method: 'PUT',
@@ -7,7 +7,7 @@ export async function updateCategory({ id, name, description, status = 1 }) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ id, name, description, status })
+    body: updatingCategory ? JSON.stringify(updatingCategory) : '{}'
   });
   let data;
   try {
@@ -21,7 +21,7 @@ export async function updateCategory({ id, name, description, status = 1 }) {
   return data;
 }
 // Thêm mới category
-export async function addCategory({ name, description }) {
+export async function addCategory({ addingCategory }) {
   const token = localStorage.getItem('token');
   // if (!token) throw new Error('Bạn phải đăng nhập để thêm danh mục!');
   const res = await fetch('http://localhost:8080/api/categories', {
@@ -30,7 +30,7 @@ export async function addCategory({ name, description }) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ name, description })
+    body: addingCategory ? JSON.stringify(addingCategory) : '{}'
   });
   let data;
   try {
@@ -43,6 +43,7 @@ export async function addCategory({ name, description }) {
   }
   return data;
 }
+
 // API cho Category
 export async function fetchCategories({ page = 0, size = 5, search = '', sort = 'name,asc' } = {}) {
   const token = localStorage.getItem('token');
