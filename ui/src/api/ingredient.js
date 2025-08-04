@@ -80,17 +80,13 @@ export async function updateIngredient({ ingredient, imageFile }) {
     body: formData
   });
   let data;
-  console.log('4');
   
   try {
     data = await res.json();
-    console.log('5');
   } catch {
-    console.log('7');
     throw new Error('Lỗi không xác định từ máy chủ.');
   }
   if (!data.success) {
-    console.log('8');
     throw new Error(data?.message || 'Lỗi khi cập nhật nguyên liệu');
     
   }

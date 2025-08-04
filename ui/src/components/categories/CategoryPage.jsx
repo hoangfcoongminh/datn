@@ -12,6 +12,7 @@ import {
   Button,
   message,
 } from "antd";
+import { StopOutlined } from "@ant-design/icons";
 import ConfirmModal from "../common/ConfirmModal";
 
 // Kiểm tra quyền user
@@ -26,7 +27,7 @@ const { Option } = Select;
 const CategoryPage = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [deleteCat, setDeleteCat] = useState(null); // category chờ xác nhận xoá
+  const [deleteCat, setDeleteCat] = useState(null); // category chờ xác nhận Xóa
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0); // page API bắt đầu từ 0
@@ -52,7 +53,7 @@ const CategoryPage = () => {
       .finally(() => setLoading(false));
   }, [page, size, search]);
 
-  // Hàm xoá mềm category
+  // Hàm Xóa mềm category
   const handleDelete = async (cat) => {
     try {
       await updateCategory({
@@ -61,14 +62,14 @@ const CategoryPage = () => {
         description: cat.description,
         status: 0,
       });
-      toast.success("Đã xoá danh mục!");
+      toast.success("Đã Xóa danh mục!");
       // Refetch
       setLoading(true);
       const data = await fetchCategories({ page, size, search });
       setCategories(data?.content || []);
       setTotal(data?.total || 0);
     } catch (err) {
-      toast.error(err.message || "Lỗi khi xoá danh mục");
+      toast.error(err.message || "Lỗi khi Xóa danh mục");
     } finally {
       setLoading(false);
       setConfirmOpen(false);
@@ -154,7 +155,7 @@ const CategoryPage = () => {
                     position: "relative",
                   }}
                   onClick={(e) => {
-                    // Nếu click vào nút Xoá thì không navigate
+                    // Nếu click vào nút Xóa thì không navigate
                     if (e.target.closest(".delete-category-btn")) return;
                     navigate(`/recipes?categoryId=${cat.id}`);
                   }}
@@ -174,6 +175,7 @@ const CategoryPage = () => {
                     (user.user?.role === "ADMIN" ||
                       user.user?.role === "USER") && (
                       <Button
+                      icon={<StopOutlined />}
                         danger
                         type="primary"
                         size="small"
@@ -195,7 +197,7 @@ const CategoryPage = () => {
                           setConfirmOpen(true);
                         }}
                       >
-                        Xoá
+                        Ngưng hoạt động
                       </Button>
                     )}
                 </Card>
@@ -208,13 +210,13 @@ const CategoryPage = () => {
                 setConfirmOpen(false);
                 setDeleteCat(null);
               }}
-              title="Xác nhận xoá danh mục"
+              title="Xác nhận Xóa danh mục"
               content={
                 deleteCat
-                  ? `Bạn có chắc chắn muốn xoá danh mục "${deleteCat.name}"?`
+                  ? `Bạn có chắc chắn muốn Xóa danh mục "${deleteCat.name}"?`
                   : ""
               }
-              okText="Xoá"
+              okText="Xóa"
               cancelText="Huỷ"
             />
           </div>
