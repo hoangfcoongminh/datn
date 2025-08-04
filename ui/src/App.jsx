@@ -19,7 +19,7 @@ import Loading from "./components/common/Loading";
 import { Header, Footer } from "./components/common";
 import { logout as apiLogout } from "./api/auth";
 import { AddRecipePage, EditRecipePage } from "./components/recipes";
-import { AddCategoryPage, CategoryPage } from "./components/categories";
+import { CategoryPage } from "./components/categories";
 import IngredientList from "./components/ingredients/IngredientList";
 import { ToastContainer } from "react-toastify";
 
@@ -136,7 +136,6 @@ function AppContent() {
           }
         />
         <Route path="/categories" element={<CategoryPage />} />
-        <Route path="/categories/add" element={<AddCategoryPage />} />
         <Route path="/ingredients" element={<IngredientList />} />
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />

@@ -119,11 +119,6 @@
   font-size: 1.08rem;
   line-height: 1.5;
 }
-.delete-btn-hover:hover {
-  background-color: #a50034;
-  color: #fff;
-  cursor: pointer;
-}
 @media (max-width: 900px) {
   .category-grid {
     grid-template-columns: 1fr;
@@ -133,3 +128,20 @@
     height: 180px;
   }
 }
+
+.ant-btn-primary.btn-save:hover {
+  background-color: #2a7f3dff !important; /* màu khi hover */
+  color: #fff;
+}
+
+.ant-btn-primary.btn-edit:hover {
+  background-color: rgb(19, 77, 133) !important; /* màu khi hover */
+  color: #fff;
+}
+
+.ant-btn-default.inactive-btn:hover {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+

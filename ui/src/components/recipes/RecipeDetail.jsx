@@ -68,7 +68,7 @@ const RecipeDetail = () => {
 
         <div className="recipe-header">
           <div className="recipe-image-section">
-            <img src={recipe.imgUrl || 'https://via.placeholder.com/400x250?text=No+Image'} alt={recipe.title} className="recipe-main-image" />
+            <img style={ {borderRadius: 8, marginLeft: 32}} src={recipe.imgUrl || 'https://via.placeholder.com/400x250?text=No+Image'} alt={recipe.title} className="recipe-main-image" />
             <button className="like-button-large">
               <FaHeart />
             </button>

@@ -1,7 +1,8 @@
 import React from "react";
-import { Modal, Spin, Input, Button, Form } from "antd";
+import { Modal, Spin } from "antd";
+import "./PopUp.css"; // Assuming you have some styles for the modal
 
-const DetailModal = ({
+const PopUp = ({
   open,
   onCancel,
   title,
@@ -10,7 +11,7 @@ const DetailModal = ({
   onEdit,
   onSave,
   onChange,
-  isEditing,
+  // isEditing,
   children
 }) => {
   return (
@@ -21,8 +22,8 @@ const DetailModal = ({
       footer={null}
       centered
       maskClosable={true}
-      width={480}
-      // style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)' }}
+      width={500}
+      modalStyle={{ borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: 32 }}><Spin size="large" /></div>
@@ -35,4 +36,4 @@ const DetailModal = ({
   );
 };
 
-export default DetailModal;
+export default PopUp;

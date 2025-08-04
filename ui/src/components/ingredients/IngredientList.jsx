@@ -25,7 +25,7 @@ import {
   detailIngredient,
   updateIngredient,
 } from "../../api/ingredient";
-import DetailModal from "../common/DetailModal";
+import PopUp from "../common/PopUp";
 import "./IngredientList.css";
 import 'antd/dist/reset.css';
 import { toast } from "react-toastify";
@@ -270,7 +270,7 @@ const IngredientList = () => {
           showTotal={(t) => `Tổng ${t} nguyên liệu`}
         />
       </div>
-      <DetailModal
+      <PopUp
         open={detailOpen}
         onCancel={() => {
           setDetailOpen(false);
@@ -282,10 +282,10 @@ const IngredientList = () => {
             : "Chi tiết nguyên liệu"
         }
         loading={detailLoading}
-        isEditing={isEditing}
+        // isEditing={isEditing}
       >
         {ingredientDetail && (
-          <div style={{ fontSize: 16, position: "relative" }}>
+          <div style={{ fontSize: 16, position: "relative", marginTop: 24, marginBottom: 24 }}>
             {/* Nút ngưng hoạt động góc trên phải */}
             <Button
               icon={<StopOutlined />}
@@ -294,7 +294,7 @@ const IngredientList = () => {
               size="small"
               style={{
                 position: "absolute",
-                top: 0,
+                top: -10,
                 right: 0,
                 zIndex: 2,
                 background: "#fff",
@@ -386,10 +386,12 @@ const IngredientList = () => {
                       }
                     }}
                   />
-                  <Image
-                    src={previewImg || ingredientDetail.imgUrl || ""}
-                    style={{ width: "80%", borderRadius: 8 }}
-                  />
+                  {(previewImg || ingredientDetail.imgUrl) && (
+                    <Image
+                      src={previewImg || ingredientDetail.imgUrl}
+                      style={{ width: "80%", borderRadius: 8 }}
+                    />
+                  )}
                 </>
               ) : (
                 <>
@@ -403,10 +405,12 @@ const IngredientList = () => {
                   >
                     Ảnh hiện tại:
                   </label>
-                  <Image
-                    src={ingredientDetail.imgUrl || ""}
-                    style={{ width: "80%", borderRadius: 8 }}
-                  />
+                  {ingredientDetail && ingredientDetail.imgUrl && (
+                    <Image
+                      src={ingredientDetail.imgUrl}
+                      style={{ width: "80%", borderRadius: 8 }}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -489,6 +493,7 @@ const IngredientList = () => {
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#184a79ff"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#246badff"; }}
+                  loading={detailLoading}
                 >
                   Sửa
                 </Button>
@@ -512,7 +517,7 @@ const IngredientList = () => {
             </div>
           </div>
         )}
-      </DetailModal>
+      </PopUp>
     </div>
   );
 };
