@@ -9,12 +9,10 @@ import com.edward.cook_craft.mapper.CategoryMapper;
 import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.model.Category;
 import com.edward.cook_craft.model.Recipe;
-import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.CategoryRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
-import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -24,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +73,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponse update(String jsonRequest, MultipartFile file) {
         CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
-        Category existed = repository.findByIdAndActive(request.getId()).orElseThrow(() -> new CustomException("category-not-exist"));
+        Category existed = repository.findByIdAndActive(request.getId()).orElseThrow(() -> new CustomException("category.not.exist"));
         if (request.getName() == null || request.getName().isEmpty()) {
             throw new CustomException("name.cannot.be.blank");
         }

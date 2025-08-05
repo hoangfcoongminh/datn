@@ -20,7 +20,7 @@ public final class JsonUtils {
         try {
             return mapper.readValue(object, clazz);
         } catch (JsonProcessingException e) {
-            throw new CustomException("fail.to.parse.json" + e.getMessage());
+            throw new CustomException("fail.to.parse.json");
         }
     }
 }
