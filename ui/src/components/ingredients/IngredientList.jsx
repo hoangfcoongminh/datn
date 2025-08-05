@@ -27,7 +27,7 @@ import {
 } from "../../api/ingredient";
 import PopUp from "../common/PopUp";
 import "./IngredientList.css";
-import 'antd/dist/reset.css';
+import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
 import ConfirmModal from "../common/ConfirmModal";
@@ -53,6 +53,7 @@ const IngredientList = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   useEffect(() => {
     fetchUnits().then((data) => setUnits(Array.isArray(data) ? data : []));
@@ -131,7 +132,6 @@ const IngredientList = () => {
     const img = file ? file : null;
     setDetailLoading(true);
     try {
-
       await updateIngredient({ ingredient: jsonRequest, imageFile: img });
 
       toast.success("Cập nhật thành công!");
@@ -285,42 +285,54 @@ const IngredientList = () => {
         // isEditing={isEditing}
       >
         {ingredientDetail && (
-          <div style={{ fontSize: 16, position: "relative", marginTop: 24, marginBottom: 24 }}>
+          <div
+            style={{
+              fontSize: 16,
+              position: "relative",
+              marginTop: 24,
+              marginBottom: 24,
+            }}
+          >
             {/* Nút ngưng hoạt động góc trên phải */}
-            <Button
-              icon={<StopOutlined />}
-              type="default"
-              danger
-              size="small"
-              style={{
-                position: "absolute",
-                top: -10,
-                right: 0,
-                zIndex: 2,
-                background: "#fff",
-                borderColor: "#d32f2f",
-                color: "#d32f2f",
-                transition: "all 0.2s",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setConfirmOpen(true);
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#d32f2f";
-                e.currentTarget.style.color = "#fff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#fff";
-                e.currentTarget.style.color = "#d32f2f";
-              }}
-            >
-              Ngưng hoạt động
-            </Button>
+            {user && (
+              <Button
+                icon={<StopOutlined />}
+                type="default"
+                danger
+                size="small"
+                style={{
+                  position: "absolute",
+                  top: -10,
+                  right: 0,
+                  zIndex: 2,
+                  background: "#fff",
+                  borderColor: "#d32f2f",
+                  color: "#d32f2f",
+                  transition: "all 0.2s",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setConfirmOpen(true);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#d32f2f";
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#fff";
+                  e.currentTarget.style.color = "#d32f2f";
+                }}
+              >
+                Ngưng hoạt động
+              </Button>
+            )}
             <ConfirmModal
               open={confirmOpen}
               onOk={async () => {
-                const newFormData = { ...formData, status: ModelStatus.INACTIVE };
+                const newFormData = {
+                  ...formData,
+                  status: ModelStatus.INACTIVE,
+                };
                 setFormData(newFormData);
                 await handleUpdateIngredient(newFormData, selectedFile);
                 // setConfirmOpen(false);
@@ -346,7 +358,7 @@ const IngredientList = () => {
                 Tên:
               </label>
               <Input
-                value={typeof formData.name === 'string' ? formData.name : ''}
+                value={typeof formData.name === "string" ? formData.name : ""}
                 disabled={!isEditing}
                 size="large"
                 onChange={(e) => {
@@ -444,7 +456,11 @@ const IngredientList = () => {
                 Mô tả:
               </label>
               <Input.TextArea
-                value={typeof formData.description === 'string' ? formData.description : ''}
+                value={
+                  typeof formData.description === "string"
+                    ? formData.description
+                    : ""
+                }
                 disabled={!isEditing}
                 autoSize={{ minRows: 2, maxRows: 4 }}
                 onChange={(e) => {
@@ -463,41 +479,48 @@ const IngredientList = () => {
                 marginTop: 24,
               }}
             >
-              {isEditing ? (
-                <Button
-                  type="primary"
-                  className="btn-save"
-                  icon={<SaveOutlined />}
-                  onClick={async () => await handleUpdateIngredient(formData, selectedFile)}
-                  style={{
-                    minWidth: 100,
-                    backgroundColor: "#349f4aff",
-                    color: "#fff",
-                    transition: "all 0.2s",
-                    borderRadius: 8,
-                  }}
-                >
-                  Lưu
-                </Button>
-              ) : (
-                <Button
-                  icon={<EditOutlined />}
-                  className="btn-edit"
-                  onClick={() => handleShowToEdit(ingredientDetail.id)}
-                  style={{
-                    minWidth: 100,
-                    backgroundColor: "#246badff",
-                    color: "#fff",
-                    transition: "all 0.2s",
-                    borderRadius: 8,
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#184a79ff"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#246badff"; }}
-                  loading={detailLoading}
-                >
-                  Sửa
-                </Button>
-              )}
+              {user &&
+                (isEditing ? (
+                  <Button
+                    type="primary"
+                    className="btn-save"
+                    icon={<SaveOutlined />}
+                    onClick={async () =>
+                      await handleUpdateIngredient(formData, selectedFile)
+                    }
+                    style={{
+                      minWidth: 100,
+                      backgroundColor: "#349f4aff",
+                      color: "#fff",
+                      transition: "all 0.2s",
+                      borderRadius: 8,
+                    }}
+                  >
+                    Lưu
+                  </Button>
+                ) : (
+                  <Button
+                    icon={<EditOutlined />}
+                    className="btn-edit"
+                    onClick={() => handleShowToEdit(ingredientDetail.id)}
+                    style={{
+                      minWidth: 100,
+                      backgroundColor: "#246badff",
+                      color: "#fff",
+                      transition: "all 0.2s",
+                      borderRadius: 8,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#184a79ff";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#246badff";
+                    }}
+                    loading={detailLoading}
+                  >
+                    Sửa
+                  </Button>
+                ))}
               <Button
                 type="default"
                 className="btn-close"
