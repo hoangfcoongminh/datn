@@ -15,6 +15,7 @@ import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class IngredientService {
+
+    @Value("${image.default.ingredient}")
+    private String defaultIngredient;
 
     private final IngredientRepository repository;
     private final UnitRepository unitRepository;
@@ -65,7 +69,7 @@ public class IngredientService {
         if (file != null && !file.isEmpty()) {
             i.setImgUrl(minioService.uploadFile(file));
         } else {
-            i.setImgUrl(minioService.getDefaultImgIngredient());
+            i.setImgUrl(defaultIngredient);
         }
         return ingredientMapper.toResponse(repository.save(i));
     }
@@ -81,7 +85,9 @@ public class IngredientService {
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
         existed.setDescription(request.getDescription());
         if (file != null && !file.isEmpty()) {
-            minioService.deleteFile(existed.getImgUrl());
+            if (!defaultIngredient.equals(existed.getImgUrl())) {
+                minioService.deleteFile(existed.getImgUrl());
+            }
             existed.setImgUrl(minioService.uploadFile(file));
         }
         return ingredientMapper.toResponse(repository.save(existed));

@@ -25,9 +25,6 @@ public class MinioService {
     @Value("${minio.url}")
     private String url;
 
-    public static final String DEFAULT_IMG_INGREDIENT = "default-ingredient";
-    public static final String DEFAULT_IMG_SEAT = "default-seat";
-
     @PostConstruct
     public void initBucket() {
         try {
@@ -39,10 +36,6 @@ public class MinioService {
             log.error("Error initializing MinIO bucket {}", e.getMessage());
             throw new RuntimeException("Error initializing MinIO bucket", e);
         }
-    }
-
-    public String getDefaultImgIngredient() {
-        return url + "/" + bucketName + "/" + DEFAULT_IMG_INGREDIENT;
     }
 
     public String uploadFile(MultipartFile file) {

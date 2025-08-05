@@ -13,6 +13,7 @@ import com.edward.cook_craft.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticService {
+
+    @Value("${image.default.avt}")
+    private String defaultAvt;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -49,6 +53,7 @@ public class AuthenticService {
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setFullName(request.getFullName());
         newUser.setEmail(request.getEmail());
+        newUser.setImgUrl(defaultAvt);
         newUser.setRole(Role.USER);
 
         newUser = userRepository.save(newUser);

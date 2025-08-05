@@ -35,3 +35,10 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   bucket: images
+
+image:
+  default:
+    avt: http://localhost:9000/images/default-avt.jpg
+    category: http://localhost:9000/images/default-category.jpg
+    recipe: http://localhost:9000/images/default-recipe.jpg
+    ingredient: http://localhost:9000/images/default-ingredient.jpg

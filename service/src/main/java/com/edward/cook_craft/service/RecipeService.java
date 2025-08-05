@@ -37,10 +37,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class RecipeService {
 
-    @Value("${minio.url}")
-    private String minioUrl;
-    @Value("${minio.bucket}")
-    private String minioBucket;
+    @Value("${image.default.recipe}")
+    private String defaultRecipe;
 
     private final RecipeRepository repository;
     private final CategoryRepository categoryRepository;
@@ -101,7 +99,7 @@ public class RecipeService {
         if (file != null && !file.isEmpty()) {
             recipe.setImgUrl(minioService.uploadFile(file));
         } else {
-            recipe.setImgUrl(minioUrl + "/" + minioBucket + "/default.jpg");
+            recipe.setImgUrl(defaultRecipe);
         }
         Recipe finalRecipe = repository.save(recipe);
 
@@ -134,9 +132,6 @@ public class RecipeService {
     public RecipeResponse update(String jsonRequest, MultipartFile file) {
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
-//        log.info("Username now: " + SecurityUtils.getCurrentUsername());
-        log.info("Ingredients received: {}", request.getIngredients().size());
-        log.info("Steps received: {}", request.getSteps().size());
         if (!Objects.equals(SecurityUtils.getCurrentUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
@@ -186,7 +181,7 @@ public class RecipeService {
         r.setServings(request.getServings());
         r.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
         if (file != null && !file.isEmpty()) {
-            if (r.getImgUrl() != null) {
+            if (!defaultRecipe.equals(r.getImgUrl())) {
                 minioService.deleteFile(r.getImgUrl());
             }
             r.setImgUrl(minioService.uploadFile(file));
