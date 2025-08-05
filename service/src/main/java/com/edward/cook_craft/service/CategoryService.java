@@ -12,12 +12,16 @@ import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.CategoryRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
+import com.edward.cook_craft.service.minio.MinioService;
+import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,10 +31,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService {
 
+    @Value("${image.default.category}")
+    private String defaultCategory;
+
     private final CategoryRepository repository;
     private final PageMapper pageMapper;
     private final CategoryMapper mapper;
     private final RecipeRepository recipeRepository;
+    private final MinioService minioService;
 
     public List<CategoryResponse> getAll() {
         return repository.findAll().stream()
@@ -46,28 +54,44 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse create(CategoryRequest request) {
+    public CategoryResponse create(String jsonRequest, MultipartFile file) {
+        CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new CustomException("name.cannot.be.blank");
+        }
         if (repository.existsByName(request.getName())) {
             throw new CustomException("name.already.exists");
         }
         Category c = mapper.of(request);
         c.setId(null);
+        if (file != null && !file.isEmpty()) {
+            c.setImgUrl(minioService.uploadFile(file));
+        } else {
+            c.setImgUrl(defaultCategory);
+        }
         c = repository.save(c);
 
         return mapper.toResponse(c);
     }
 
     @Transactional
-    public CategoryResponse update(CategoryRequest request) {
-        Category existed = validate(request.getId());
-
-        if (request.getName() != null && !request.getName().equals(existed.getName())) {
-            if (repository.existsByName(request.getName())) {
-                throw new CustomException("name.already.exists");
-            }
+    public CategoryResponse update(String jsonRequest, MultipartFile file) {
+        CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
+        Category existed = repository.findByIdAndActive(request.getId()).orElseThrow(() -> new CustomException("category-not-exist"));
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new CustomException("name.cannot.be.blank");
+        }
+        if (!request.getName().equals(existed.getName()) && repository.existsByName(request.getName())) {
+            throw new CustomException("name.already.exists");
         }
         existed.setName(request.getName());
         existed.setDescription(request.getDescription());
+        if (file != null && !file.isEmpty()) {
+            if (!defaultCategory.equals(existed.getImgUrl())) {
+                minioService.deleteFile(existed.getImgUrl());
+            }
+            existed.setImgUrl(minioService.uploadFile(file));
+        }
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
         existed = repository.save(existed);
 
@@ -79,13 +103,5 @@ public class CategoryService {
         }
 
         return mapper.toResponse(existed);
-    }
-
-    private Category validate(Long id) {
-        Optional<Category> check = repository.findByIdAndActive(id);
-        if (check.isEmpty()) {
-            throw new CustomException("category-not-exist");
-        }
-        return check.get();
     }
 }

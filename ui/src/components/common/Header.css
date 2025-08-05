@@ -86,3 +86,7 @@
 .header-dropdown-list button:hover {
   background: #fbe0ea;
 }
+
+.ant-dropdown-menu {
+  border-radius: 8px !important;
+}

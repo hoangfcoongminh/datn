@@ -1,13 +1,17 @@
 // Cập nhật category
-export async function updateCategory({ updatingCategory }) {
+export async function updateCategory({ updatingCategory, imageFile }) {
   const token = localStorage.getItem('token');
+  const formData = new FormData();
+  formData.append('jsonRequest', JSON.stringify(updatingCategory));
+  if (imageFile) {
+    formData.append('img', imageFile);
+  }
   const res = await fetch('http://localhost:8080/api/categories', {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: updatingCategory ? JSON.stringify(updatingCategory) : '{}'
+    body: formData
   });
   let data;
   try {
@@ -21,16 +25,20 @@ export async function updateCategory({ updatingCategory }) {
   return data;
 }
 // Thêm mới category
-export async function addCategory({ addingCategory }) {
+export async function addCategory({ addingCategory, imageFile }) {
   const token = localStorage.getItem('token');
+  const formData = new FormData();
+  formData.append('jsonRequest', JSON.stringify(addingCategory));
+  if (imageFile) {
+    formData.append('img', imageFile);
+  }
   // if (!token) throw new Error('Bạn phải đăng nhập để thêm danh mục!');
   const res = await fetch('http://localhost:8080/api/categories', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: addingCategory ? JSON.stringify(addingCategory) : '{}'
+    body: formData
   });
   let data;
   try {

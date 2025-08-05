@@ -27,6 +27,8 @@ public class User extends BaseModel {
 
     private String email;
 
+    private String imgUrl;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
