@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +62,19 @@ public class RecipeService {
         List<Long> categoryIds = request.getCategoryIds() == null || request.getCategoryIds().isEmpty() ? null : request.getCategoryIds();
         List<Long> ingredientIds = request.getIngredientIds() == null || request.getIngredientIds().isEmpty() ? null : request.getIngredientIds();
         List<String> authorUsernames = request.getAuthorUsernames() == null || request.getAuthorUsernames().isEmpty() ? null : request.getAuthorUsernames();
+        Integer status = request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus();
+        boolean sortByFavorite = pageable.getSort().stream()
+                .anyMatch(order -> order.getProperty().equalsIgnoreCase("favorite"));
+        Page<Recipe> data;
+        if (sortByFavorite) {
+            data = repository.filterWithFavorite(
+                    keyword, categoryIds, ingredientIds, authorUsernames, status, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
+            );
+        } else {
+            data = repository.filter(
+                    keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
+        }
 
-        Page<Recipe> data = repository.filter(
-                keyword, categoryIds, ingredientIds, authorUsernames, pageable);
         return pageMapper.map(data, recipeMapper::toResponse);
     }
 
