@@ -53,7 +53,7 @@ export async function addCategory({ addingCategory, imageFile }) {
 }
 
 // API cho Category
-export async function fetchCategories({ page = 0, size = 5, search = '', sort = 'name,asc' } = {}) {
+export async function fetchCategories({ page, size, search, sort } = {}) {
   const token = localStorage.getItem('token');
   const res = await fetch(`http://localhost:8080/api/categories/filter?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`,
     {
