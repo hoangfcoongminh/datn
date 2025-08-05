@@ -32,7 +32,7 @@ import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
 
-const PAGE_SIZE_OPTIONS = [5, 10, 20];
+// const PAGE_SIZE_OPTIONS = [5, 10, 20];
 const { Option } = Select;
 
 const CategoryPage = () => {
@@ -41,8 +41,9 @@ const CategoryPage = () => {
   const [updatingCategory, setUpdatingCategory] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("id,asc");
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
+  const [size, setSize] = useState(5);
   const [total, setTotal] = useState(0);
   const [pageLoading, setPageLoading] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -83,7 +84,7 @@ const CategoryPage = () => {
       const data = await fetchCategories({
         page,
         size: size,
-        sort: "name,asc",
+        sort: sortField,
         search: search,
       });
       setCategories(data.content || []);
@@ -97,7 +98,7 @@ const CategoryPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, size, search]);
+  }, [page, size, search, sortField]);
 
   const handleShowDetail = async (cat) => {
     try {
@@ -116,7 +117,11 @@ const CategoryPage = () => {
   const handleAddCategory = async (addingCategory, file) => {
     try {
       setBtnLoading(true);
-      await addCategory({ addingCategory: addingCategory, imageFile: file });
+      const cleanedCategory = {
+        name: addingCategory.name.trim(),
+        description: addingCategory.description.trim(),
+      };
+      await addCategory({ addingCategory: cleanedCategory, imageFile: file });
       toast.success("Đã thêm danh mục!");
       setPopUp(false);
       setAddingCategory({
@@ -134,21 +139,22 @@ const CategoryPage = () => {
   };
 
   // Hàm Cập nhật category
-  const handleUpdateCategory = async (cat) => {
+  const handleUpdateCategory = async (cat, file) => {
     setBtnLoading(true);
     try {
       const category = {
         id: cat.id,
-        name: cat.name,
-        description: cat.description,
+        name: cat.name.trim(),
+        description: cat.description.trim(),
         status: cat.status,
       };
-      await updateCategory({ updatingCategory: category });
+      await updateCategory({ updatingCategory: category, imageFile: file });
       toast.success("Đã Cập nhật danh mục!");
       // Refetch
       if (cat.status === ModelStatus.INACTIVE) {
         setDetailOpen(false);
       }
+      setIsEditing(false);
       fetchData();
     } catch (err) {
       toast.error(err.message || "Lỗi khi Cập nhật danh mục");
@@ -198,6 +204,23 @@ const CategoryPage = () => {
           >
             + Thêm Danh mục
           </Button>
+          <div className="filter-group search-group">
+            <label>Sắp xếp theo</label>
+            <Select
+              value={sortField}
+              style={{ width: 160, borderRadius: 8 }}
+              onChange={(value) => {
+                setSortField(value);
+                setPage(0);
+              }}
+              options={[
+                { value: "name,asc", label: "Tên tăng dần" },
+                { value: "name,desc", label: "Tên giảm dần" },
+                { value: "id,asc", label: "Cũ nhất" },
+                { value: "id,desc", label: "Mới nhất" },
+              ]}
+            />
+          </div>
           <div className="filter-group search-group">
             <label>Tìm kiếm</label>
             <Input
@@ -303,7 +326,7 @@ const CategoryPage = () => {
                 pageSize={size}
                 total={total}
                 showSizeChanger={true}
-                pageSizeOptions={PAGE_SIZE_OPTIONS.map(String)}
+                // pageSizeOptions={PAGE_SIZE_OPTIONS.map(String)}
                 onChange={(p, ps) => {
                   setPage(p - 1);
                   setSize(ps);
@@ -337,6 +360,7 @@ const CategoryPage = () => {
                     name: e.target.value,
                   });
                 }}
+                style={{ borderRadius: 8 }}
               />
             </div>
             <div style={{ marginBottom: 16 }}>
@@ -359,14 +383,15 @@ const CategoryPage = () => {
                     setPreviewImg(null);
                   }
                 }}
+                style={{ borderRadius: 8 }}
               />
               {previewImg && (
                 <>
-                  <div style={{ textAlign: 'center'}}>
+                  <div style={{ textAlign: "center" }}>
                     <Image
-                    src={previewImg || ingredientDetail.imgUrl}
-                    style={{ width: "80%", borderRadius: 8 }}
-                  />
+                      src={previewImg || ingredientDetail.imgUrl}
+                      style={{ width: "80%", borderRadius: 8 }}
+                    />
                   </div>
                 </>
               )}
@@ -378,7 +403,7 @@ const CategoryPage = () => {
                 Mô tả:
               </label>
               <Input.TextArea
-                autoSize={{ minRows: 2, maxRows: 4 }}
+                rows={3}
                 value={addingCategory.description}
                 onChange={(e) => {
                   setAddingCategory({
@@ -386,6 +411,7 @@ const CategoryPage = () => {
                     description: e.target.value,
                   });
                 }}
+                style={{ borderRadius: 8, resize: "both" }}
               />
             </div>
             <div
@@ -488,7 +514,48 @@ const CategoryPage = () => {
                       name: e.target.value,
                     });
                   }}
+                  style={{ borderRadius: 8 }}
                 />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{
+                    fontWeight: 500,
+                    marginBottom: 4,
+                    display: "block",
+                  }}
+                >
+                  Hình minh họa:
+                </label>
+                {isEditing && (
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    style={{ marginBottom: 8 }}
+                    onChange={(e) => {
+                      const file = e.target.files && e.target.files[0];
+                      setSelectedFile(file || null);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => setPreviewImg(ev.target.result);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setPreviewImg(null);
+                      }
+                    }}
+                    styles={{ borderRadius: 8 }}
+                  />
+                )}
+                {(previewImg || editingCategory.imgUrl) && (
+                  <>
+                    <div style={{ textAlign: "center" }}>
+                      <Image
+                        src={previewImg || editingCategory.imgUrl}
+                        style={{ width: "80%", borderRadius: 8 }}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label
@@ -501,7 +568,7 @@ const CategoryPage = () => {
                   Mô tả:
                 </label>
                 <Input.TextArea
-                  autoSize={{ minRows: 2, maxRows: 4 }}
+                  rows={3}
                   value={editingCategory.description}
                   disabled={!isEditing}
                   onChange={(e) => {
@@ -510,6 +577,7 @@ const CategoryPage = () => {
                       description: e.target.value,
                     });
                   }}
+                  styles={{ borderRadius: 8 }}
                 />
               </div>
             </div>
@@ -529,7 +597,7 @@ const CategoryPage = () => {
                     className="btn-save"
                     icon={<SaveOutlined />}
                     onClick={async () =>
-                      await handleUpdateCategory(editingCategory)
+                      await handleUpdateCategory(editingCategory, selectedFile)
                     }
                     style={{
                       minWidth: 100,

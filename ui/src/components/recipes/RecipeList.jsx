@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button, Spin } from "antd";
 import {
@@ -30,13 +30,17 @@ const RecipeList = () => {
   const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(10);
   const [keyword, setKeyword] = useState("");
+  const [minTime, setMinTime] = useState("");
+  const [maxTime, setMaxTime] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const params = new URLSearchParams(location.search);
   const categoryIdFromUrl = params.get("categoryId");
-  
+  const [sortField, setSortField] = useState("id,asc");
+  const [typeTime, setTypeTime] = useState("hour");
+
   useEffect(() => {
     if (categoryIdFromUrl) {
       setCategoryIds([parseInt(categoryIdFromUrl)]);
@@ -58,8 +62,11 @@ const RecipeList = () => {
         keyword,
         categoryIds,
         ingredientIds,
+        minTime: minTime || undefined,
+        maxTime: maxTime || undefined,
         page,
         size: size,
+        sort: sortField,
       });
       setRecipes(data.content || []);
       setTotal(data.total || 1);
@@ -73,7 +80,46 @@ const RecipeList = () => {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [keyword, categoryIds, ingredientIds, page, size]);
+  }, [
+    keyword,
+    categoryIds,
+    ingredientIds,
+    // minTime,
+    // maxTime,
+    page,
+    size,
+    sortField,
+  ]);
+
+  const handleMinTimeChange = (value) => {
+    const num = value ? Number(value) : null;
+
+    // Chỉ validate khi cả hai giá trị cùng tồn tại
+    console.log(num, " - ", maxTime);
+    
+    if (num !== null && maxTime !== null && num > Number(maxTime)) {
+      toast.error("Khoảng thời gian không hợp lệ!");
+      return;
+    }
+
+    setPage(0);
+    setMinTime(value || null);
+  };
+
+  const handleMaxTimeChange = (value) => {
+    const num = value ? Number(value) : null;
+
+    // Chỉ validate khi cả hai giá trị cùng tồn tại
+    console.log(minTime, " - ", num);
+
+    if (num !== null && minTime !== null && num < Number(minTime)) {
+      toast.error("Khoảng thời gian không hợp lệ!");
+      return;
+    }
+
+    setPage(0);
+    setMaxTime(value || null);
+  };
 
   return (
     <div className="recipe-list-page">
@@ -88,7 +134,7 @@ const RecipeList = () => {
             fontWeight: "bold",
             color: "#a50034",
             letterSpacing: 2,
-            marginBottom: 0
+            marginBottom: 0,
           }}
         >
           DANH SÁCH CÔNG THỨC
@@ -140,6 +186,7 @@ const RecipeList = () => {
                   }}
                   optionFilterProp="children"
                   showSearch
+                  style={{ width: 300 }}
                 >
                   {categories.map((cat) => (
                     <Option key={cat.id} value={cat.id}>
@@ -171,14 +218,6 @@ const RecipeList = () => {
               </div>
               <div className="filter-group search-group">
                 <label>Tìm kiếm</label>
-                {/* <input
-                  allowClear
-                  type="text"
-                  placeholder="Nhập từ khóa tìm kiếm..."
-                  value={keyword}
-                  onChange={e => { setKeyword(e.target.value); setPage(0); }}
-                  className="search-input"
-                /> */}
                 <Input
                   allowClear
                   placeholder="Tìm kiếm tên hoặc mô tả..."
@@ -190,6 +229,89 @@ const RecipeList = () => {
                   style={{ maxWidth: 320, borderRadius: 8 }}
                 />
               </div>
+              <div className="filter-group">
+                <label
+                  style={{ display: "block", fontWeight: 600 }}
+                >
+                  Thời gian làm
+                </label>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    // background: "#fafafa",
+                    padding: "0px 16px",
+                    borderRadius: 8,
+                    // border: "1px solid #ddd",
+                  }}
+                >
+                  <label style={{ fontSize: 14 }}>Từ:</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="Từ..."
+                    value={minTime ?? ""}
+                    onChange={(e) => {
+                      setPage(0);
+                      setMinTime(e.target.value);
+                      handleMinTimeChange(e.target.value);
+                    }}
+                    style={{
+                      width: 100,
+                      borderRadius: 6,
+                    }}
+                  />
+                  <span style={{ fontWeight: 500, color: "#888" }}>-</span>
+                  <label style={{ fontSize: 14 }}>Đến:</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="Đến..."
+                    value={maxTime ?? ""}
+                    onChange={(e) => {
+                      setPage(0);
+                      setMaxTime(e.target.value);
+                      handleMaxTimeChange(e.target.value);
+                    }}
+                    style={{
+                      width: 100,
+                      borderRadius: 6,
+                    }}
+                  />
+                  <Select
+                    value={typeTime}
+                    onChange={(value) => {
+                      setTypeTime(value);
+                      setPage(0);
+                    }}
+                    style={{ minWidth: 100 }}
+                    options={[
+                      { value: "minute", label: "Phút" },
+                      { value: "hour", label: "Giờ" },
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className="filter-group">
+                <label>Sắp xếp theo</label>
+                <Select
+                  value={sortField}
+                  style={{ width: 160, borderRadius: 8 }}
+                  onChange={(value) => {
+                    setSortField(value);
+                    setPage(0);
+                  }}
+                  options={[
+                    { value: "title,asc", label: "Tên tăng dần" },
+                    { value: "title,desc", label: "Tên giảm dần" },
+                    { value: "id,asc", label: "Cũ nhất" },
+                    { value: "id,desc", label: "Mới nhất" },
+                    // { value: "favorites,desc", label: "Yêu thích nhất" },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -198,10 +320,10 @@ const RecipeList = () => {
       {/* Content Section */}
       <div className="content-section">
         {loading ? (
-            <div style={{ textAlign: "center", margin: "40px 0" }}>
-              <Spin size="large" />
-            </div>
-          ) : error ? (
+          <div style={{ textAlign: "center", margin: "40px 0" }}>
+            <Spin size="large" />
+          </div>
+        ) : error ? (
           <div className="error-state">
             <p>{error}</p>
           </div>
