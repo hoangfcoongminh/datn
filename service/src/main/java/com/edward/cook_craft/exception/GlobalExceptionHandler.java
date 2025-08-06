@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<?>> handleApiException(CustomException ex, Locale locale) {
-        String message = messageSource.getMessage(ex.getMessageKey(), null, locale);
+        String message = messageSource.getMessage(ex.getMessageKey(), null, ex.getMessage(), locale);
         return ResponseEntity.status(ex.getStatus())
                 .body(ApiResponse.failure(ex.getStatus(), ex.getTitle(), message));
     }

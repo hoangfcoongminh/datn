@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,4 +63,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                         @Param("authorUsernames") List<String> authorUsernames,
                         @Param("status") Integer status,
                         Pageable pageable);
+
+    List<Recipe> findByCreatedAtBetween(LocalDateTime startOfYear, LocalDateTime endOfYear);
 }
