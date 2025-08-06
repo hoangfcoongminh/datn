@@ -26,11 +26,7 @@ public class RecipeController {
     @GetMapping
     @Operation(summary = "Get all recipes", description = "Retrieve a list of all recipes")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ApiResponse.failure(e.getMessage());
-//        }
     }
 
     @PostMapping("/filter")
@@ -56,11 +52,7 @@ public class RecipeController {
             @RequestPart String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile img
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.create(jsonRequest, img));
-//        } catch (Exception e) {
-//            return ApiResponse.failure(e.getMessage());
-//        }
     }
 
     @PutMapping
@@ -69,11 +61,7 @@ public class RecipeController {
             @RequestPart String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile img
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, img));
-//        } catch (Exception e) {
-//            return ApiResponse.failure(e.getMessage());
-//        }
     }
 
 }

@@ -23,11 +23,7 @@ public class IngredientController {
     @GetMapping
     @Operation(summary = "Get all ingredients", description = "Retrieve a list of all ingredients")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @GetMapping("/{id}")
@@ -53,11 +49,7 @@ public class IngredientController {
             @RequestPart(name = "jsonRequest") String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile file
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.create(jsonRequest, file));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @PutMapping
@@ -66,11 +58,7 @@ public class IngredientController {
             @RequestPart(name = "jsonRequest") String jsonRequest,
             @RequestPart(name = "img",  required = false) MultipartFile file
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
 }
