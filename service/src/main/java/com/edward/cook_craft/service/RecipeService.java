@@ -14,6 +14,7 @@ import com.edward.cook_craft.mapper.RecipeStepMapper;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.RecipeIngredientDetail;
 import com.edward.cook_craft.model.RecipeStep;
+import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
@@ -50,6 +51,7 @@ public class RecipeService {
     private final MinioService minioService;
     private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
     private final RecipeStepMapper recipeStepMapper;
+    private final FavoriteRepository favoriteRepository;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
@@ -64,7 +66,7 @@ public class RecipeService {
         Integer status = request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus();
         boolean sortByFavorite = pageable.getSort().stream()
                 .anyMatch(order -> order.getProperty().equalsIgnoreCase("favorite"));
-        Page<Recipe> data;
+        List<Recipe> data;
         if (sortByFavorite) {
             data = repository.filterWithFavorite(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
@@ -74,7 +76,12 @@ public class RecipeService {
                     keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
         }
 
-        return pageMapper.map(data, recipeMapper::toResponse);
+        List<RecipeResponse> response = data.stream().map(recipeMapper::toResponse).toList();
+        response.forEach(r -> {
+            r.setIsFavorite(checkFavorite(r.getId()));
+        });
+
+        return pageMapper.map(response, pageable, response.size());
     }
 
     public RecipeDetailResponse details(Long id) {
@@ -84,6 +91,7 @@ public class RecipeService {
         }
         Recipe recipeData = recipe.get();
         RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
+        response.setIsFavorite(checkFavorite(id));
 
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
@@ -287,5 +295,13 @@ public class RecipeService {
         if (!updateStep.isEmpty()) {
             savedUpdateStep = recipeStepRepository.saveAll(updateStep);
         }
+    }
+
+    private Boolean checkFavorite(Long recipeId) {
+        User u = SecurityUtils.getCurrentUser();
+        if (u != null) {
+            return favoriteRepository.existsByUserIdAndRecipeId(u.getId(), recipeId);
+        }
+        return null;
     }
 }
