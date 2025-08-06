@@ -8,12 +8,10 @@ import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.IngredientMapper;
 import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.model.Ingredient;
-import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.IngredientRepository;
 import com.edward.cook_craft.repository.UnitRepository;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
-import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -46,7 +44,7 @@ public class IngredientService {
     public IngredientResponse details(Long id) {
         Optional<Ingredient> optional = repository.findById(id);
         if (optional.isEmpty()) {
-            throw new CustomException("ingredients.not.found");
+            throw new CustomException("ingredient.not.found");
         }
         return ingredientMapper.toResponse(optional.get());
     }
@@ -96,18 +94,18 @@ public class IngredientService {
     private void validate(IngredientRequest request) {
         Long id = (request.getId() == null) ?  null : request.getId();
         if (id != null && !repository.existsById(request.getId())) {
-            throw new CustomException("ingredient-not-exist");
+            throw new CustomException("ingredient.not.found");
         }
         if (request.getName() == null || request.getName().isEmpty()) {
-            throw new CustomException("ingredient-name-empty");
+            throw new CustomException("ingredient.name.empty");
         }
 
         if (request.getUnitId() == null || !unitRepository.existsById(request.getUnitId())) {
-            throw new CustomException("unit-not-valid");
+            throw new CustomException("unit.not.valid");
         }
 
         if (repository.checkDuplicateIngredient(request.getName(), request.getUnitId(), id)) {
-            throw new CustomException("ingredient-duplicate");
+            throw new CustomException("ingredient.duplicate");
         }
     }
 }

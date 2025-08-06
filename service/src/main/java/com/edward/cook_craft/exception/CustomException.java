@@ -7,15 +7,18 @@ import org.springframework.http.HttpStatus;
 public class CustomException extends RuntimeException {
 
     private String title;
+    private String messageKey;
     private final int status;
 
-    public CustomException(String message) {
-        super(message);
+    public CustomException(String messageKey) {
+        super(messageKey);
+        this.messageKey = messageKey;
         this.status = HttpStatus.INTERNAL_SERVER_ERROR.value();
     }
 
-    public CustomException(String message, int status) {
-        super(message);
+    public CustomException(String messageKey, int status) {
+        super(messageKey);
+        this.messageKey = messageKey;
         this.status = status;
     }
 

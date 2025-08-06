@@ -23,11 +23,7 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = "Get all categories", description = "Retrieve a list of all categories")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @PostMapping("/filter")
@@ -36,11 +32,7 @@ public class CategoryController {
             @RequestBody CategoryRequest categoryRequest,
             Pageable pageable
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.filter(categoryRequest, pageable));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @PostMapping
@@ -58,11 +50,7 @@ public class CategoryController {
             @RequestPart(name = "jsonRequest") String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile file
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
 }

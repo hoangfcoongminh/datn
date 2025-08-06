@@ -2,6 +2,8 @@ package com.edward.cook_craft.exception;
 
 import com.edward.cook_craft.dto.response.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,13 +11,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.Locale;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private MessageSource messageSource;
+
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ApiResponse<?>> handleApiException(CustomException ex) {
+    public ResponseEntity<ApiResponse<?>> handleApiException(CustomException ex, Locale locale) {
+        String message = messageSource.getMessage(ex.getMessageKey(), null, locale);
         return ResponseEntity.status(ex.getStatus())
-                .body(ApiResponse.failure(ex.getStatus(), ex.getTitle(), ex.getMessage()));
+                .body(ApiResponse.failure(ex.getStatus(), ex.getTitle(), message));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

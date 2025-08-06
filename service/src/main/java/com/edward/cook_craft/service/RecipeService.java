@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -154,7 +153,7 @@ public class RecipeService {
 
     private void validateRecipeRequest(RecipeRequest request) {
         if (request.getId() != null && repository.getByIdAndActive(request.getId()).isEmpty()) {
-            throw new CustomException("recipe-not-found");
+            throw new CustomException("recipe.not.found");
         }
 
         if (request.getCategoryId() == null || categoryRepository.findByIdAndActive(request.getCategoryId()).isEmpty()) {

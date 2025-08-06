@@ -22,11 +22,7 @@ public class UnitController {
     @GetMapping
     @Operation(summary = "Get all units", description = "Retrieve a list of all units")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @GetMapping("/{id}")
