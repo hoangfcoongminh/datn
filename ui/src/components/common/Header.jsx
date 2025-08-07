@@ -73,6 +73,15 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
       >
         {user ? (
           <Space size={16}>
+            {user.user.role === "ADMIN" && (
+              <Button
+                type="primary"
+                style={{ background: "#a50034", borderColor: "#a50034", borderRadius: 8 }}
+                onClick={() => navigate("/admin/dashboard")}
+              >
+                ADMIN HOME
+              </Button>
+            )}
             <Badge count={0} size="small">
               <Button
                 type="text"

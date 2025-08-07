@@ -73,8 +73,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (SignatureException ex) {
             authenticationEntryPoint.commence(request, response, new CustomAuthenticException("auth.token.signature.invalid"));
         } catch (Exception ex) {
-            throw ex;
-//            authenticationEntryPoint.commence(request, response, new CustomAuthException("auth.authenticate.fail"));
+//            throw ex;
+            authenticationEntryPoint.commence(request, response, new CustomAuthenticException("auth.authenticate.fail"));
         }
     }
 }

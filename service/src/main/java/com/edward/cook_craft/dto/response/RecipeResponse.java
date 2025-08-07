@@ -33,4 +33,6 @@ public class RecipeResponse extends BaseResponse {
     private Integer servings;   //Serve for how many people
 
     private String imgUrl;
+
+    private Boolean isFavorite;
 }
