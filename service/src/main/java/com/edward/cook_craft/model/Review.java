@@ -20,11 +20,13 @@ public class Review extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    private Long userId;
 
-    private String recipeId;
+    private String username;
 
-    private Integer rating;
+    private Long recipeId;
+
+    private Float rating;
 
     private String comment;
 }
