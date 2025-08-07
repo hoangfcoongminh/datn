@@ -11,10 +11,7 @@ import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.RecipeStepMapper;
-import com.edward.cook_craft.model.Recipe;
-import com.edward.cook_craft.model.RecipeIngredientDetail;
-import com.edward.cook_craft.model.RecipeStep;
-import com.edward.cook_craft.model.User;
+import com.edward.cook_craft.model.*;
 import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
@@ -22,15 +19,17 @@ import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,6 +51,7 @@ public class RecipeService {
     private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
     private final RecipeStepMapper recipeStepMapper;
     private final FavoriteRepository favoriteRepository;
+    private final ReviewRepository reviewRepository;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
@@ -75,10 +75,19 @@ public class RecipeService {
             data = repository.filter(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
         }
-
         List<RecipeResponse> response = data.stream().map(recipeMapper::toResponse).toList();
+        List<Long> recipeIds = data.stream().map(Recipe::getId).toList();
+
+        var ratingMap = getRatingMap(recipeIds);
+        var favoriteMap = checkFavoriteByUser(recipeIds);
+
+        recipeIds.forEach(id -> {
+            ratingMap.computeIfAbsent(id, k -> Pair.of(0.0f, 0));
+        });
         response.forEach(r -> {
-            r.setIsFavorite(checkFavorite(r.getId()));
+            r.setIsFavorite(favoriteMap.get(r.getId()));
+            r.setAverageRating(ratingMap.get(r.getId()).getFirst());
+            r.setTotalReview(ratingMap.get(r.getId()).getSecond());
         });
 
         return pageMapper.map(response, pageable, response.size());
@@ -91,7 +100,13 @@ public class RecipeService {
         }
         Recipe recipeData = recipe.get();
         RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
-        response.setIsFavorite(checkFavorite(id));
+        List<Long> recipeIds = List.of(id);
+        var favoriteMap = checkFavoriteByUser(recipeIds);
+        var ratingMap = getRatingMap(recipeIds);
+
+        response.setIsFavorite(favoriteMap.get(id));
+        response.setAverageRating(ratingMap.get(id).getFirst());
+        response.setTotalReview(ratingMap.get(id).getSecond());
 
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
@@ -297,11 +312,39 @@ public class RecipeService {
         }
     }
 
-    private Boolean checkFavorite(Long recipeId) {
+    private Map<Long, Boolean> checkFavoriteByUser(List<Long> recipeIds) {
         User u = SecurityUtils.getCurrentUser();
-        if (u != null) {
-            return favoriteRepository.existsByUserIdAndRecipeId(u.getId(), recipeId);
+        if (u == null) {
+            return recipeIds.stream().collect(Collectors.toMap(id -> id, id -> false));
         }
-        return null;
+        Map<Long, Boolean> favoriteMap = favoriteRepository.findAllFavoriteByUserIdAndRecipeIds(u.getId(), recipeIds)
+                .stream()
+                .collect(Collectors.toMap(Favorite::getRecipeId, f -> true));
+
+        recipeIds.forEach(id -> favoriteMap.computeIfAbsent(id, k -> false));
+
+        return favoriteMap;
+    }
+
+    private Map<Long, Pair<Float, Integer>> getRatingMap(List<Long> recipeIds) {
+        var ratingMap=  reviewRepository.findByRecipeIdIn(recipeIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        Review::getRecipeId,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                reviews -> {
+                                    double sum = reviews.stream()
+                                            .mapToDouble(review -> review.getRating() != null ? review.getRating() : 0.0)
+                                            .sum();
+                                    int count = reviews.size();
+                                    double average = count > 0 ? sum / count : 0.0;
+                                    return Pair.of((float) average, count);
+                                }
+                        )
+                ));
+        recipeIds.forEach(id -> ratingMap.computeIfAbsent(id, k -> Pair.of(0.0f, 0)));
+
+        return ratingMap;
     }
 }

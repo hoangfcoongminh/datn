@@ -17,5 +17,11 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "AND r.status = 1")
     List<Favorite> findAllFavoriteByUserId(@Param("userId") Long userId);
 
-    boolean existsByUserIdAndRecipeId(Long userId, Long recipeId);
+    @Query(value = "SELECT f " +
+            "FROM Favorite f " +
+            "WHERE f.userId = :userId " +
+            "AND f.recipeId IN :recipeIds " +
+            "AND f.status = 1")
+    List<Favorite> findAllFavoriteByUserIdAndRecipeIds(@Param("userId") Long userId,
+                                                       @Param("recipeIds") List<Long> recipeIds);
 }
