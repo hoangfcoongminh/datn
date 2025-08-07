@@ -1,23 +1,36 @@
-// components/dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { Card, Select, Spin, Alert, DatePicker } from "antd";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
+const chartTypes = [
+  { value: "bar", label: "Cột (Bar)" },
+  { value: "line", label: "Đường (Line)" },
+  { value: "pie", label: "Tròn (Pie)" },
+  { value: "doughnut", label: "Doughnut" },
+];
+
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
+  ArcElement,
 } from "chart.js";
-import moment from "moment";
-import { fetchRecipeStats, fetchUserStats, getChartData } from "../../api/dashboard";
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
+import { fetchRecipeStats, getChartData } from "../../api/dashboard";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend
@@ -29,12 +42,15 @@ const DashBoard = () => {
   const [recipeStats, setRecipeStats] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [type, setType] = useState("year");
-  const [year, setYear] = useState(moment().year()); // Mặc định là năm hiện tại
-  const [month, setMonth] = useState(moment().month() + 1); // Mặc định là tháng hiện tại
-  const [dateRange, setDateRange] = useState([
-    moment().startOf("month"),
-    moment(),
-  ]); // Mặc định là từ đầu tháng đến hiện tại
+  const [chartType, setChartType] = useState("bar");
+  const currentYear = dayjs();
+  const [year, setYear] = useState(currentYear);
+  const currentMonth = dayjs();
+  const [month, setMonth] = useState(currentMonth);
+  const today = dayjs();
+  const startOfMonth = dayjs().startOf("month");
+
+  const [dateRange, setDateRange] = useState([startOfMonth, today]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -45,10 +61,10 @@ const DashBoard = () => {
       try {
         const params = {};
         if (type === "year") {
-          params.year = year;
+          params.year = year.year();
         } else if (type === "month") {
-          params.year = year;
-          params.month = month;
+          params.year = year.year();
+          params.month = month.month() + 1;
         } else if (type === "day") {
           params.startDate = dateRange[0]?.format("YYYY-MM-DD");
           params.endDate = dateRange[1]?.format("YYYY-MM-DD");
@@ -57,10 +73,12 @@ const DashBoard = () => {
         const recipeData = await fetchRecipeStats(type, params);
         setRecipeStats(recipeData);
 
-        const userData = await fetchUserStats(type, params);
-        setUserStats(userData);
+        // const userData = await fetchUserStats(type, params);
+        // setUserStats(userData);
       } catch (err) {
         setError(err.message || "An error occurred");
+        console.log(err);
+        
       } finally {
         setLoading(false);
       }
@@ -88,7 +106,14 @@ const DashBoard = () => {
       >
         Dashboard Quản trị
       </h2>
-      <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
+      <div
+        style={{
+          marginBottom: 24,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+        }}
+      >
         <span style={{ fontWeight: 600 }}>Thống kê theo:</span>
         <Select
           value={type}
@@ -103,79 +128,132 @@ const DashBoard = () => {
             { value: "day", label: "Ngày" },
           ]}
         />
+        <span style={{ fontWeight: 600 }}>Biểu đồ:</span>
+        <Select
+          value={chartType}
+          onChange={(value) => {
+            setChartType(value);
+          }}
+          style={{ width: 140 }}
+          options={chartTypes}
+        />
         {type === "year" && (
-          <YearPicker
-            value={year ? moment(year, "YYYY") : null}
+          <DatePicker
+            picker="year"
+            value={year}
             onChange={(date) => {
-              setYear(date ? date.year() : null);
-              setError(null);
+              if (date && dayjs.isDayjs(date) && date.isValid()) {
+                setYear(date);
+              }
             }}
+            allowClear={false}
+            style={{ width: 150, borderRadius: 8 }}
             placeholder="Chọn năm"
-            style={{ width: 120 }}
           />
         )}
         {type === "month" && (
           <>
             <YearPicker
-              value={year ? moment(year, "YYYY") : null}
+              value={year}
               onChange={(date) => {
-                setYear(date ? date.year() : null);
+                setYear(date && dayjs.isDayjs(date) && date.isValid() ? date : currentYear);
                 setError(null);
               }}
               placeholder="Chọn năm"
+              allowClear={false}
               style={{ width: 120 }}
             />
             <MonthPicker
-              value={year && month ? moment(`${year}-${month}`, "YYYY-MM") : null}
+              value={month}
               onChange={(date) => {
-                setMonth(date ? date.month() + 1 : null); // month() trả về 0-11, cần +1
+                setMonth(date && dayjs.isDayjs(date) && date.isValid() ? date : currentMonth);
                 setError(null);
               }}
               placeholder="Chọn tháng"
-              style={{ width: 120 }}
+              allowClear={false}
+              style={{ width: 150, borderRadius: 8 }}
             />
           </>
         )}
         {type === "day" && (
           <RangePicker
-            value={dateRange}
+            value={dateRange[0] && dateRange[1] ? [dateRange[0], dateRange[1]] : null}
             onChange={(dates) => {
-              setDateRange(dates);
+              if (dates && dates[0] && dates[1]) {
+                setDateRange([dates[0], dates[1]]);
+              } else {
+                setDateRange([startOfMonth, today]);
+              }
               setError(null);
             }}
             format="YYYY-MM-DD"
-            style={{ width: 240 }}
+            allowClear={false}
+            style={{ width: 280, borderRadius: 8 }}
           />
         )}
       </div>
-      {error && (
-        <Alert
-          message="Lỗi"
-          description={error}
-          type="error"
-          showIcon
-          style={{ marginBottom: 24 }}
-        />
-      )}
+      {error && toast.error(error)}
       {loading ? (
         <Spin size="large" />
       ) : (
         <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
           <Card title="Công thức mới" style={{ flex: 1, minWidth: 350 }}>
             <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16 }}>
-              Tổng công thức: {recipeStats.length > 0 ? recipeStats.reduce((sum, r) => sum + r.count, 0) : 0}
+              Tổng công thức:{" "}
+              {recipeStats.length > 0
+                ? recipeStats.reduce((sum, r) => sum + r.count, 0)
+                : 0}
             </div>
-            <Bar
-              data={getChartData(recipeStats, "Công thức")}
-              options={{
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                  y: { beginAtZero: true, title: { display: true, text: "Số lượng" } },
-                  x: { title: { display: true, text: "Thời gian" } },
-                },
-              }}
-            />
+            {chartType === "bar" && (
+              <Bar
+                data={getChartData(recipeStats, "Công thức")}
+                options={{
+                  responsive: true,
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: { display: true, text: "Số lượng" },
+                    },
+                    x: { title: { display: true, text: "Thời gian" } },
+                  },
+                }}
+              />
+            )}
+            {chartType === "line" && (
+              <Line
+                data={getChartData(recipeStats, "Công thức")}
+                options={{
+                  responsive: true,
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: { display: true, text: "Số lượng" },
+                    },
+                    x: { title: { display: true, text: "Thời gian" } },
+                  },
+                }}
+              />
+            )}
+            {chartType === "pie" && (
+              <Pie
+                data={getChartData(recipeStats, "Công thức")}
+                options={{
+                  responsive: true,
+                  plugins: { legend: { display: true, position: "bottom" } },
+                }}
+              />
+            )}
+            {chartType === "doughnut" && (
+              <Doughnut
+                data={getChartData(recipeStats, "Công thức")}
+                options={{
+                  responsive: true,
+                  plugins: { legend: { display: true, position: "bottom" } },
+                }}
+              />
+            )}
           </Card>
           <Card title="Người dùng mới" style={{ flex: 1, minWidth: 350 }}>
             <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16 }}>

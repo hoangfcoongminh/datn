@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -14,10 +16,10 @@ public class AdminController {
 
     private final DashboardService dashboardService;
 
-    @GetMapping("/dashboard/recipes/year/{year}")
+    @GetMapping("/dashboard/recipes/year")
     public ResponseEntity<?> dashboardByYear(
-            @PathVariable Integer year
-    ){
+            @RequestParam("year") Integer year
+    ) {
         return ResponseUtils.handleSuccess(dashboardService.getRecipesByYear(year));
     }
 
@@ -25,21 +27,27 @@ public class AdminController {
     public ResponseEntity<?> dashboardByMonth(
             @RequestParam("year") Integer year,
             @RequestParam("month") Integer month
-    ){
+    ) {
         return ResponseUtils.handleSuccess(dashboardService.getRecipesByMonth(year, month));
     }
 
-    @PostMapping("/dashboard/recipes/year")
-    public ResponseEntity<?> dashboardByMonth(
-            @RequestBody DashBoardRequest request
-    ){
+    @GetMapping("/dashboard/recipes/year-range")
+    public ResponseEntity<?> dashboardByMonthRange(
+            @RequestParam("year") Integer year
+    ) {
+        DashBoardRequest request = DashBoardRequest.builder().year(year).build();
         return ResponseUtils.handleSuccess(dashboardService.getRecipesByMonthRange(request));
     }
 
-    @PostMapping("/dashboard/recipes/month")
-    public ResponseEntity<?> dashboardByDate(
-            @RequestBody DashBoardRequest request
-    ){
+    @GetMapping("/dashboard/recipes/date-range")
+    public ResponseEntity<?> dashboardByDateRange(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate
+    ) {
+        DashBoardRequest request = DashBoardRequest.builder()
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
         return ResponseUtils.handleSuccess(dashboardService.getRecipesByDateRange(request));
     }
 

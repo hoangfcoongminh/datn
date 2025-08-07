@@ -1,17 +1,19 @@
-export async function fetchRecipeStats(type = "day", params = {}) {
+export async function fetchRecipeStats(type = "year", params = {}) {
   const token = localStorage.getItem("token");
   const queryParams = new URLSearchParams();
-  queryParams.append("groupBy", type.toUpperCase());
-
+  let path = "";
   switch (type) {
     case "year":
+      path = "/year";
       if (params.year) queryParams.append("year", params.year);
       break;
     case "month":
+      path = "/month";
       if (params.year) queryParams.append("year", params.year);
       if (params.month) queryParams.append("month", params.month);
       break;
     case "day":
+      path = "/date-range";
       if (params.startDate) queryParams.append("startDate", params.startDate);
       if (params.endDate) queryParams.append("endDate", params.endDate);
       break;
@@ -19,8 +21,7 @@ export async function fetchRecipeStats(type = "day", params = {}) {
       throw new Error("Invalid type parameter");
   }
 
-  const url = `http://localhost:8080/api/admin/dashboard/recipes?${queryParams.toString()}`;
-
+  const url = `http://localhost:8080/api/admin/dashboard/recipes${path}?${queryParams.toString()}`;
   try {
     const res = await fetch(url, {
       method: "GET",

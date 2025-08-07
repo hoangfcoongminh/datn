@@ -22,6 +22,7 @@ import { AddRecipePage, EditRecipePage } from "./components/recipes";
 import { CategoryPage } from "./components/categories";
 import IngredientList from "./components/ingredients/IngredientList";
 import { ToastContainer } from "react-toastify";
+import DashBoard  from "./components/admin/DashBoard";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -132,6 +133,16 @@ function AppContent() {
               <Navigate to="/home" replace />
             ) : (
               <SignupPage onSignup={handleSignup} />
+            )
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            user && user.user.role === "ADMIN" ? (
+              <DashBoard/>
+            ) : (
+              <NotFound />
             )
           }
         />

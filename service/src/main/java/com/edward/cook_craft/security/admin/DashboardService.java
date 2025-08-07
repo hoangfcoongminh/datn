@@ -1,6 +1,7 @@
 package com.edward.cook_craft.security.admin;
 
 import com.edward.cook_craft.dto.request.DashBoardRequest;
+import com.edward.cook_craft.dto.response.StaticResponse;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.repository.RecipeRepository;
@@ -19,152 +20,141 @@ public class DashboardService {
 
     private final RecipeRepository recipeRepository;
 
-    public List<Map<String, Object>> getRecipesByYear(Integer year) {
-        LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
-        LocalDateTime endOfYear = LocalDate.of(year, 12, 31).atTime(23, 59, 59);
-
-        // Nếu là năm hiện tại -> chỉ lấy đến tháng hiện tại
-        int currentYear = LocalDate.now().getYear();
-        int maxMonth = (year == currentYear) ? LocalDate.now().getMonthValue() : 12;
-
-        // Lấy danh sách công thức trong khoảng thời gian
-        List<Recipe> recipes = recipeRepository.findByCreatedAtBetween(startOfYear, endOfYear);
-
-        // Group theo tháng
-        Map<Integer, Long> monthCountMap = recipes.stream()
-                .collect(Collectors.groupingBy(
-                        recipe -> recipe.getCreatedAt().getMonthValue(),
-                        Collectors.counting()
-                ));
-
-        // Tạo list kết quả
-        List<Map<String, Object>> stats = new ArrayList<>();
-        for (int month = 1; month <= maxMonth; month++) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("month", String.format("%04d-%02d", year, month)); // yyyy-MM
-            data.put("count", monthCountMap.getOrDefault(month, 0L));
-            stats.add(data);
-        }
-
-        return stats;
+    public enum GroupBy {
+        YEAR, MONTH, DAY
     }
 
-    public List<Map<String, Object>> getRecipesByMonth(Integer year, Integer month) {
-        // Ngày bắt đầu của tháng
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        // Ngày kết thúc của tháng
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+    /**
+     * Lấy thống kê số lượng công thức theo khoảng thời gian và đơn vị nhóm.
+     *
+     * @param request Yêu cầu chứa thông tin khoảng thời gian
+     * @param groupBy Đơn vị nhóm dữ liệu (YEAR, MONTH, DAY)
+     * @return Danh sách thống kê với định dạng chuẩn
+     */
+    public List<StaticResponse> getRecipeStats(DashBoardRequest request, GroupBy groupBy) {
+        LocalDateTime startDateTime;
+        LocalDateTime endDateTime;
 
-        // Nếu là tháng và năm hiện tại -> chỉ lấy đến ngày hôm nay
-        LocalDate today = LocalDate.now();
-        if (year.equals(today.getYear()) && month.equals(today.getMonthValue())) {
-            endDate = today;
+        // Xác định khoảng thời gian
+        if (groupBy == GroupBy.YEAR) {
+            Integer year = request.getYear();
+            if (year == null) {
+                throw new CustomException("year.cannot.null");
+            }
+            startDateTime = LocalDate.of(year, 1, 1).atStartOfDay();
+            endDateTime = LocalDate.of(year, 12, 31).atTime(23, 59, 59);
+            if (year == LocalDate.now().getYear()) {
+                endDateTime = LocalDate.now().atTime(23, 59, 59);
+            }
+        } else if (groupBy == GroupBy.MONTH) {
+            Integer year = request.getYear();
+            Integer month = request.getMonth();
+            if (year == null || month == null) {
+                throw new CustomException("year.and.month.cannot.null");
+            }
+            YearMonth yearMonth = YearMonth.of(year, month);
+            startDateTime = yearMonth.atDay(1).atStartOfDay();
+            endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+            if (year == LocalDate.now().getYear() && month == LocalDate.now().getMonthValue()) {
+                endDateTime = LocalDate.now().atTime(23, 59, 59);
+            }
+        } else {
+            LocalDate startDate = request.getStartDate();
+            LocalDate endDate = request.getEndDate() == null ? LocalDate.now() : request.getEndDate();
+            if (startDate == null) {
+                throw new CustomException("start.date.cannot.null");
+            }
+            if (startDate.isAfter(endDate)) {
+                throw new CustomException("start.date.must.before.end.date");
+            }
+            startDateTime = startDate.atStartOfDay();
+            endDateTime = endDate.atTime(23, 59, 59);
         }
 
-        LocalDateTime startOfMonth = startDate.atStartOfDay();
-        LocalDateTime endOfMonth = endDate.atTime(23, 59, 59);
-
-        // Lấy danh sách công thức trong khoảng thời gian
-        List<Recipe> recipes = recipeRepository.findByCreatedAtBetween(startOfMonth, endOfMonth);
-
-        // Group theo ngày
-        Map<Integer, Long> dayCountMap = recipes.stream()
-                .collect(Collectors.groupingBy(
-                        recipe -> recipe.getCreatedAt().getDayOfMonth(),
-                        Collectors.counting()
-                ));
-
-        // Tạo list kết quả
-        List<Map<String, Object>> stats = new ArrayList<>();
-        int maxDay = endDate.getDayOfMonth();
-        for (int day = 1; day <= maxDay; day++) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("day", String.format("%04d-%02d-%02d", year, month, day)); // yyyy-MM-dd
-            data.put("count", dayCountMap.getOrDefault(day, 0L));
-            stats.add(data);
-        }
-
-        return stats;
-    }
-
-    public List<Map<String, Object>> getRecipesByMonthRange(DashBoardRequest request) {
-        YearMonth startMonth = request.getStartMonth();
-        YearMonth endMonth = request.getEndMonth() == null ? YearMonth.now() : request.getEndMonth();
-        if (startMonth == null) {
-            throw new CustomException("start.month.cannot.null");
-        }
-        if (startMonth.isAfter(endMonth)) {
-            throw new CustomException("start.month.must.before.end.month");
-        }
-
-        LocalDateTime startDateTime = startMonth.atDay(1).atStartOfDay();
-        LocalDateTime endDateTime = endMonth.atEndOfMonth().plusDays(1).atStartOfDay();
-
+        // Lấy danh sách công thức
         List<Recipe> recipes = recipeRepository.findByCreatedAtBetween(startDateTime, endDateTime);
 
-        // Gom nhóm theo tháng
-        Map<YearMonth, Long> grouped = recipes.stream()
-                .collect(Collectors.groupingBy(
-                        recipe -> YearMonth.from(recipe.getCreatedAt()),
-                        Collectors.counting()
-                ));
+        // Gom nhóm dữ liệu
+        Map<String, Long> groupedData = groupRecipes(recipes, groupBy, startDateTime, endDateTime);
 
-        // Tạo danh sách đủ các tháng trong khoảng (kể cả tháng không có dữ liệu)
-        List<Map<String, Object>> result = new ArrayList<>();
-        YearMonth current = startMonth;
-        while (!current.isAfter(endMonth)) {
-            result.add(Map.of(
-                    "month", current.toString(), // dạng yyyy-MM
-                    "count", grouped.getOrDefault(current, 0L)
-            ));
-            current = current.plusMonths(1);
+        // Chuyển đổi thành định dạng trả về
+        return formatResult(groupedData, groupBy, startDateTime, endDateTime);
+    }
+
+    /**
+     * Gom nhóm công thức theo đơn vị thời gian.
+     */
+    private Map<String, Long> groupRecipes(List<Recipe> recipes, GroupBy groupBy, LocalDateTime start, LocalDateTime end) {
+        if (groupBy == GroupBy.YEAR) {
+            return recipes.stream()
+                    .collect(Collectors.groupingBy(
+                            recipe -> String.format("%04d-%02d", recipe.getCreatedAt().getYear(), recipe.getCreatedAt().getMonthValue()),
+                            Collectors.counting()
+                    ));
+        } else if (groupBy == GroupBy.MONTH) {
+            return recipes.stream()
+                    .collect(Collectors.groupingBy(
+                            recipe -> String.format("%04d-%02d-%02d", recipe.getCreatedAt().getYear(), recipe.getCreatedAt().getMonthValue(), recipe.getCreatedAt().getDayOfMonth()),
+                            Collectors.counting()
+                    ));
+        } else {
+            return recipes.stream()
+                    .collect(Collectors.groupingBy(
+                            recipe -> recipe.getCreatedAt().toLocalDate().toString(), // yyyy-MM-dd
+                            Collectors.counting()
+                    ));
+        }
+    }
+
+    /**
+     * Định dạng kết quả trả về, đảm bảo bao gồm tất cả các đơn vị thời gian trong khoảng.
+     */
+    private List<StaticResponse> formatResult(Map<String, Long> groupedData, GroupBy groupBy, LocalDateTime start, LocalDateTime end) {
+        List<StaticResponse> result = new ArrayList<>();
+        LocalDate currentDate = start.toLocalDate();
+        LocalDate endDate = end.toLocalDate();
+
+        if (groupBy == GroupBy.YEAR) {
+            YearMonth current = YearMonth.from(start);
+            YearMonth endMonth = YearMonth.from(end);
+            while (!current.isAfter(endMonth)) {
+                String timeUnit = current.toString(); // yyyy-MM
+                result.add(new StaticResponse(timeUnit, groupedData.getOrDefault(timeUnit, 0L)));
+                current = current.plusMonths(1);
+            }
+        } else if (groupBy == GroupBy.MONTH) {
+            while (!currentDate.isAfter(endDate)) {
+                String timeUnit = currentDate.toString(); // yyyy-MM-dd
+                result.add(new StaticResponse(timeUnit, groupedData.getOrDefault(timeUnit, 0L)));
+                currentDate = currentDate.plusDays(1);
+            }
+        } else {
+            while (!currentDate.isAfter(endDate)) {
+                String timeUnit = currentDate.toString(); // yyyy-MM-dd
+                result.add(new StaticResponse(timeUnit, groupedData.getOrDefault(timeUnit, 0L)));
+                currentDate = currentDate.plusDays(1);
+            }
         }
 
         return result;
     }
 
-    public List<Map<String, Object>> getRecipesByDateRange(DashBoardRequest request) {
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate = request.getEndDate() == null ? LocalDate.now() : request.getEndDate();
-
-        // Nếu ngày bắt đầu hoặc ngày kết thúc null → trả về rỗng
-        if (startDate == null) {
-            throw new CustomException("start.date.cannot.null");
-        }
-
-        // Đảm bảo startDate <= endDate
-        if (startDate.isAfter(endDate)) {
-            throw new CustomException("start.date.must.before.end.date");
-        }
-
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-
-        // Lấy danh sách công thức trong khoảng thời gian
-        List<Recipe> recipes = recipeRepository.findByCreatedAtBetween(startDateTime, endDateTime);
-
-        // Group theo ngày
-        Map<LocalDate, Long> dateCountMap = recipes.stream()
-                .collect(Collectors.groupingBy(
-                        recipe -> recipe.getCreatedAt().toLocalDate(),
-                        Collectors.counting()
-                ));
-
-        // Tạo list kết quả từ startDate đến endDate
-        List<Map<String, Object>> stats = new ArrayList<>();
-        LocalDate currentDate = startDate;
-        while (!currentDate.isAfter(endDate)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("date", currentDate.toString()); // yyyy-MM-dd
-            data.put("count", dateCountMap.getOrDefault(currentDate, 0L));
-            stats.add(data);
-            currentDate = currentDate.plusDays(1);
-        }
-
-        return stats;
+    /**
+     * Các phương thức cũ để giữ tương thích (nếu cần).
+     */
+    public List<StaticResponse> getRecipesByYear(Integer year) {
+        return getRecipeStats(DashBoardRequest.builder().year(year).build(), GroupBy.YEAR);
     }
 
+    public List<StaticResponse> getRecipesByMonth(Integer year, Integer month) {
+        return getRecipeStats(DashBoardRequest.builder().year(year).month(month).build(), GroupBy.MONTH);
+    }
 
+    public List<StaticResponse> getRecipesByMonthRange(DashBoardRequest request) {
+        return getRecipeStats(request, GroupBy.YEAR);
+    }
 
-
+    public List<StaticResponse> getRecipesByDateRange(DashBoardRequest request) {
+        return getRecipeStats(request, GroupBy.DAY);
+    }
 }
