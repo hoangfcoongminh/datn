@@ -30,4 +30,21 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
             "AND r.username = :username " +
             "AND r.status = 1")
     Optional<Review> findByUsernameAndRecipeId(String username, Long recipeId);
+
+    @Query(value = "SELECT r " +
+            "FROM Review r " +
+            "WHERE r.userId = :userId " +
+            "AND r.status = 1")
+    List<Review> findByUserId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT r " +
+            "FROM Review r " +
+            "WHERE r.status = 1 ")
+    List<Review> findAllActive();
+
+    @Query(value = "SELECT r " +
+            "FROM Review r " +
+            "WHERE r.recipeId IN :recipeIds " +
+            "AND r.status = 1 ")
+    List<Review> findByRecipeIdAndActive(@Param("recipeIds") Long recipeIds);
 }

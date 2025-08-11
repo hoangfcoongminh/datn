@@ -1,6 +1,5 @@
 package com.edward.cook_craft.dto.request;
 
-import com.edward.cook_craft.enums.EntityStatus;
 import lombok.Getter;
 
 @Getter

@@ -41,6 +41,11 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "GROUP BY f.recipeId")
     List<RecipeLikeCount> countLikesGroupByRecipeIdByRecipeIds(@Param("recipeIds") List<Long> recipeIds);
 
+    @Query(value = "SELECT f " +
+            "FROM Favorite f " +
+            "WHERE f.recipeId = :recipeId " +
+            "AND f.status = 1")
+    List<Favorite> findByRecipeId(@Param("recipeIds") Long recipeId);
 
     interface RecipeLikeCount {
         Long getRecipeId();
