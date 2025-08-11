@@ -28,5 +28,6 @@ public class Review extends BaseModel {
 
     private Float rating;
 
+    @Column(columnDefinition = "TEXT")
     private String comment;
 }

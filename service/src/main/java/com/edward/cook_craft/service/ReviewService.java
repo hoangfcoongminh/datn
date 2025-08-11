@@ -8,7 +8,9 @@ import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.ReviewMapper;
 import com.edward.cook_craft.model.Review;
+import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.ReviewRepository;
+import com.edward.cook_craft.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +31,11 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final PageMapper pageMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     public ReviewResponse comment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
+        Optional<Review> comment = reviewRepository.findByUsernameAndRecipeId(request.getUsername(), request.getRecipeId());
         if (comment.isPresent()) {
             throw new CustomException("already.review");
         }
@@ -42,7 +47,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse updateComment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
+        Optional<Review> comment = reviewRepository.findByUsernameAndRecipeId(request.getUsername(), request.getRecipeId());
         if (comment.isEmpty()) {
             throw new CustomException("comment.not.found");
         }
@@ -60,8 +65,19 @@ public class ReviewService {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
-        Page<Review> data = reviewRepository.findByRecipeId(recipeId, page);
+        Page<Review> pageData = reviewRepository.findByRecipeId(recipeId, page);
+        List<ReviewResponse> data = pageData.getContent().stream()
+                .map(reviewMapper::toResponse).toList();
 
-        return pageMapper.map(data, reviewMapper::toResponse);
+        List<String> usernames = data.stream().map(ReviewResponse::getUsername).toList();
+        Map<String, User> avtUserMap = userRepository.findByUsernameIn(usernames).stream()
+                .collect(Collectors.toMap(User::getUsername, i -> i));
+
+        data.forEach(r -> {
+            r.setImgUrl(avtUserMap.get(r.getUsername()).getImgUrl());
+            r.setFullName(avtUserMap.get(r.getUsername()).getFullName());
+        });
+
+        return pageMapper.map(data, pageable, pageData.getTotalElements());
     }
 }

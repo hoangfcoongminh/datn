@@ -39,4 +39,6 @@ public class RecipeResponse extends BaseResponse {
     private float averageRating;
 
     private int totalReview;
+
+    private int totalFavorite;
 }

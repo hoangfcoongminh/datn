@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout, Menu, Dropdown, Avatar, Button, Space, Badge } from "antd";
 import { BellOutlined, UserOutlined, DownOutlined } from "@ant-design/icons";
-import logo from "../../assets/cooking.png";
+import logo from "../../../assets/cooking.png";
 import "./Header.css";
 
 const { Header: AntHeader } = Layout;
@@ -15,7 +15,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
     { key: "category", label: "Category" },
     { key: "recipe", label: "Recipe" },
     { key: "ingredient", label: "Ingredient" },
-    { key: "unit", label: "Unit" },
+    // { key: "unit", label: "Unit" },
   ];
 
   return (

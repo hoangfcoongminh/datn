@@ -80,14 +80,13 @@ public class RecipeService {
 
         var ratingMap = getRatingMap(recipeIds);
         var favoriteMap = checkFavoriteByUser(recipeIds);
+        var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
 
-        recipeIds.forEach(id -> {
-            ratingMap.computeIfAbsent(id, k -> Pair.of(0.0f, 0));
-        });
         response.forEach(r -> {
             r.setIsFavorite(favoriteMap.get(r.getId()));
             r.setAverageRating(ratingMap.get(r.getId()).getFirst());
             r.setTotalReview(ratingMap.get(r.getId()).getSecond());
+            r.setTotalFavorite(totalFavoriteMap.get(r.getId()));
         });
 
         return pageMapper.map(response, pageable, response.size());
@@ -103,10 +102,13 @@ public class RecipeService {
         List<Long> recipeIds = List.of(id);
         var favoriteMap = checkFavoriteByUser(recipeIds);
         var ratingMap = getRatingMap(recipeIds);
+        var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
 
         response.setIsFavorite(favoriteMap.get(id));
         response.setAverageRating(ratingMap.get(id).getFirst());
         response.setTotalReview(ratingMap.get(id).getSecond());
+        response.setTotalFavorite(totalFavoriteMap.get(response.getId()));
+
 
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
@@ -327,7 +329,7 @@ public class RecipeService {
     }
 
     private Map<Long, Pair<Float, Integer>> getRatingMap(List<Long> recipeIds) {
-        var ratingMap=  reviewRepository.findByRecipeIdIn(recipeIds)
+        var ratingMap = reviewRepository.findByRecipeIdIn(recipeIds)
                 .stream()
                 .collect(Collectors.groupingBy(
                         Review::getRecipeId,
@@ -346,5 +348,18 @@ public class RecipeService {
         recipeIds.forEach(id -> ratingMap.computeIfAbsent(id, k -> Pair.of(0.0f, 0)));
 
         return ratingMap;
+    }
+
+    private Map<Long, Integer> checkTotalFavoriteForRecipe(List<Long> recipeIds) {
+        List<FavoriteRepository.RecipeLikeCount> counts = favoriteRepository.countLikesGroupByRecipeIdByRecipeIds(recipeIds);
+
+        var totalFavoriteMap = counts.stream()
+                .collect(Collectors.toMap(
+                        FavoriteRepository.RecipeLikeCount::getRecipeId,
+                        FavoriteRepository.RecipeLikeCount::getLikeCount
+                ));
+        recipeIds.forEach(id -> totalFavoriteMap.putIfAbsent(id, 0));
+
+        return totalFavoriteMap;
     }
 }

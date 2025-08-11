@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
@@ -14,7 +15,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "INNER JOIN Recipe r " +
             "ON f.recipeId = r.id " +
             "WHERE f.userId = :userId " +
-            "AND r.status = 1")
+            "AND r.status = 1 " +
+            "AND f.status = 1")
     List<Favorite> findAllFavoriteByUserId(@Param("userId") Long userId);
 
     @Query(value = "SELECT f " +
@@ -24,4 +26,24 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "AND f.status = 1")
     List<Favorite> findAllFavoriteByUserIdAndRecipeIds(@Param("userId") Long userId,
                                                        @Param("recipeIds") List<Long> recipeIds);
+
+    @Query(value = "SELECT f " +
+            "FROM Favorite f " +
+            "WHERE f.userId = :userId " +
+            "AND f.recipeId = :recipeId ")
+    Optional<Favorite> findByUserIdAndRecipeId(@Param("userId") Long userId,
+                                               @Param("recipeId") Long recipeId);
+
+    @Query("SELECT f.recipeId AS recipeId, COUNT(f.id) AS likeCount " +
+            "FROM Favorite f " +
+            "WHERE f.recipeId IN :recipeIds " +
+            "AND f.status = 1 " +
+            "GROUP BY f.recipeId")
+    List<RecipeLikeCount> countLikesGroupByRecipeIdByRecipeIds(@Param("recipeIds") List<Long> recipeIds);
+
+
+    interface RecipeLikeCount {
+        Long getRecipeId();
+        Integer getLikeCount();
+    }
 }
