@@ -11,6 +11,7 @@ import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.ReviewRepository;
 import com.edward.cook_craft.repository.UserRepository;
+import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,19 +36,23 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse comment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
+        Long userId = SecurityUtils.getCurrentUser().getId();
+        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(userId, request.getRecipeId());
         if (comment.isPresent()) {
             throw new CustomException("already.review");
         }
         Review review = reviewMapper.of(request);
         review.setId(null);
+        review.setUserId(userId);
+        review.setUsername(SecurityUtils.getCurrentUsername());
 
         return reviewMapper.toResponse(reviewRepository.save(review));
     }
 
     @Transactional
     public ReviewResponse updateComment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
+        Long userId = SecurityUtils.getCurrentUser().getId();
+        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(userId, request.getRecipeId());
         if (comment.isEmpty()) {
             throw new CustomException("comment.not.found");
         }

@@ -10,8 +10,6 @@ public class ReviewMapper {
 
     public Review of(ReviewRequest request) {
         return Review.builder()
-                .userId(request.getUserId())
-                .username(request.getUsername())
                 .recipeId(request.getRecipeId())
                 .rating(request.getRating())
                 .comment(request.getComment())
