@@ -45,7 +45,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "FROM Favorite f " +
             "WHERE f.recipeId = :recipeId " +
             "AND f.status = 1")
-    List<Favorite> findByRecipeId(@Param("recipeIds") Long recipeId);
+    List<Favorite> findByRecipeId(@Param("recipeId") Long recipeId);
 
     interface RecipeLikeCount {
         Long getRecipeId();

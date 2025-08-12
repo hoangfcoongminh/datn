@@ -35,7 +35,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse comment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUsernameAndRecipeId(request.getUsername(), request.getRecipeId());
+        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
         if (comment.isPresent()) {
             throw new CustomException("already.review");
         }
@@ -47,7 +47,7 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse updateComment(ReviewRequest request) {
-        Optional<Review> comment = reviewRepository.findByUsernameAndRecipeId(request.getUsername(), request.getRecipeId());
+        Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(request.getUserId(), request.getRecipeId());
         if (comment.isEmpty()) {
             throw new CustomException("comment.not.found");
         }

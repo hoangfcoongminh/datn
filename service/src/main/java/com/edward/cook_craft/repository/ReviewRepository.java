@@ -27,9 +27,9 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     @Query(value = "SELECT r " +
             "FROM Review r " +
             "WHERE r.recipeId = :recipeId " +
-            "AND r.username = :username " +
+            "AND r.userId = :userId " +
             "AND r.status = 1")
-    Optional<Review> findByUsernameAndRecipeId(String username, Long recipeId);
+    Optional<Review> findByUserIdAndRecipeId(@Param("username") Long username, @Param("recipeId") Long recipeId);
 
     @Query(value = "SELECT r " +
             "FROM Review r " +
@@ -44,7 +44,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
 
     @Query(value = "SELECT r " +
             "FROM Review r " +
-            "WHERE r.recipeId IN :recipeIds " +
+            "WHERE r.recipeId = :recipeId " +
             "AND r.status = 1 ")
-    List<Review> findByRecipeIdAndActive(@Param("recipeIds") Long recipeIds);
+    List<Review> findByRecipeIdAndActive(@Param("recipeId") Long recipeId);
 }

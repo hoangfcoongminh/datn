@@ -42,7 +42,7 @@ public class AdminController {
     @GetMapping("/dashboard/recipes/date-range")
     public ResponseEntity<?> dashboardByDateRange(
             @RequestParam("startDate") LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate
+            @RequestParam(name = "endDate", required = false) LocalDate endDate
     ) {
         DashBoardRequest request = DashBoardRequest.builder()
                 .startDate(startDate)

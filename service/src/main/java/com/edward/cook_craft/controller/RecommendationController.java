@@ -19,15 +19,13 @@ public class RecommendationController {
     private final RelatedRecommendationService relatedRecommendationService;
 
     @GetMapping("/user")
-    public ResponseEntity<?> getRecommendationsByUser(
-            @RequestParam Long userId
-    ) {
-        return ResponseUtils.handleSuccess(personalRecommendationService.getRecommendationsForUser(userId));
+    public ResponseEntity<?> getRecommendationsByUser() {
+        return ResponseUtils.handleSuccess(personalRecommendationService.getRecommendationsForUser());
     }
 
     @GetMapping("/recipe")
     public ResponseEntity<?> getRecommendationsByRecipe(
-            @RequestParam Long recipeId
+            @RequestParam("recipeId") Long recipeId
     ) {
         return ResponseUtils.handleSuccess(relatedRecommendationService.getRelatedRecipes(recipeId));
     }

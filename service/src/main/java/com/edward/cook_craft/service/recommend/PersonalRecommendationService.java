@@ -8,6 +8,7 @@ import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.repository.FavoriteRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.ReviewRepository;
+import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,8 @@ public class PersonalRecommendationService {
     private final ReviewRepository reviewRepository;
     private final RecipeMapper recipeMapper;
 
-    public List<RecipeResponse> getRecommendationsForUser(Long userId) {
+    public List<RecipeResponse> getRecommendationsForUser() {
+        Long userId = SecurityUtils.getCurrentUser().getId();
 
         List<Review> myReviews = reviewRepository.findByUserId(userId);
         List<Favorite> myFavorites = favoriteRepository.findAllFavoriteByUserId(userId);
