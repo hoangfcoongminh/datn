@@ -42,7 +42,7 @@ public class UserService {
     public UserResponse profile() {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new CustomException("something.went.wrong");
+            throw new CustomException("not.authenticated");
         }
         return userMapper.toResponse(user);
     }
@@ -76,7 +76,7 @@ public class UserService {
     public UserFavoritesResponse addRecipeFavorite(Long recipeId) {
         User userNow = SecurityUtils.getCurrentUser();
         if (userNow == null) {
-            throw new CustomException("user.not.found");
+            throw new CustomException("not.authenticated");
         }
 
         try {

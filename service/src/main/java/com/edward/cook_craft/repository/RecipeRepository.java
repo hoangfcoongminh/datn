@@ -23,7 +23,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "                                       WHERE rid.recipeId = r.id " +
             "                                       AND rid.ingredientId IN :ingredientIds )))" +
             "AND (:status = -1 OR r.status = :status)")
-    List<Recipe> filter(@Param("keyword") String keyword,
+    Page<Recipe> filter(@Param("keyword") String keyword,
                         @Param("categoryIds") List<Long> categoryIds,
                         @Param("ingredientIds") List<Long> ingredientIds,
                         @Param("authorUsernames") List<String> authorUsernames,
@@ -57,7 +57,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "AND (:status = -1 OR r.status = :status) " +
             "GROUP BY r " +
             "ORDER BY COUNT(f) DESC ")
-    List<Recipe> filterWithFavorite(@Param("keyword") String keyword,
+    Page<Recipe> filterWithFavorite(@Param("keyword") String keyword,
                         @Param("categoryIds") List<Long> categoryIds,
                         @Param("ingredientIds") List<Long> ingredientIds,
                         @Param("authorUsernames") List<String> authorUsernames,

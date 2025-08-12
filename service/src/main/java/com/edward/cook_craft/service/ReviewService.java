@@ -36,7 +36,11 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse comment(ReviewRequest request) {
-        Long userId = SecurityUtils.getCurrentUser().getId();
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new CustomException("not.authenticated");
+        }
+        Long userId = user.getId();
         Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(userId, request.getRecipeId());
         if (comment.isPresent()) {
             throw new CustomException("already.review");
@@ -44,14 +48,18 @@ public class ReviewService {
         Review review = reviewMapper.of(request);
         review.setId(null);
         review.setUserId(userId);
-        review.setUsername(SecurityUtils.getCurrentUsername());
+        review.setUsername(user.getUsername());
 
         return reviewMapper.toResponse(reviewRepository.save(review));
     }
 
     @Transactional
     public ReviewResponse updateComment(ReviewRequest request) {
-        Long userId = SecurityUtils.getCurrentUser().getId();
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new CustomException("not.authenticated");
+        }
+        Long userId = user.getId();
         Optional<Review> comment = reviewRepository.findByUserIdAndRecipeId(userId, request.getRecipeId());
         if (comment.isEmpty()) {
             throw new CustomException("comment.not.found");

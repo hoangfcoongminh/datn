@@ -1,10 +1,12 @@
 package com.edward.cook_craft.service.recommend;
 
 import com.edward.cook_craft.dto.response.RecipeResponse;
+import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.model.Favorite;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.Review;
+import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.FavoriteRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.ReviewRepository;
@@ -29,7 +31,11 @@ public class PersonalRecommendationService {
     private final RecipeMapper recipeMapper;
 
     public List<RecipeResponse> getRecommendationsForUser() {
-        Long userId = SecurityUtils.getCurrentUser().getId();
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new CustomException("not.authenticated");
+        }
+        Long userId = user.getId();
 
         List<Review> myReviews = reviewRepository.findByUserId(userId);
         List<Favorite> myFavorites = favoriteRepository.findAllFavoriteByUserId(userId);

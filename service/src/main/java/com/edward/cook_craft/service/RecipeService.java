@@ -19,10 +19,13 @@ import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,30 +69,36 @@ public class RecipeService {
         Integer status = request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus();
         boolean sortByFavorite = pageable.getSort().stream()
                 .anyMatch(order -> order.getProperty().equalsIgnoreCase("favorite"));
-        List<Recipe> data;
+        Page<Recipe> paged;
         if (sortByFavorite) {
-            data = repository.filterWithFavorite(
+            paged = repository.filterWithFavorite(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
             );
         } else {
-            data = repository.filter(
+            paged = repository.filter(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
         }
+        List<Recipe> data = paged.getContent();
         List<RecipeResponse> response = data.stream().map(recipeMapper::toResponse).toList();
         List<Long> recipeIds = data.stream().map(Recipe::getId).toList();
 
         var ratingMap = getRatingMap(recipeIds);
-        var favoriteMap = checkFavoriteByUser(recipeIds);
         var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
 
         response.forEach(r -> {
-            r.setIsFavorite(favoriteMap.get(r.getId()));
             r.setAverageRating(ratingMap.get(r.getId()).getFirst());
             r.setTotalReview(ratingMap.get(r.getId()).getSecond());
             r.setTotalFavorite(totalFavoriteMap.get(r.getId()));
         });
 
-        return pageMapper.map(response, pageable, response.size());
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            var favoriteMap = checkFavoriteByUser(recipeIds);
+            response.forEach(r -> {
+                r.setIsFavorite(favoriteMap.get(r.getId()));
+            });
+        }
+
+        return pageMapper.map(response, pageable, paged.getTotalElements());
     }
 
     public RecipeDetailResponse details(Long id) {
@@ -100,11 +109,13 @@ public class RecipeService {
         Recipe recipeData = recipe.get();
         RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
         List<Long> recipeIds = List.of(id);
-        var favoriteMap = checkFavoriteByUser(recipeIds);
         var ratingMap = getRatingMap(recipeIds);
         var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            var favoriteMap = checkFavoriteByUser(recipeIds);
+            response.setIsFavorite(favoriteMap.get(id));
+        }
 
-        response.setIsFavorite(favoriteMap.get(id));
         response.setAverageRating(ratingMap.get(id).getFirst());
         response.setTotalReview(ratingMap.get(id).getSecond());
         response.setTotalFavorite(totalFavoriteMap.get(response.getId()));
@@ -165,9 +176,13 @@ public class RecipeService {
 
     @Transactional
     public RecipeResponse update(String jsonRequest, MultipartFile file) {
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new CustomException("not.authenticated");
+        }
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
-        if (!Objects.equals(SecurityUtils.getCurrentUsername(), request.getAuthorUsername())) {
+        if (!Objects.equals(user.getUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();

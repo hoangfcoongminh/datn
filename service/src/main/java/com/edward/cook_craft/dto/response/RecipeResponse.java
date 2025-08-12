@@ -34,6 +34,8 @@ public class RecipeResponse extends BaseResponse {
 
     private String imgUrl;
 
+    private String videoUrl;
+
     private Boolean isFavorite;
 
     private float averageRating;

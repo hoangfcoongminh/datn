@@ -1,7 +1,16 @@
 // Helper to format time difference
 function getRelativeTime(dateString) {
+  // Hỗ trợ định dạng 'HH:mm:ss DD-MM-YYYY'
+  let date;
+  if (/^\d{2}:\d{2}:\d{2} \d{2}-\d{2}-\d{4}$/.test(dateString)) {
+    // Chuyển thành 'YYYY-MM-DDTHH:mm:ss'
+    const [time, dmy] = dateString.split(' ');
+    const [day, month, year] = dmy.split('-');
+    date = new Date(`${year}-${month}-${day}T${time}`);
+  } else {
+    date = new Date(dateString);
+  }
   const now = new Date();
-  const date = new Date(dateString);
   const diffMs = now - date;
   const diffMins = Math.floor(diffMs / 60000);
   if (diffMins < 1) return 'Vừa xong';
@@ -15,7 +24,8 @@ function getRelativeTime(dateString) {
 import React, { useEffect, useState } from "react";
 import { Avatar, Button, Input, List, Pagination, Spin, Rate } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { fetchReviews, postReview } from "../../../api/review";
+import { fetchReviews, postReview, updateReview } from "../../../api/review";
+import ConfirmModal from "../ConfirmModal";
 import "./Review.css";
 
 export default function Review({ recipeId, user, allowPost = true, averageRating, totalReview, onReviewChange }) {
@@ -27,6 +37,7 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
   const [posting, setPosting] = useState(false);
   const [rating, setRating] = useState(5);
   const pageSize = 5;
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const loadReviews = async (p = page) => {
     setLoading(true);
@@ -50,7 +61,6 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
     setPosting(true);
     try {
       const comment = {
-        username: user.username,
         recipeId: recipeId,
         rating: rating,
         comment: cmt.trim()
@@ -63,6 +73,20 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
       if (onReviewChange) onReviewChange();
     } finally {
       setPosting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const comment = {
+        recipeId: recipeId,
+        status: 0
+      }
+      await updateReview(comment);
+      if (onReviewChange) onReviewChange();
+    } finally {
+     loadReviews(1);
+     setConfirmOpen(false);
     }
   };
 
@@ -140,16 +164,27 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
               <div style={{ display: 'flex', width: '100%' }}>
                 <Avatar src={item.imgUrl} icon={<UserOutlined />} size={40} style={{ marginTop: 2 }} />
                 <div style={{ flex: 1, marginLeft: 16 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#d81f11ff' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#d81f11ff', position: 'relative' }}>
                     <span style={{ fontWeight: 500, fontSize: 16 }}>
                       {item.fullName}
-                      {item.username === user.username && <span style={{ color: '#266c82ff', fontWeight: 600 }}>-Đánh giá của bạn</span>}
+                      {item.username === user?.username && <span style={{ color: '#266c82ff', fontWeight: 600 }}>-Đánh giá của bạn</span>}
                     </span>
                     <span style={{ color: "#888", fontSize: 13 }}>{getRelativeTime(item.createdAt)}</span>
                     {typeof item.rating === "number" && (
                       <span style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 10 }}>
                         <Rate allowHalf disabled value={item.rating} />
                       </span>
+                    )}
+                    {/* Nút xóa chỉ hiển thị nếu là chủ comment */}
+                    {item.username === user?.username && (
+                      <Button
+                        danger
+                        size="small"
+                        style={{ position: 'absolute', right: 0, top: 0 }}
+                        onClick={() => setConfirmOpen(true)}
+                      >
+                        Xóa
+                      </Button>
                     )}
                   </div>
                   <div
@@ -189,6 +224,19 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
             </div>
           </div>
         )}
+        <ConfirmModal
+          open={confirmOpen}
+          onOk={() => {
+            handleDelete();
+          }}
+          onCancel={() => {
+            setConfirmOpen(false);
+          }}
+          title="Xác nhận xóa bài đánh giá"
+          content={"Bạn có chắc chắn muốn xóa bài đánh giá này ?"}
+          okText="Xóa"
+          cancelText="Huỷ"
+        />
       </Spin>
     </div>
   );

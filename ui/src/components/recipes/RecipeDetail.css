@@ -49,6 +49,7 @@
 .recipe-image-section {
   position: relative;
   height: 400px;
+  padding: 0 50px;
 }
 
 .recipe-main-image {

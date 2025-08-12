@@ -42,4 +42,6 @@ public class Recipe extends BaseModel {
     private Integer servings;   //Serve for how many people
 
     private String imgUrl;
+
+    private String videoUrl;
 }

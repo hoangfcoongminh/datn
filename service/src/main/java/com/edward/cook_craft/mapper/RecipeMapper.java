@@ -27,6 +27,7 @@ public class RecipeMapper {
                 .cookTime(recipe.getCookTime())
                 .servings(recipe.getServings())
                 .imgUrl(recipe.getImgUrl())
+                .videoUrl(recipe.getVideoUrl())
                 .createdAt(recipe.getCreatedAt())
                 .createdBy(recipe.getCreatedBy())
                 .modifiedAt(recipe.getModifiedAt())
