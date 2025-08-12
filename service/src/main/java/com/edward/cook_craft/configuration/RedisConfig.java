@@ -45,8 +45,11 @@ public class RedisConfig {
     @Primary
     public RedisTemplate<String, Object> redisTemplate(@Qualifier("redis-cook-craft-cache") RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+
         redisTemplate.setKeySerializer(new StringRedisSerializer());
+
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 
         return redisTemplate;

@@ -43,4 +43,6 @@ public class RecipeResponse extends BaseResponse {
     private int totalReview;
 
     private int totalFavorite;
+
+    private long viewCount;
 }

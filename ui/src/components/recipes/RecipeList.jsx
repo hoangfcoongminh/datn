@@ -1,5 +1,5 @@
 import React, { use, useEffect, useState } from "react";
-import ScrollToTopButton from '../common/ScrollToTopButton';
+import ScrollToTopButton from "../common/ScrollToTopButton";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button, Spin } from "antd";
 import {
@@ -17,6 +17,7 @@ import "antd/dist/reset.css";
 import "./RecipeList.css";
 import { toast } from "react-toastify";
 import { addFavorite } from "../../api/user";
+import Recommendation from "../common/recommendation/Recommendation";
 
 const { Option } = Select;
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
@@ -82,7 +83,7 @@ const RecipeList = () => {
     setLoading(true);
     fetchData();
     // Scroll lên đầu trang mỗi khi đổi trang
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     // eslint-disable-next-line
   }, [
     keyword,
@@ -100,7 +101,7 @@ const RecipeList = () => {
 
     // Chỉ validate khi cả hai giá trị cùng tồn tại
     console.log(num, " - ", maxTime);
-    
+
     if (num !== null && maxTime !== null && num > Number(maxTime)) {
       toast.error("Khoảng thời gian không hợp lệ!");
       return;
@@ -127,17 +128,17 @@ const RecipeList = () => {
 
   const [favoriteLoading, setFavoriteLoading] = useState({});
   const handleAddFavorite = async (id) => {
-    setFavoriteLoading(prev => ({ ...prev, [id]: true }));
+    setFavoriteLoading((prev) => ({ ...prev, [id]: true }));
     try {
       await addFavorite(id);
       // Không cập nhật cục bộ isFavorite nữa, fetch lại danh sách để lấy totalFavorite mới nhất
       await fetchData();
     } catch (err) {
-      toast.error('Lỗi khi thêm vào yêu thích');
+      toast.error("Lỗi khi thêm vào yêu thích");
     } finally {
-      setFavoriteLoading(prev => ({ ...prev, [id]: false }));
+      setFavoriteLoading((prev) => ({ ...prev, [id]: false }));
     }
-  }
+  };
 
   return (
     <div className="recipe-list-page">
@@ -248,9 +249,7 @@ const RecipeList = () => {
                 />
               </div>
               <div className="filter-group">
-                <label
-                  style={{ display: "block", fontWeight: 600 }}
-                >
+                <label style={{ display: "block", fontWeight: 600 }}>
                   Thời gian làm
                 </label>
                 <div
@@ -377,7 +376,14 @@ const RecipeList = () => {
                     <div className="card-content">
                       <h3 className="recipe-title">{recipe.title}</h3>
                       <p className="recipe-description">{recipe.description}</p>
-                      <div className="recipe-meta" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div
+                        className="recipe-meta"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 16,
+                        }}
+                      >
                         <div className="meta-item">
                           <FaClock />
                           <span>{recipe.cookTime.toFixed(2)} giờ</span>
@@ -390,18 +396,27 @@ const RecipeList = () => {
                           <FaUtensils />
                           <span>{recipe.difficulty}</span>
                         </div>
-                        <div className="meta-item" style={{ marginLeft: 'auto' }}>
+                        <div
+                          className="meta-item"
+                          style={{ marginLeft: "auto" }}
+                        >
                           <button
                             className="like-button"
-                            onClick={e => {
+                            onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
                               handleAddFavorite(recipe.id);
                             }}
                             disabled={favoriteLoading[recipe.id]}
-                            title={recipe.isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
+                            title={
+                              recipe.isFavorite ? "Bỏ yêu thích" : "Yêu thích"
+                            }
                           >
-                            {recipe.isFavorite ? <FaHeart /> : <FaHeart style={{ opacity: 0.3 }} />}
+                            {recipe.isFavorite ? (
+                              <FaHeart />
+                            ) : (
+                              <FaHeart style={{ opacity: 0.3 }} />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -441,10 +456,18 @@ const RecipeList = () => {
                 />
               </div>
             </div>
+            <ScrollToTopButton />
+            <div style={{ marginTop: 48 }}>
+              <Recommendation
+                type={"user"}
+                // id={}
+                title={"Gợi ý cho bạn"}
+                apiParams
+              />
+            </div>
           </>
         )}
       </div>
-      <ScrollToTopButton />
     </div>
   );
 };

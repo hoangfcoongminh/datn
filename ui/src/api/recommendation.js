@@ -3,7 +3,7 @@ export async function recommendForUser() {
   const res = await fetch("http://localhost:8080/api/recommendation/user", {
     headers: {
       accept: "*/*",
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
   let data;

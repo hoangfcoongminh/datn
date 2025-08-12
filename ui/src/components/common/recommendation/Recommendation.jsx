@@ -4,6 +4,8 @@ import {
   recommendForUser,
   recommendForRecipe,
 } from "../../../api/recommendation";
+import { useNavigate } from "react-router-dom";
+import { Button } from "antd";
 import "./Recommendation.css";
 
 /**
@@ -23,6 +25,7 @@ export default function Recommendation({
   const [loading, setLoading] = useState(true);
   const [slide, setSlide] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
+  const navigate = useNavigate();
 
   const fetchRecommend = async () => {
     setLoading(true);
@@ -57,11 +60,21 @@ export default function Recommendation({
     fetchRecommend();
   }, [type, id, JSON.stringify(apiParams)]);
 
+  // Vòng tròn, luôn hiển thị hết các card
+  const maxSlide = Math.max(0, recipes.length - visibleCount);
   const next = () =>
-    setSlide((s) =>
-      Math.min(s + 1, Math.max(0, recipes.length - visibleCount))
-    );
-  const prev = () => setSlide((s) => Math.max(s - 1, 0));
+    setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
+  const prev = () =>
+    setSlide((s) => (s - 1 < 0 ? maxSlide : s - 1));
+
+  // Auto slide vòng tròn
+  useEffect(() => {
+    if (recipes.length <= visibleCount) return;
+    const timer = setInterval(() => {
+      setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [recipes.length, visibleCount, maxSlide]);
 
   if (loading)
     return (
@@ -113,9 +126,23 @@ export default function Recommendation({
                 {recipe.authorFullName && (
                   <div className="rec-author">
                     {recipe.authorImgUrl ? (
-                      <img src={recipe.authorImgUrl} alt="avatar" className="rec-author-avatar" />
+                      <img
+                        src={recipe.authorImgUrl}
+                        alt="avatar"
+                        className="rec-author-avatar"
+                      />
                     ) : (
-                      <span className="rec-author-avatar" style={{display:'inline-flex',alignItems:'center',justifyContent:'center',background:'#eee',color:'#a50034',fontWeight:700}}>
+                      <span
+                        className="rec-author-avatar"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "#eee",
+                          color: "#a50034",
+                          fontWeight: 700,
+                        }}
+                      >
                         {recipe.authorFullName.charAt(0).toUpperCase()}
                       </span>
                     )}
@@ -124,19 +151,29 @@ export default function Recommendation({
                 )}
                 <div className="rec-title">{recipe.title}</div>
                 <div className="rec-meta">
-                  {typeof recipe.averageRating === 'number' && (
+                  {typeof recipe.averageRating === 'number' && !isNaN(recipe.averageRating) && (
                     <span className="rec-rating" title="Đánh giá trung bình">
-                      <svg width="16" height="16" viewBox="0 0 20 20" fill="#faad14" style={{marginRight:2}}><path d="M10 15.27L16.18 18l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 3.73L3.82 18z"/></svg>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 20 20"
+                        fill="#faad14"
+                        style={{ marginRight: 2 }}
+                      >
+                        <path d="M10 15.27L16.18 18l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 3.73L3.82 18z" />
+                      </svg>
                       {recipe.averageRating.toFixed(1)}
                     </span>
                   )}
-                  <span title="Số lượt thích">
-                    {recipe.totalFavorite} lượt thích
-                  </span>
+                  {typeof recipe.totalFavorite === 'number' && !isNaN(recipe.totalFavorite) && (
+                    <span title="Số lượt thích">
+                      {recipe.totalFavorite} lượt thích
+                    </span>
+                  )}
                 </div>
-                <a className="rec-link" href={`/recipes/${recipe.id}`}>
-                  Xem chi tiết
-                </a>
+                <Button type="primary" style={{padding:0, fontWeight:600, borderRadius:8}} onClick={() => navigate(`/recipes/${recipe.id}`)}>
+                  Chi tiết
+                </Button>
               </div>
             </div>
           ))}

@@ -28,6 +28,7 @@ public class RecipeMapper {
                 .servings(recipe.getServings())
                 .imgUrl(recipe.getImgUrl())
                 .videoUrl(recipe.getVideoUrl())
+                .viewCount(recipe.getViewCount())
                 .createdAt(recipe.getCreatedAt())
                 .createdBy(recipe.getCreatedBy())
                 .modifiedAt(recipe.getModifiedAt())
@@ -46,6 +47,7 @@ public class RecipeMapper {
                 .prepTime(request.getPrepTime())
                 .cookTime(request.getCookTime())
                 .servings(request.getServings())
+                .viewCount(0L)
                 .build();
     }
 }

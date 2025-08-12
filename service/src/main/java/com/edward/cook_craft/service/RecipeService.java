@@ -13,6 +13,7 @@ import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.RecipeStepMapper;
 import com.edward.cook_craft.model.*;
 import com.edward.cook_craft.repository.*;
+import com.edward.cook_craft.service.batch.RecipeViewService;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
@@ -55,6 +56,7 @@ public class RecipeService {
     private final RecipeStepMapper recipeStepMapper;
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
+    private final RecipeViewService recipeViewService;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
@@ -120,7 +122,6 @@ public class RecipeService {
         response.setTotalReview(ratingMap.get(id).getSecond());
         response.setTotalFavorite(totalFavoriteMap.get(response.getId()));
 
-
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
                 .map(recipeIngredientDetailMapper::toResponse).toList();
@@ -130,6 +131,10 @@ public class RecipeService {
 
         response.setRecipeIngredients(recipeIngredientResponses);
         response.setRecipeSteps(recipeStepResponses);
+
+        //Increase view of this recipe
+        recipeViewService.increaseView(id);
+
         return response;
     }
 
@@ -147,6 +152,7 @@ public class RecipeService {
         } else {
             recipe.setImgUrl(defaultRecipe);
         }
+
         Recipe finalRecipe = repository.save(recipe);
 
         var savedIngredients = ingredients.stream().map(i -> {

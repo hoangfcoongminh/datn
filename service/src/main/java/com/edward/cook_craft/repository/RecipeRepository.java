@@ -4,6 +4,7 @@ import com.edward.cook_craft.model.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -77,4 +78,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "WHERE r.id IN :recipeIds " +
             "AND r.status = 1")
     List<Recipe> findAllByIdActive(@Param("recipeIds") List<Long> recipeIds);
+
+    @Modifying
+    @Query("UPDATE Recipe r " +
+            "SET r.viewCount = r.viewCount + :views " +
+            "WHERE r.id = :recipeId")
+    void incrementViewCount(@Param("recipeId") Long recipeId, @Param("views") long views);
+
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.status = 1 " +
+            "ORDER BY r.viewCount DESC " +
+            "LIMIT 10")
+    List<Recipe> findTop10ViewRecipes();
 }

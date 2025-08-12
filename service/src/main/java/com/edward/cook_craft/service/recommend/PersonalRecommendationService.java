@@ -33,7 +33,8 @@ public class PersonalRecommendationService {
     public List<RecipeResponse> getRecommendationsForUser() {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new CustomException("not.authenticated");
+            List<Recipe> recipes = recipeRepository.findTop10ViewRecipes();
+            return recipes.stream().map(recipeMapper::toResponse).toList();
         }
         Long userId = user.getId();
 
