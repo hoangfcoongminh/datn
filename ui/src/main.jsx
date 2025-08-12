@@ -6,7 +6,7 @@ import App from "./App.jsx";
 import { ConfigProvider } from "antd";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <ConfigProvider
       theme={{
         token: {
@@ -22,5 +22,5 @@ createRoot(document.getElementById("root")).render(
       <App />
 
     </ConfigProvider>,
-  </StrictMode>,
+  /* </StrictMode>, */
 );

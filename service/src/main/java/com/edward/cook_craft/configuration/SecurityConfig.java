@@ -50,11 +50,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/units").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/units/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
                         .requestMatchers(
                                 "/api/categories/**",
                                 "/api/ingredients/**",
                                 "/api/recipes/**",
-                                "/api/units/**").hasAuthority("USER")
+                                "/api/units/**",
+                                "/api/review/**").hasAuthority("USER")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

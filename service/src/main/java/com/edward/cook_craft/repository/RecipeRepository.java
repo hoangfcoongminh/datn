@@ -65,4 +65,16 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                         Pageable pageable);
 
     List<Recipe> findByCreatedAtBetween(LocalDateTime startOfYear, LocalDateTime endOfYear);
+
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.categoryId = :categoryId " +
+            "AND r.status = 1")
+    List<Recipe> findByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.id IN :recipeIds " +
+            "AND r.status = 1")
+    List<Recipe> findAllByIdActive(@Param("recipeIds") List<Long> recipeIds);
 }
