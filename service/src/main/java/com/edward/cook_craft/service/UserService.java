@@ -123,4 +123,11 @@ public class UserService {
         return recipeService.filter(request, pageable);
     }
 
+    public UserResponse getUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new CustomException("user.not.found");
+        }
+        return userMapper.toResponse(user.get());
+    }
 }

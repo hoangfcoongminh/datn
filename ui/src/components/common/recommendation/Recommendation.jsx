@@ -135,7 +135,7 @@ export default function Recommendation({
                   alt={recipe.title}
                 />
               </div>
-              <div className="rec-info">
+              <div className="rec-info" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
                 {/* Tác giả */}
                 {recipe.authorUsername && (
                   <div className="rec-author">

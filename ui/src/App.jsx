@@ -156,7 +156,7 @@ function AppContent() {
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />
         <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
-        <Route path="/users/:username" element={<UserProfile />} />
+        <Route path="/user/:username" element={<UserProfile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

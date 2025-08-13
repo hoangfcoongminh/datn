@@ -73,6 +73,21 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+.user-info {
+  width: 100%;
+}
+.user-bio {
+  display: block;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 8px;
+  width: 75%;
+  height: 80px;
+  padding: 6px 8px;
+}
+.user-bio > p {
+  cursor: text;
+}
 @media (max-width: 1100px) {
   .recipes-grid { grid-template-columns: repeat(3, 1fr); }
 }
@@ -95,6 +110,9 @@
 .recipe-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 24px rgba(165,0,52,0.18), 0 2px 8px rgba(0,0,0,0.08);
+}
+.rating-count {
+  margin-left: 10px;
 }
 
 .card-image { height: 180px; overflow: hidden; }

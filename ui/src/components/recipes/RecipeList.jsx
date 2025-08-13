@@ -375,6 +375,30 @@ const RecipeList = () => {
                       </div>
                     </div>
                     <div className="card-content">
+                      <div className="rec-author" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
+                        {recipe.authorAvtUrl ? (
+                          <img
+                            src={recipe.authorAvtUrl}
+                            alt="avatar"
+                            className="rec-author-avatar"
+                          />
+                        ) : (
+                          <span
+                            className="rec-author-avatar"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: "#eee",
+                              color: "#a50034",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {recipe.authorFullName.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                        {recipe.authorFullName}
+                      </div>
                       <h3 className="recipe-title">{recipe.title}</h3>
                       <p className="recipe-description">{recipe.description}</p>
                       <div
