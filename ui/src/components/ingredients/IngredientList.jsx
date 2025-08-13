@@ -25,7 +25,7 @@ import {
   detailIngredient,
   updateIngredient,
 } from "../../api/ingredient";
-import PopUp from "../common/PopUp";
+import PopUp from "../common/popup/PopUp";
 import "./IngredientList.css";
 import "antd/dist/reset.css";
 import { toast } from "react-toastify";

@@ -248,29 +248,32 @@
 }
 
 .like-button {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 44px;
-  height: 44px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
-  color: #a50034;
+  background: linear-gradient(135deg, #fff 60%, #fbe0ea 100%);
+  color: #e74c3c;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  z-index: 2;
+  font-size: 1.35rem;
+  width: 38px;
+  height: 38px;
+  box-shadow: 0 2px 8px rgba(231,76,60,0.08);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  margin-left: 8px;
+}
+
+.like-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .like-button:hover {
-  background: #a50034;
-  color: white;
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #e74c3c 0%, #f2f2f2 100%);
+  color: #fff;
+  transform: scale(1.13);
+  box-shadow: 0 4px 16px rgba(231,76,60,0.13);
 }
 
 .card-overlay {

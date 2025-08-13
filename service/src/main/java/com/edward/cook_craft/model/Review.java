@@ -7,22 +7,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-/**
- * BẢNG ĐƠN VỊ
- */
-
 @Entity
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
-@Table(name = "units")
-public class Unit extends BaseModel {
+@Table(name = "reviews")
+public class Review extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private Long userId;
+
+    private String username;
+
+    private Long recipeId;
+
+    private Float rating;
+
+    @Column(columnDefinition = "TEXT")
+    private String comment;
 }
