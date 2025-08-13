@@ -31,6 +31,7 @@ import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
 import ConfirmModal from "../common/ConfirmModal";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 const { Option } = Select;
 
@@ -541,6 +542,7 @@ const IngredientList = () => {
           </div>
         )}
       </PopUp>
+      <ChatLauncher />
     </div>
   );
 };

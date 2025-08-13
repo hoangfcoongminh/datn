@@ -1,7 +1,6 @@
-package com.edward.cook_craft.service.recommend;
+package com.edward.cook_craft.service.recommendation;
 
 import com.edward.cook_craft.dto.response.RecipeResponse;
-import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.model.Favorite;
 import com.edward.cook_craft.model.Recipe;
@@ -10,6 +9,8 @@ import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.FavoriteRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.ReviewRepository;
+import com.edward.cook_craft.repository.UserRepository;
+import com.edward.cook_craft.utils.RecipeUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,12 +30,13 @@ public class PersonalRecommendationService {
     private final RecipeRepository recipeRepository;
     private final ReviewRepository reviewRepository;
     private final RecipeMapper recipeMapper;
+    private final RecipeUtils recipeUtils;
 
     public List<RecipeResponse> getRecommendationsForUser() {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
             List<Recipe> recipes = recipeRepository.findTop10ViewRecipes();
-            return recipes.stream().map(recipeMapper::toResponse).toList();
+            return recipeUtils.mapWithExtraInfo(recipes);
         }
         Long userId = user.getId();
 
@@ -47,8 +49,8 @@ public class PersonalRecommendationService {
         ).collect(Collectors.toSet());
 
         Set<Long> similarUsers = findSimilarUsers(userId, myReviews, myFavorites);
-        List<Review> l = reviewRepository.findAllActive();
-        List<Long> cfRecipeIds = l.stream()
+        List<Review> reviews = reviewRepository.findAllActive();
+        List<Long> cfRecipeIds = reviews.stream()
                 .filter(r -> similarUsers.contains(r.getUserId()))
                 .filter(r -> r.getRating() >= 4)
                 .map(Review::getRecipeId)
@@ -62,8 +64,14 @@ public class PersonalRecommendationService {
             List<Recipe> cbResults = contentBasedSuggestion(myReviews, myFavorites, interactedRecipeIds);
             suggestions.addAll(cbResults);
         }
+        if (suggestions.size() < 10) {
+            List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
+                    suggestions.stream().map(Recipe::getId).toList());
+            suggestions.addAll(topView);
+        }
+        var response = recipeUtils.mapWithExtraInfo(suggestions);
 
-        return suggestions.stream().distinct().limit(10).map(recipeMapper::toResponse).toList();
+        return response.stream().distinct().limit(10).toList();
     }
 
     private Set<Long> findSimilarUsers(Long userId, List<Review> myReviews, List<Favorite> myFavorites) {

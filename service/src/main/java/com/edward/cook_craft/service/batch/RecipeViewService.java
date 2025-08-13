@@ -19,15 +19,15 @@ public class RecipeViewService {
     private final RecipeRepository recipeRepository;
 
     public void increaseView(Long recipeId) {
-        log.info("Increase view count for recipe {}", recipeId);
+//        log.info("Increase view count for recipe {}", recipeId);
         String key = "recipe:view:" + recipeId;
         redisTemplate.opsForValue().increment(key);
     }
 
-    @Scheduled(cron = "0 * * * * *") //every minutes
+    @Scheduled(cron = "0 * * * * *") //every minute
     @Transactional
     public void flushViewsToDb() {
-        log.info("Flush views to DB");
+//        log.info("Flush views to DB");
         Set<String> keys = redisTemplate.keys("recipe:view:*");
         if (keys.isEmpty()) return;
 

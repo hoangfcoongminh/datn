@@ -12,12 +12,13 @@ import {
 import { filterRecipes } from "../../api/recipe";
 import { fetchAllCategories } from "../../api/category";
 import { fetchIngredients } from "../../api/ingredient";
-import { Select, Pagination, Input } from "antd";
+import { Select, Pagination, Input, Rate } from "antd";
 import "antd/dist/reset.css";
 import "./RecipeList.css";
 import { toast } from "react-toastify";
 import { addFavorite } from "../../api/user";
 import Recommendation from "../common/recommendation/Recommendation";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 const { Option } = Select;
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
@@ -385,21 +386,40 @@ const RecipeList = () => {
                         }}
                       >
                         <div className="meta-item">
-                          <FaClock />
-                          <span>{recipe.cookTime.toFixed(2)} giờ</span>
-                        </div>
-                        <div className="meta-item">
-                          <FaStar />
-                          <span>{recipe.averageRating.toFixed(1)}</span>
-                        </div>
-                        <div className="meta-item">
-                          <FaUtensils />
-                          <span>{recipe.difficulty}</span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 20,
+                              color: "#faad14",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
+                            <Rate
+                              allowHalf
+                              disabled
+                              value={recipe.averageRating || 0}
+                              style={{ fontSize: 22, color: "#faad14" }}
+                            />
+                          </span>
+                          <span
+                            style={{
+                              color: "#000",
+                              fontWeight: 500,
+                              fontSize: 16,
+                            }}
+                          >
+                            {recipe.totalReview} lượt đánh giá
+                          </span>
                         </div>
                         <div
                           className="meta-item"
                           style={{ marginLeft: "auto" }}
-                        >
+                        ></div>
+                      </div>
+                      <div className="card-footer">
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <button
                             className="like-button"
                             onClick={(e) => {
@@ -418,12 +438,10 @@ const RecipeList = () => {
                               <FaHeart style={{ opacity: 0.3 }} />
                             )}
                           </button>
+                          <span className="likes-count">
+                            {recipe.totalFavorite} lượt thích
+                          </span>
                         </div>
-                      </div>
-                      <div className="card-footer">
-                        <span className="likes-count">
-                          {recipe.totalFavorite} lượt thích
-                        </span>
                         <Link
                           to={`/recipes/${recipe.id}`}
                           className="cta-button"
@@ -468,6 +486,7 @@ const RecipeList = () => {
           </>
         )}
       </div>
+      <ChatLauncher />
     </div>
   );
 };

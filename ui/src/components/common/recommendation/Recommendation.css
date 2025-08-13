@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 24px 0 36px 0;
+  padding: 24px 18px 36px 18px;
 }
 .rec-nav {
   position: absolute;
@@ -32,7 +32,7 @@
   align-items: center;
   pointer-events: none;
   z-index: 3;
-  padding: 0 8px;
+  padding: 0 12px;
 }
 .rec-btn {
   pointer-events: auto;
@@ -67,16 +67,18 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  scroll-padding: 0 18px; /* extra safe area so first/last card are fully visible */
 }
 .rec-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(.4,1,.4,1);
+  padding: 0 12px; /* ensure first/last card not clipped by overflow */
 }
 .rec-card {
   background: #fff;
   border-radius: 28px;
   box-shadow: 0 4px 24px rgba(165,0,52,0.13), 0 1.5px 6px rgba(0,0,0,0.04);
-  margin: 0 18px;
+  margin: 0 12px;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
@@ -191,8 +193,11 @@
   .rec-card { min-width: 200px; max-width: 260px; }
   .rec-img-wrap { height: 120px; }
   .rec-info { padding: 14px 10px 12px 10px; }
+  .rec-nav { padding: 0 8px; }
 }
 @media (max-width: 700px) {
+  .rec-slider { padding: 16px 12px 28px 12px; }
+  .rec-track { padding: 0 4px; }
   .rec-card { min-width: 90vw; max-width: 98vw; margin: 0 2vw; }
   .rec-img-wrap { height: 90px; }
   .rec-header h3 { font-size: 18px; }

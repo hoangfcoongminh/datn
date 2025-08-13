@@ -60,6 +60,7 @@ public class UserService {
             minioService.deleteFile(existsAvtUrl);
             user.setImgUrl(minioService.uploadFile(file));
         }
+        user.setDescription(request.getDescription());
 
         user = userRepository.save(user);
 

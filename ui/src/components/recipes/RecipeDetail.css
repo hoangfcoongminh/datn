@@ -103,9 +103,11 @@
 
 .recipe-description {
   font-size: 1.2rem;
-  color: #5a6c7d;
+  color: #1e1d1d;
   line-height: 1.6;
+  margin-top: 20px;
   margin-bottom: 30px;
+  font-weight: 500;
 }
 
 .recipe-stats {
@@ -211,7 +213,7 @@
 .ingredients-list li {
   padding: 12px 0;
   border-bottom: 1px solid #e9ecef;
-  color: #5a6c7d;
+  color: #000;
   font-size: 1.1rem;
   position: relative;
   padding-left: 24px;
@@ -241,7 +243,7 @@
   gap: 20px;
   padding: 20px 0;
   border-bottom: 1px solid #e9ecef;
-  color: #5a6c7d;
+  color: #000;
   font-size: 1.1rem;
   line-height: 1.6;
 }
@@ -334,4 +336,8 @@
   .instructions-list li {
     font-size: 1rem;
   }
-} 
+}
+
+.rec-author {
+  cursor: pointer;
+}

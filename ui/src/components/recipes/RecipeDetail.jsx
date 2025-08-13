@@ -16,6 +16,7 @@ import { Button, Image } from "antd";
 import Review from "../common/review/Review";
 import Recommendation from "../common/recommendation/Recommendation";
 import { addFavorite } from "../../api/user";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -172,8 +173,33 @@ const RecipeDetail = () => {
               />
             </div>
             <h1 className="recipe-title">{recipe.title}</h1>
+            {recipe.authorUsername && (
+              <div className="rec-author" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
+                {recipe.authorAvtUrl ? (
+                  <img
+                    src={recipe.authorAvtUrl}
+                    alt="avatar"
+                    className="rec-author-avatar"
+                  />
+                ) : (
+                  <span
+                    className="rec-author-avatar"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#eee",
+                      color: "#a50034",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {recipe.authorFullName.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                {recipe.authorFullName}
+              </div>
+            )}
             <p className="recipe-description">{recipe.description}</p>
-
             <div
               className="recipe-stats"
               style={{
@@ -209,14 +235,15 @@ const RecipeDetail = () => {
                 }}
               >
                 {recipe.videoUrl && (
-                  <Button type="primary"
+                  <Button
+                    type="primary"
                     style={{
                       background: "#a50034",
                       borderColor: "#a50034",
                       borderRadius: 8,
                       fontWeight: 600,
                       width: "fit-content",
-                    }} 
+                    }}
                     onClick={() => setShowVideo((v) => !v)}
                   >
                     {showVideo ? "Ẩn video hướng dẫn" : "Xem video hướng dẫn"}
@@ -290,6 +317,7 @@ const RecipeDetail = () => {
           apiParams
         />
       </div>
+      <ChatLauncher />
     </div>
   );
 };

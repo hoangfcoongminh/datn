@@ -59,11 +59,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "GROUP BY r " +
             "ORDER BY COUNT(f) DESC ")
     Page<Recipe> filterWithFavorite(@Param("keyword") String keyword,
-                        @Param("categoryIds") List<Long> categoryIds,
-                        @Param("ingredientIds") List<Long> ingredientIds,
-                        @Param("authorUsernames") List<String> authorUsernames,
-                        @Param("status") Integer status,
-                        Pageable pageable);
+                                    @Param("categoryIds") List<Long> categoryIds,
+                                    @Param("ingredientIds") List<Long> ingredientIds,
+                                    @Param("authorUsernames") List<String> authorUsernames,
+                                    @Param("status") Integer status,
+                                    Pageable pageable);
 
     List<Recipe> findByCreatedAtBetween(LocalDateTime startOfYear, LocalDateTime endOfYear);
 
@@ -84,6 +84,16 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "SET r.viewCount = r.viewCount + :views " +
             "WHERE r.id = :recipeId")
     void incrementViewCount(@Param("recipeId") Long recipeId, @Param("views") long views);
+
+    @Query("""
+                SELECT r
+                FROM Recipe r
+                WHERE r.status = 1
+                  AND (:excludeIds IS NULL OR r.id NOT IN :excludeIds)
+                ORDER BY r.viewCount DESC
+            """)
+    List<Recipe> findTopViewExcludeIds(@Param("excludeIds") List<Long> excludeIds);
+
 
     @Query(value = "SELECT r " +
             "FROM Recipe r " +

@@ -1,4 +1,4 @@
-package com.edward.cook_craft.service.recommend;
+package com.edward.cook_craft.service.recommendation;
 
 import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.mapper.RecipeMapper;
@@ -8,9 +8,11 @@ import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.repository.FavoriteRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.ReviewRepository;
+import com.edward.cook_craft.utils.RecipeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,7 @@ public class RelatedRecommendationService {
     private final RecipeRepository recipeRepository;
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
-    private final RecipeMapper recipeMapper;
+    private final RecipeUtils recipeUtils;
 
     public List<RecipeResponse> getRelatedRecipes(Long recipeId) {
         Recipe current = recipeRepository.getByIdAndActive(recipeId).orElse(null);
@@ -53,10 +55,16 @@ public class RelatedRecommendationService {
 
         List<Recipe> communityBased = recipeRepository.findAllById(relatedRecipeIds);
 
-        return Stream.concat(contentBased.stream(), communityBased.stream())
+        List<Recipe> suggestions = new ArrayList<>(Stream.concat(contentBased.stream(), communityBased.stream())
                 .distinct()
                 .limit(10)
-                .map(recipeMapper::toResponse)
-                .toList();
+                .toList());
+        if (suggestions.size() < 10) {
+            List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
+                    suggestions.stream().map(Recipe::getId).toList());
+            suggestions.addAll(topView);
+        }
+
+        return recipeUtils.mapWithExtraInfo(suggestions);
     }
 }

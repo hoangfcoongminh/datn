@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa";
 import {
   recommendForUser,
   recommendForRecipe,
 } from "../../../api/recommendation";
 import { useNavigate } from "react-router-dom";
-import { Button } from "antd";
+import { Button, Rate } from "antd";
 import "./Recommendation.css";
+import { toast } from "react-toastify";
+import { addFavorite } from "../../../api/user";
 
 /**
  * props:
@@ -44,6 +46,20 @@ export default function Recommendation({
     }
   };
 
+  const [favoriteLoading, setFavoriteLoading] = useState({});
+  const handleAddFavorite = async (id) => {
+    setFavoriteLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      await addFavorite(id);
+      // Không cập nhật cục bộ isFavorite nữa, fetch lại danh sách để lấy totalFavorite mới nhất
+      await fetchRecommend();
+    } catch (err) {
+      toast.error("Lỗi khi thêm vào yêu thích");
+    } finally {
+      setFavoriteLoading((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
   useEffect(() => {
     // Responsive: 4 desktop, 2 tablet, 1 mobile
     const handleResize = () => {
@@ -62,17 +78,15 @@ export default function Recommendation({
 
   // Vòng tròn, luôn hiển thị hết các card
   const maxSlide = Math.max(0, recipes.length - visibleCount);
-  const next = () =>
-    setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
-  const prev = () =>
-    setSlide((s) => (s - 1 < 0 ? maxSlide : s - 1));
+  const next = () => setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
+  const prev = () => setSlide((s) => (s - 1 < 0 ? maxSlide : s - 1));
 
   // Auto slide vòng tròn
   useEffect(() => {
     if (recipes.length <= visibleCount) return;
     const timer = setInterval(() => {
       setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
-    }, 5000);
+    }, 50000000);
     return () => clearInterval(timer);
   }, [recipes.length, visibleCount, maxSlide]);
 
@@ -110,7 +124,7 @@ export default function Recommendation({
             <div
               className="rec-card"
               key={recipe.id || idx}
-              style={{ minWidth: `${100 / visibleCount}%` }}
+              style={{ width: `${100 / visibleCount}%` }}
             >
               <div className="rec-img-wrap">
                 <img
@@ -123,11 +137,11 @@ export default function Recommendation({
               </div>
               <div className="rec-info">
                 {/* Tác giả */}
-                {recipe.authorFullName && (
+                {recipe.authorUsername && (
                   <div className="rec-author">
-                    {recipe.authorImgUrl ? (
+                    {recipe.authorAvtUrl ? (
                       <img
-                        src={recipe.authorImgUrl}
+                        src={recipe.authorAvtUrl}
                         alt="avatar"
                         className="rec-author-avatar"
                       />
@@ -151,27 +165,62 @@ export default function Recommendation({
                 )}
                 <div className="rec-title">{recipe.title}</div>
                 <div className="rec-meta">
-                  {typeof recipe.averageRating === 'number' && !isNaN(recipe.averageRating) && (
-                    <span className="rec-rating" title="Đánh giá trung bình">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 20 20"
-                        fill="#faad14"
-                        style={{ marginRight: 2 }}
+                  {typeof recipe.averageRating === "number" &&
+                    !isNaN(recipe.averageRating) && (
+                      <span title="Đánh giá">
+                        <Rate
+                          allowHalf
+                          disabled
+                          value={recipe.averageRating || 0}
+                          style={{ fontSize: 22, color: "#faad14" }}
+                        />
+                        {recipe.totalReview}
+                      </span>
+                    )}
+                  {typeof recipe.totalFavorite === "number" &&
+                    !isNaN(recipe.totalFavorite) && (
+                      <span
+                        title="Lượt thích"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px", // khoảng cách giữa icon và số
+                        }}
                       >
-                        <path d="M10 15.27L16.18 18l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 3.73L3.82 18z" />
-                      </svg>
-                      {recipe.averageRating.toFixed(1)}
-                    </span>
-                  )}
-                  {typeof recipe.totalFavorite === 'number' && !isNaN(recipe.totalFavorite) && (
-                    <span title="Số lượt thích">
-                      {recipe.totalFavorite} lượt thích
-                    </span>
-                  )}
+                        <button
+                          className="like-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            handleAddFavorite(recipe.id);
+                          }}
+                          disabled={favoriteLoading[recipe.id]}
+                          title={
+                            recipe.isFavorite ? "Bỏ yêu thích" : "Yêu thích"
+                          }
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {recipe.isFavorite ? (
+                            <FaHeart />
+                          ) : (
+                            <FaHeart style={{ opacity: 0.3 }} />
+                          )}
+                        </button>
+                        <span>{recipe.totalFavorite}</span>
+                      </span>
+                    )}
                 </div>
-                <Button type="primary" style={{padding:0, fontWeight:600, borderRadius:8}} onClick={() => navigate(`/recipes/${recipe.id}`)}>
+                <Button
+                  type="primary"
+                  style={{ padding: 0, fontWeight: 600, borderRadius: 8 }}
+                  onClick={() => navigate(`/recipes/${recipe.id}`)}
+                >
                   Chi tiết
                 </Button>
               </div>

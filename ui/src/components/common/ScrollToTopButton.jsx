@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 const ScrollToTopButton = () => {
@@ -28,18 +27,14 @@ const ScrollToTopButton = () => {
         color: '#fff',
         border: 'none',
         borderRadius: '50%',
-        width: 56,
-        height: 56,
-        fontSize: 32,
-        fontWeight: 'bold',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
+        width: 48,
+        height: 48,
+        fontSize: 24,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         cursor: 'pointer',
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 0.3s',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
       }}
       aria-label="Lên đầu trang"
     >
@@ -47,6 +42,5 @@ const ScrollToTopButton = () => {
     </button>
   );
 };
-
 
 export default ScrollToTopButton;

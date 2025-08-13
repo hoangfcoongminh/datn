@@ -22,6 +22,10 @@ public class RecipeResponse extends BaseResponse {
 
     private String authorUsername;  // username of the user who created the recipe
 
+    private String authorAvtUrl;
+
+    private String authorFullName;
+
     private String title;
 
     private String description;

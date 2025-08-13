@@ -16,6 +16,7 @@ import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.batch.RecipeViewService;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
+import com.edward.cook_craft.utils.RecipeUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,8 +55,7 @@ public class RecipeService {
     private final MinioService minioService;
     private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
     private final RecipeStepMapper recipeStepMapper;
-    private final FavoriteRepository favoriteRepository;
-    private final ReviewRepository reviewRepository;
+    private final RecipeUtils recipeUtils;
     private final RecipeViewService recipeViewService;
 
     public List<RecipeResponse> getAll() {
@@ -81,24 +81,7 @@ public class RecipeService {
                     keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
         }
         List<Recipe> data = paged.getContent();
-        List<RecipeResponse> response = data.stream().map(recipeMapper::toResponse).toList();
-        List<Long> recipeIds = data.stream().map(Recipe::getId).toList();
-
-        var ratingMap = getRatingMap(recipeIds);
-        var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
-
-        response.forEach(r -> {
-            r.setAverageRating(ratingMap.get(r.getId()).getFirst());
-            r.setTotalReview(ratingMap.get(r.getId()).getSecond());
-            r.setTotalFavorite(totalFavoriteMap.get(r.getId()));
-        });
-
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            var favoriteMap = checkFavoriteByUser(recipeIds);
-            response.forEach(r -> {
-                r.setIsFavorite(favoriteMap.get(r.getId()));
-            });
-        }
+        var response = recipeUtils.mapWithExtraInfo(data);
 
         return pageMapper.map(response, pageable, paged.getTotalElements());
     }
@@ -109,18 +92,7 @@ public class RecipeService {
             throw new CustomException("recipe.not.found");
         }
         Recipe recipeData = recipe.get();
-        RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
-        List<Long> recipeIds = List.of(id);
-        var ratingMap = getRatingMap(recipeIds);
-        var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            var favoriteMap = checkFavoriteByUser(recipeIds);
-            response.setIsFavorite(favoriteMap.get(id));
-        }
-
-        response.setAverageRating(ratingMap.get(id).getFirst());
-        response.setTotalReview(ratingMap.get(id).getSecond());
-        response.setTotalFavorite(totalFavoriteMap.get(response.getId()));
+        RecipeDetailResponse response = new RecipeDetailResponse(recipeUtils.mapWithExtraInfo(List.of(recipeData)).get(0));
 
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
@@ -335,52 +307,5 @@ public class RecipeService {
         }
     }
 
-    private Map<Long, Boolean> checkFavoriteByUser(List<Long> recipeIds) {
-        User u = SecurityUtils.getCurrentUser();
-        if (u == null) {
-            return recipeIds.stream().collect(Collectors.toMap(id -> id, id -> false));
-        }
-        Map<Long, Boolean> favoriteMap = favoriteRepository.findAllFavoriteByUserIdAndRecipeIds(u.getId(), recipeIds)
-                .stream()
-                .collect(Collectors.toMap(Favorite::getRecipeId, f -> true));
 
-        recipeIds.forEach(id -> favoriteMap.computeIfAbsent(id, k -> false));
-
-        return favoriteMap;
-    }
-
-    private Map<Long, Pair<Float, Integer>> getRatingMap(List<Long> recipeIds) {
-        var ratingMap = reviewRepository.findByRecipeIdIn(recipeIds)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        Review::getRecipeId,
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                reviews -> {
-                                    double sum = reviews.stream()
-                                            .mapToDouble(review -> review.getRating() != null ? review.getRating() : 0.0)
-                                            .sum();
-                                    int count = reviews.size();
-                                    double average = count > 0 ? sum / count : 0.0;
-                                    return Pair.of((float) average, count);
-                                }
-                        )
-                ));
-        recipeIds.forEach(id -> ratingMap.computeIfAbsent(id, k -> Pair.of(0.0f, 0)));
-
-        return ratingMap;
-    }
-
-    private Map<Long, Integer> checkTotalFavoriteForRecipe(List<Long> recipeIds) {
-        List<FavoriteRepository.RecipeLikeCount> counts = favoriteRepository.countLikesGroupByRecipeIdByRecipeIds(recipeIds);
-
-        var totalFavoriteMap = counts.stream()
-                .collect(Collectors.toMap(
-                        FavoriteRepository.RecipeLikeCount::getRecipeId,
-                        FavoriteRepository.RecipeLikeCount::getLikeCount
-                ));
-        recipeIds.forEach(id -> totalFavoriteMap.putIfAbsent(id, 0));
-
-        return totalFavoriteMap;
-    }
 }

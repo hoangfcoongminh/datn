@@ -12,6 +12,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
 
   const menuItems = [
     { key: "home", label: "Trang chủ" },
+    { key: "newsfeed", label: "NewsFeed" },
     { key: "category", label: "Danh mục" },
     { key: "recipe", label: "Công thức" },
     { key: "ingredient", label: "Nguyên liệu" },
