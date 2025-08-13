@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 
 /**
@@ -28,16 +29,17 @@ public class Recipe extends BaseModel {
 
     private Long categoryId;
 
-    private Long authorId;  // ID of the user who created the recipe
+    private String authorUsername;  // username of the user who created the recipe
 
     private String title;
 
     private String description;
 
-    private Duration prepTime;
+    private BigDecimal prepTime; //hours
 
-    private Duration cookTime;
+    private BigDecimal cookTime; //hours
 
     private Integer servings;   //Serve for how many people
 
+    private String imgUrl;
 }

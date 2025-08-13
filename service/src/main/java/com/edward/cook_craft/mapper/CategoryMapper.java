@@ -12,6 +12,7 @@ public class CategoryMapper {
         return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
+                .imgUrl(category.getImgUrl())
                 .description(category.getDescription())
                 .createdAt(category.getCreatedAt())
                 .modifiedAt(category.getModifiedAt())

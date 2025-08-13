@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Setter
 public class RecipeIngredientDetailRequest {
 
-//    private Long id;
+    private Long id;
 
     private Long recipeId;
 

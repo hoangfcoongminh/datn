@@ -5,5 +5,7 @@ import lombok.Getter;
 @Getter
 public class UnitRequest {
 
+    private Long id;
     private String name;
+    private Integer status;
 }

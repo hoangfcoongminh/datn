@@ -28,4 +28,19 @@ public class PageMapper {
                 sort
         );
     }
+
+    public <T> PagedResponse<T> map(List<T> data, Pageable pageable, long totalElements) {
+        String sort = pageable.getSort().isSorted()
+                ? pageable.getSort().toString()
+                : "unsorted";
+
+        return new PagedResponse<>(
+                data,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                totalElements,
+                sort
+        );
+    }
+
 }

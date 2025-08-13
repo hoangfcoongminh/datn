@@ -13,5 +13,6 @@ public class CategoryResponse extends BaseResponse {
 
     private Long id;
     private String name;
+    private String imgUrl;
     private String description;
 }

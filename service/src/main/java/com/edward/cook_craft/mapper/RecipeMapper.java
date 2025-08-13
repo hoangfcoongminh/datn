@@ -2,22 +2,31 @@ package com.edward.cook_craft.mapper;
 
 import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.dto.response.RecipeResponse;
+import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.model.Recipe;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class RecipeMapper {
+
+    private final ObjectMapper objectMapper;
 
     public RecipeResponse toResponse(Recipe recipe) {
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .categoryId(recipe.getCategoryId())
-                .authorId(recipe.getAuthorId())
+                .authorUsername(recipe.getAuthorUsername())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
                 .prepTime(recipe.getPrepTime())
                 .cookTime(recipe.getCookTime())
                 .servings(recipe.getServings())
+                .imgUrl(recipe.getImgUrl())
                 .createdAt(recipe.getCreatedAt())
                 .createdBy(recipe.getCreatedBy())
                 .modifiedAt(recipe.getModifiedAt())
@@ -30,7 +39,7 @@ public class RecipeMapper {
         return Recipe.builder()
                 .id(request.getId())
                 .categoryId(request.getCategoryId())
-                .authorId(request.getAuthorId())
+                .authorUsername(request.getAuthorUsername())
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .prepTime(request.getPrepTime())

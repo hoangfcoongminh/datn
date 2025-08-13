@@ -13,15 +13,18 @@ import com.edward.cook_craft.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticService {
+
+    @Value("${image.default.avt}")
+    private String defaultAvt;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -34,9 +37,9 @@ public class AuthenticService {
     public LoginResponse login(LoginRequest request) {
         validateLogin(request);
 
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(request.getUsername());
-        String token = jwtService.generateAccessToken(userDetails);
-        UserResponse userResponse = userMapper.toResponse(((CustomUserDetails) userDetails).getUser());
+        CustomUserDetails customUserDetails = (CustomUserDetails) customUserDetailService.loadUserByUsername(request.getUsername());
+        String token = jwtService.generateAccessToken(customUserDetails);
+        UserResponse userResponse = userMapper.toResponse(customUserDetails.getUser());
 
         return new LoginResponse(token, userResponse);
     }
@@ -50,6 +53,7 @@ public class AuthenticService {
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setFullName(request.getFullName());
         newUser.setEmail(request.getEmail());
+        newUser.setImgUrl(defaultAvt);
         newUser.setRole(Role.USER);
 
         newUser = userRepository.save(newUser);
@@ -76,12 +80,15 @@ public class AuthenticService {
             throw new CustomException("confirm.password.invalid");
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new CustomException("user.name.exists");
         }
     }
 
     private void validateLogin(LoginRequest request) {
+        if (userRepository.findByUsername(request.getUsername()).isEmpty()) {
+            throw new CustomException("user.not.found");
+        }
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

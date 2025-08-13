@@ -10,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/ingredients/")
+@RequestMapping("/api/ingredients")
 @RequiredArgsConstructor
 @Tag(name = "Ingredients", description = "Ingredient management API")
 public class IngredientController {
@@ -22,11 +23,15 @@ public class IngredientController {
     @GetMapping
     @Operation(summary = "Get all ingredients", description = "Retrieve a list of all ingredients")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get detail ingredient", description = "Detail of an ingredient")
+    public ResponseEntity<?> details(
+            @PathVariable Long id
+    ) {
+        return ResponseUtils.handleSuccess(service.details(id));
     }
 
     @PostMapping("/filter")
@@ -41,25 +46,19 @@ public class IngredientController {
     @PostMapping
     @Operation(summary = "Create a new ingredient", description = "Add a new ingredient to the system")
     public ResponseEntity<?> create(
-            @RequestBody @Valid IngredientRequest request
+            @RequestPart(name = "jsonRequest") String jsonRequest,
+            @RequestPart(name = "img", required = false) MultipartFile file
     ) {
-//        try {
-        return ResponseUtils.handleSuccess(service.create(request));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
+        return ResponseUtils.handleSuccess(service.create(jsonRequest, file));
     }
 
     @PutMapping
     @Operation(summary = "Update an ingredient", description = "Update an existed ingredient")
     public ResponseEntity<?> update(
-            @RequestBody @Valid IngredientRequest request
+            @RequestPart(name = "jsonRequest") String jsonRequest,
+            @RequestPart(name = "img",  required = false) MultipartFile file
     ) {
-//        try {
-        return ResponseUtils.handleSuccess(service.update(request));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
+        return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
     }
 
 }

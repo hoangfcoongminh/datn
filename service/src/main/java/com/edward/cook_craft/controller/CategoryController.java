@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -22,11 +23,7 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = "Get all categories", description = "Retrieve a list of all categories")
     public ResponseEntity<?> getAll() {
-//        try {
         return ResponseUtils.handleSuccess(service.getAll());
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @PostMapping("/filter")
@@ -35,35 +32,25 @@ public class CategoryController {
             @RequestBody CategoryRequest categoryRequest,
             Pageable pageable
     ) {
-//        try {
         return ResponseUtils.handleSuccess(service.filter(categoryRequest, pageable));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
     }
 
     @PostMapping
     @Operation(summary = "Create a new category", description = "Create a new category with the provided details")
     public ResponseEntity<?> create(
-            @RequestBody @Valid CategoryRequest request
+            @RequestPart(name = "jsonRequest") String jsonRequest,
+            @RequestPart(name = "img", required = false) MultipartFile file
     ) {
-//       try {
-        return ResponseUtils.handleSuccess(service.create(request));
-//       } catch (Exception e) {
-//           return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//       }
+        return ResponseUtils.handleSuccess(service.create(jsonRequest, file));
     }
 
     @PutMapping
     @Operation(summary = "Update an category", description = "Update an existed category")
     public ResponseEntity<?> update(
-            @RequestBody @Valid CategoryRequest request
+            @RequestPart(name = "jsonRequest") String jsonRequest,
+            @RequestPart(name = "img", required = false) MultipartFile file
     ) {
-//        try {
-        return ResponseUtils.handleSuccess(service.update(request));
-//        } catch (Exception e) {
-//            return ResponseEntity.ok(ApiResponse.failure(e.getMessage()));
-//        }
+        return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
     }
 
 }
