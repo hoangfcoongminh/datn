@@ -23,6 +23,7 @@ import {
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { fetchRecipeStats, getChartData } from "../../api/dashboard";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 ChartJS.register(
   CategoryScale,
@@ -273,6 +274,7 @@ const DashBoard = () => {
           </Card>
         </div>
       )}
+      <ChatLauncher />
     </div>
   );
 };

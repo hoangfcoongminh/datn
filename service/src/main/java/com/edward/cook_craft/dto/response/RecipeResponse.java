@@ -22,6 +22,10 @@ public class RecipeResponse extends BaseResponse {
 
     private String authorUsername;  // username of the user who created the recipe
 
+    private String authorAvtUrl;
+
+    private String authorFullName;
+
     private String title;
 
     private String description;
@@ -34,6 +38,8 @@ public class RecipeResponse extends BaseResponse {
 
     private String imgUrl;
 
+    private String videoUrl;
+
     private Boolean isFavorite;
 
     private float averageRating;
@@ -41,4 +47,6 @@ public class RecipeResponse extends BaseResponse {
     private int totalReview;
 
     private int totalFavorite;
+
+    private long viewCount;
 }

@@ -31,6 +31,7 @@ import "./CategoryPage.css";
 import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 // const PAGE_SIZE_OPTIONS = [5, 10, 20];
 const { Option } = Select;
@@ -43,7 +44,7 @@ const CategoryPage = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("id,asc");
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(5);
+  const [size, setSize] = useState(4);
   const [total, setTotal] = useState(0);
   const [pageLoading, setPageLoading] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -242,7 +243,7 @@ const CategoryPage = () => {
             </div>
           ) : categories.length === 0 ? (
             <Empty
-              description="Không có danh mục phù hợp"
+              description="Chưa có danh mục"
               style={{ margin: "40px 0" }}
             />
           ) : (
@@ -673,6 +674,7 @@ const CategoryPage = () => {
           cancelText="Huỷ"
         />
       </div>
+      <ChatLauncher />
     </>
   );
 };

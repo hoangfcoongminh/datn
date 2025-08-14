@@ -29,7 +29,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
             "WHERE r.recipeId = :recipeId " +
             "AND r.userId = :userId " +
             "AND r.status = 1")
-    Optional<Review> findByUserIdAndRecipeId(@Param("username") Long username, @Param("recipeId") Long recipeId);
+    Optional<Review> findByUserIdAndRecipeId(@Param("userId") Long userId, @Param("recipeId") Long recipeId);
 
     @Query(value = "SELECT r " +
             "FROM Review r " +

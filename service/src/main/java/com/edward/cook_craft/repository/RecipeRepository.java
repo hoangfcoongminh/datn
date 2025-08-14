@@ -4,6 +4,7 @@ import com.edward.cook_craft.model.Recipe;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,7 +24,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "                                       WHERE rid.recipeId = r.id " +
             "                                       AND rid.ingredientId IN :ingredientIds )))" +
             "AND (:status = -1 OR r.status = :status)")
-    List<Recipe> filter(@Param("keyword") String keyword,
+    Page<Recipe> filter(@Param("keyword") String keyword,
                         @Param("categoryIds") List<Long> categoryIds,
                         @Param("ingredientIds") List<Long> ingredientIds,
                         @Param("authorUsernames") List<String> authorUsernames,
@@ -57,12 +58,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "AND (:status = -1 OR r.status = :status) " +
             "GROUP BY r " +
             "ORDER BY COUNT(f) DESC ")
-    List<Recipe> filterWithFavorite(@Param("keyword") String keyword,
-                        @Param("categoryIds") List<Long> categoryIds,
-                        @Param("ingredientIds") List<Long> ingredientIds,
-                        @Param("authorUsernames") List<String> authorUsernames,
-                        @Param("status") Integer status,
-                        Pageable pageable);
+    Page<Recipe> filterWithFavorite(@Param("keyword") String keyword,
+                                    @Param("categoryIds") List<Long> categoryIds,
+                                    @Param("ingredientIds") List<Long> ingredientIds,
+                                    @Param("authorUsernames") List<String> authorUsernames,
+                                    @Param("status") Integer status,
+                                    Pageable pageable);
 
     List<Recipe> findByCreatedAtBetween(LocalDateTime startOfYear, LocalDateTime endOfYear);
 
@@ -77,4 +78,27 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "WHERE r.id IN :recipeIds " +
             "AND r.status = 1")
     List<Recipe> findAllByIdActive(@Param("recipeIds") List<Long> recipeIds);
+
+    @Modifying
+    @Query("UPDATE Recipe r " +
+            "SET r.viewCount = r.viewCount + :views " +
+            "WHERE r.id = :recipeId")
+    void incrementViewCount(@Param("recipeId") Long recipeId, @Param("views") long views);
+
+    @Query("""
+                SELECT r
+                FROM Recipe r
+                WHERE r.status = 1
+                  AND (:excludeIds IS NULL OR r.id NOT IN :excludeIds)
+                ORDER BY r.viewCount DESC
+            """)
+    List<Recipe> findTopViewExcludeIds(@Param("excludeIds") List<Long> excludeIds);
+
+
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.status = 1 " +
+            "ORDER BY r.viewCount DESC " +
+            "LIMIT 10")
+    List<Recipe> findTop10ViewRecipes();
 }

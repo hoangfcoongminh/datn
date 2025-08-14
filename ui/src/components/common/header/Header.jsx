@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout, Menu, Dropdown, Avatar, Button, Space, Badge } from "antd";
-import { BellOutlined, UserOutlined, DownOutlined } from "@ant-design/icons";
+import { BellOutlined, DownOutlined } from "@ant-design/icons";
 import logo from "../../../assets/cooking.png";
 import "./Header.css";
 
@@ -12,65 +12,91 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
 
   const menuItems = [
     { key: "home", label: "Trang chủ" },
-    { key: "category", label: "Category" },
-    { key: "recipe", label: "Recipe" },
-    { key: "ingredient", label: "Ingredient" },
+    { key: "newsfeed", label: "NewsFeed" },
+    { key: "category", label: "Danh mục" },
+    { key: "recipe", label: "Công thức" },
+    { key: "ingredient", label: "Nguyên liệu" },
     // { key: "unit", label: "Unit" },
   ];
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const handleHamburger = () => setMenuOpen((v) => !v);
+  const handleMenuClick = (key) => {
+    setMenuOpen(false);
+    onNavigate(key);
+  };
+
   return (
-    <AntHeader
-      className="main-header"
-      style={{
-        background: "#fff",
-        boxShadow: "0 2px 12px rgba(165,0,52,0.07)",
-        padding: 0,
-      }}
-    >
-      <div
-        className="header-left"
-        style={{ display: "flex", alignItems: "center", gap: 18 }}
-      >
+    <AntHeader className="main-header">
+      <div className="header-left" style={{ display: "flex", alignItems: "center", gap: 18 }}>
         <img
           src={logo}
           alt="logo"
-          // className="header-logo"
+          className="header-logo"
           onClick={() => onNavigate("home")}
-          style={{
-            cursor: "pointer",
-            marginLeft: 40,
-            height: 60,
-            width: "auto",
-            borderRadius: 5,
-            backgroundColor: "none",
-          }}
+          style={{ cursor: "pointer", marginLeft: 40, height: 60, width: "auto", borderRadius: 5, border: "none", backgroundColor: "white" }}
         />
         <Menu
           mode="horizontal"
           selectedKeys={[]}
-          style={{
-            borderBottom: "none",
-            fontWeight: 600,
-            fontSize: 16,
-            background: "transparent",
-          }}
+          className="header-menu"
+          style={{ borderBottom: "none", fontWeight: 600, fontSize: 16, background: "transparent" }}
           items={menuItems.map((item) => ({
             key: item.key,
             label: (
-              <span
-                onClick={() => onNavigate(item.key)}
-                style={{ color: "#a50034" }}
-              >
+              <span onClick={() => onNavigate(item.key)} style={{ color: "#a50034" }}>
                 {item.label}
               </span>
             ),
           }))}
         />
+        <button className="header-hamburger" onClick={handleHamburger} aria-label="menu">
+          <span style={{ fontSize: 28, lineHeight: 1 }}>&#9776;</span>
+        </button>
       </div>
-      <div
-        className="header-right"
-        style={{ display: "flex", alignItems: "center", gap: 12 }}
-      >
+      {/* Mobile menu overlay */}
+      {menuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.25)",
+            zIndex: 9999,
+          }}
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 220,
+              height: "100vh",
+              background: "#fff",
+              boxShadow: "2px 0 12px rgba(165,0,52,0.13)",
+              padding: 24,
+              display: "flex",
+              flexDirection: "column",
+              gap: 18,
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {menuItems.map((item) => (
+              <span
+                key={item.key}
+                style={{ color: "#a50034", fontWeight: 600, fontSize: 18, padding: "8px 0", cursor: "pointer" }}
+                onClick={() => handleMenuClick(item.key)}
+              >
+                {item.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {user ? (
           <Space size={16}>
             {user.user.role === "ADMIN" && (

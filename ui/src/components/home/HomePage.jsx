@@ -15,6 +15,7 @@ import {
   FaThumbsUp
 } from 'react-icons/fa';
 
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -261,6 +262,8 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
           </div>
         </div>
       </section>
+
+      <ChatLauncher />
     </div>
   );
 };

@@ -101,7 +101,7 @@
 }
 
 .filter-header p {
-  color: #6c757d;
+  color: #000;
   font-size: 1.1rem;
 }
 
@@ -323,7 +323,7 @@
 }
 
 .recipe-description {
-  color: #6c757d;
+  color: #000;
   line-height: 1.6;
   margin-bottom: 20px;
   display: -webkit-box;
@@ -344,12 +344,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6c757d;
+  color: #000;
   font-size: 0.9rem;
 }
 
 .meta-item svg {
-  color: #a50034;
+  /* color: #a50034; */
   font-size: 1rem;
 }
 
@@ -362,7 +362,7 @@
 }
 
 .likes-count {
-  color: #6c757d;
+  /* color: #000; */
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -395,7 +395,7 @@
 }
 
 .pagination-info {
-  color: #6c757d;
+  color: #000;
   font-size: 0.95rem;
 }
 
@@ -409,7 +409,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6c757d;
+  color: #000;
   font-size: 0.95rem;
 }
 

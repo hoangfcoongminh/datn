@@ -63,7 +63,6 @@
   margin-top: 2px;
 }
 .btn-send {
-  background-color: #1d9cc0ff;
   border: "none";
   width: 65px;
   height: 35px;
@@ -71,6 +70,10 @@
   font-size: 16;
   letter-spacing: 1;
   box-shadow: "0 2px 8px rgba(38,108,130,0.10)";
+}
+
+.btn-send:hover {
+  background-color: #1d9cc0ff !important;
 }
 @media (max-width: 600px) {
   .review-root {

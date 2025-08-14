@@ -15,12 +15,14 @@ import HomePage from "./components/home/HomePage";
 import RecipeList from "./components/recipes/RecipeList";
 import RecipeDetail from "./components/recipes/RecipeDetail";
 import NotFound from "./components/common/notfound/NotFound";
+import { UserProfile } from "./components/user";
 import Loading from "./components/common/loading/Loading";
 import { Header, Footer } from "./components/common";
 import { logout as apiLogout } from "./api/auth";
 import { AddRecipePage, EditRecipePage } from "./components/recipes";
 import { CategoryPage } from "./components/categories";
 import IngredientList from "./components/ingredients/IngredientList";
+import NewsFeed from "./components/newsfeed/NewsFeed";
 import { ToastContainer } from "react-toastify";
 import DashBoard  from "./components/admin/DashBoard";
 
@@ -85,6 +87,7 @@ function AppContent() {
 
   const handleHeaderNavigate = (key) => {
     if (key === "home" || key === "") navigate("/home");
+    else if (key === "newsfeed") navigate("/newsfeed");
     else if (key === "category") navigate("/categories");
     else if (key === "ingredient") navigate("/ingredients");
     else if (key === "recipe") navigate("/recipes");
@@ -146,12 +149,14 @@ function AppContent() {
             )
           }
         />
+        <Route path="/newsfeed" element={<NewsFeed />} />
         <Route path="/categories" element={<CategoryPage />} />
         <Route path="/ingredients" element={<IngredientList />} />
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />
         <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
+        <Route path="/user/:username" element={<UserProfile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

@@ -1,5 +1,5 @@
 // API cho Recipe
-export async function filterRecipes({ keyword, categoryIds, ingredientIds, authorIds, page, size, sort }) {
+export async function filterRecipes({ keyword, categoryIds, ingredientIds, authorUsernames, page, size, sort }) {
   const token = localStorage.getItem('token');
   const res = await fetch(`http://localhost:8080/api/recipes/filter?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`, {
     method: 'POST',
@@ -8,7 +8,7 @@ export async function filterRecipes({ keyword, categoryIds, ingredientIds, autho
       'accept': '*/*',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     },
-    body: JSON.stringify({ keyword, categoryIds, ingredientIds, authorIds })
+    body: JSON.stringify({ keyword, categoryIds, ingredientIds, authorUsernames })
   });
   let data;
   try {
