@@ -14,7 +14,7 @@ public final class SecurityUtils {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new CustomException("token.not.valid");
+            throw new CustomException("not.authenticated");
         }
 
         Object principal = authentication.getPrincipal();
@@ -22,14 +22,14 @@ public final class SecurityUtils {
         if (principal instanceof CustomUserDetails) {
             return ((CustomUserDetails) principal).getUser();
         }
-        throw new CustomException("token.not.valid");
+        throw new CustomException("not.authenticated");
     }
 
     public static String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new CustomException("token.not.valid");
+            throw new CustomException("not.authenticated");
         }
 
         Object principal = authentication.getPrincipal();
@@ -37,6 +37,6 @@ public final class SecurityUtils {
         if (principal instanceof CustomUserDetails) {
             return ((CustomUserDetails) principal).getUsername();
         }
-        throw new CustomException("token.not.valid");
+        throw new CustomException("not.authenticated");
     }
 }
