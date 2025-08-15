@@ -16,4 +16,7 @@ public class UserResponse {
     private String description;
     private String imgUrl;
     private Role role;
+    private int totalReviewForUser;
+    private float averageRating;
+    private int totalFavoriteForUser;
 }

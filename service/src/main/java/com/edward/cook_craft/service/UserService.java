@@ -7,12 +7,13 @@ import com.edward.cook_craft.dto.response.UserFavoritesResponse;
 import com.edward.cook_craft.dto.response.UserResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
-import com.edward.cook_craft.mapper.PageMapper;
-import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.UserMapper;
 import com.edward.cook_craft.model.Favorite;
+import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.FavoriteRepository;
+import com.edward.cook_craft.repository.RecipeRepository;
+import com.edward.cook_craft.repository.ReviewRepository;
 import com.edward.cook_craft.repository.UserRepository;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.CommonUtils;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +38,8 @@ public class UserService {
     private final MinioService minioService;
     private final FavoriteRepository favoriteRepository;
     private final RecipeService recipeService;
-    private final PageMapper pageMapper;
-    private final RecipeMapper recipeMapper;
+    private final ReviewRepository reviewRepository;
+    private final RecipeRepository recipeRepository;
 
     public UserResponse profile() {
         User user = SecurityUtils.getCurrentUser();
@@ -128,6 +130,28 @@ public class UserService {
         if (user.isEmpty()) {
             throw new CustomException("user.not.found");
         }
-        return userMapper.toResponse(user.get());
+        UserResponse response = userMapper.toResponse(user.get());
+        response.setTotalReviewForUser(getTotalReviewForUser(username));
+        response.setAverageRating(getAverageRatingForUser(username));
+        response.setTotalFavoriteForUser(getTotalFavoriteForUser(username));
+        return response;
+    }
+
+    private List<Review> getAllReviewForUser(String username) {
+        return reviewRepository.findAllReviewForUser(username);
+    }
+    private int getTotalReviewForUser(String username) {
+        return getAllReviewForUser(username).size();
+    }
+    private float getAverageRatingForUser(String username) {
+        float total = getAllReviewForUser(username)
+                .stream()
+                .map(Review::getRating)
+                .reduce(0f, Float::sum);
+
+        return total / getTotalReviewForUser(username);
+    }
+    private int getTotalFavoriteForUser(String username) {
+        return favoriteRepository.findTotalFavoriteForUser(username).size();
     }
 }

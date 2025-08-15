@@ -94,7 +94,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             """)
     List<Recipe> findTopViewExcludeIds(@Param("excludeIds") List<Long> excludeIds);
 
-
     @Query(value = "SELECT r " +
             "FROM Recipe r " +
             "WHERE r.status = 1 " +

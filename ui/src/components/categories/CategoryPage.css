@@ -1,7 +1,10 @@
 .category-page-container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: white;
   padding: 40px 20px;
+  width: 75%;
+  margin: 40px auto;
+  border-radius: 10px;
 }
 
 .category-title {
