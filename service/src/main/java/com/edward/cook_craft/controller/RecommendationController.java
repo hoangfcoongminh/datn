@@ -1,7 +1,7 @@
 package com.edward.cook_craft.controller;
 
-import com.edward.cook_craft.service.recommend.PersonalRecommendationService;
-import com.edward.cook_craft.service.recommend.RelatedRecommendationService;
+import com.edward.cook_craft.service.recommendation.PersonalRecommendationService;
+import com.edward.cook_craft.service.recommendation.RelatedRecommendationService;
 import com.edward.cook_craft.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -6,6 +6,7 @@ import { fetchIngredients } from '../../api/ingredient';
 import { fetchUnits } from '../../api/unit';
 import { getRecipeDetail, updateRecipe } from '../../api/recipe';
 import { toast } from 'react-toastify';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const { Option } = Select;
 
@@ -211,6 +212,7 @@ const EditRecipePage = () => {
           </Form.Item>
         </Form>
       </Card>
+      <ChatLauncher />
     </div>
   );
 };

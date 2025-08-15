@@ -42,7 +42,7 @@ public class UserService {
     public UserResponse profile() {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
-            throw new CustomException("something.went.wrong");
+            throw new CustomException("not.authenticated");
         }
         return userMapper.toResponse(user);
     }
@@ -60,6 +60,7 @@ public class UserService {
             minioService.deleteFile(existsAvtUrl);
             user.setImgUrl(minioService.uploadFile(file));
         }
+        user.setDescription(request.getDescription());
 
         user = userRepository.save(user);
 
@@ -76,7 +77,7 @@ public class UserService {
     public UserFavoritesResponse addRecipeFavorite(Long recipeId) {
         User userNow = SecurityUtils.getCurrentUser();
         if (userNow == null) {
-            throw new CustomException("user.not.found");
+            throw new CustomException("not.authenticated");
         }
 
         try {
@@ -122,4 +123,11 @@ public class UserService {
         return recipeService.filter(request, pageable);
     }
 
+    public UserResponse getUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new CustomException("user.not.found");
+        }
+        return userMapper.toResponse(user.get());
+    }
 }

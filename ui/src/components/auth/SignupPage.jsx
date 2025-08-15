@@ -4,6 +4,8 @@ import './Auth.css';
 import { FaUserAlt, FaLock, FaEnvelope, FaHome, FaSignInAlt } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signup } from '../../api/auth';
+import { toast } from 'react-toastify';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const SignupPage = ({ onSignup }) => {
   const [email, setEmail] = useState('');
@@ -30,6 +32,7 @@ const SignupPage = ({ onSignup }) => {
     setLoading(true);
     try {
       const data = await signup({ username, password, confirmPassword, fullName, email });
+      toast.success('Đăng ký thành công!');
       onSignup && onSignup(username, data);
     } catch (err) {
       if (Array.isArray(err.message)) {
@@ -161,6 +164,7 @@ const SignupPage = ({ onSignup }) => {
           </div>
         </div>
       </div>
+      <ChatLauncher />
     </div>
   );
 };

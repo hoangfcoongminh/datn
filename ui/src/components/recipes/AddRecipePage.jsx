@@ -6,6 +6,7 @@ import { fetchUnits } from '../../api/unit';
 import { Link, useNavigate } from 'react-router-dom';
 import { createRecipe } from '../../api/recipe';
 import { toast } from 'react-toastify';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const { Option } = Select;
 
@@ -169,6 +170,7 @@ const AddRecipePage = () => {
           </Form.Item>
         </Form>
       </Card>
+      <ChatLauncher />
     </div>
   );
 };
