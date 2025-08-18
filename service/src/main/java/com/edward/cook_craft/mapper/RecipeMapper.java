@@ -31,6 +31,7 @@ public class RecipeMapper {
                 .version(recipe.getVersion())
                 .build();
     }
+
     public Recipe of(RecipeRequest request) {
         return Recipe.builder()
                 .id(request.getId())

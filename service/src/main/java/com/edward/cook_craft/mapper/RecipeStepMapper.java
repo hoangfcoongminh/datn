@@ -1,10 +1,7 @@
 package com.edward.cook_craft.mapper;
 
-import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeStepRequest;
-import com.edward.cook_craft.dto.response.RecipeIngredientDetailResponse;
 import com.edward.cook_craft.dto.response.RecipeStepResponse;
-import com.edward.cook_craft.model.RecipeIngredientDetail;
 import com.edward.cook_craft.model.RecipeStep;
 import org.springframework.stereotype.Component;
 

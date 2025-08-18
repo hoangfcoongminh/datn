@@ -92,7 +92,7 @@ public class IngredientService {
     }
 
     private void validate(IngredientRequest request) {
-        Long id = (request.getId() == null) ?  null : request.getId();
+        Long id = (request.getId() == null) ? null : request.getId();
         if (id != null && !repository.existsById(request.getId())) {
             throw new CustomException("ingredient.not.found");
         }

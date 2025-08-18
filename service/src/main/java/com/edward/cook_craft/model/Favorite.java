@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "favorites",uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "recipeId"}))
+@Table(name = "favorites", uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "recipeId"}))
 @SuperBuilder
 public class Favorite extends BaseModel {
 

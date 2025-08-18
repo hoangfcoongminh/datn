@@ -1,14 +1,10 @@
 package com.edward.cook_craft.dto.request;
 
-import com.edward.cook_craft.model.RecipeStep;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 
 @Getter

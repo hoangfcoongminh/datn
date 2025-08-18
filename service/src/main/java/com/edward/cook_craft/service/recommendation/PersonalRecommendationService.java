@@ -9,7 +9,6 @@ import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.FavoriteRepository;
 import com.edward.cook_craft.repository.RecipeRepository;
 import com.edward.cook_craft.repository.ReviewRepository;
-import com.edward.cook_craft.repository.UserRepository;
 import com.edward.cook_craft.utils.RecipeUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;

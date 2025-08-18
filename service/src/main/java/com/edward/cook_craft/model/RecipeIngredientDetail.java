@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "recipe_ingredient_details")
-public class RecipeIngredientDetail extends BaseModel{
+public class RecipeIngredientDetail extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

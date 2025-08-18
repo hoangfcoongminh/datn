@@ -25,7 +25,9 @@ public class IngredientMapper {
                 .version(ingredient.getVersion())
                 .build();
     }
-            ;
+
+    ;
+
     public Ingredient of(IngredientRequest ingredientRequest) {
         return Ingredient.builder()
                 .id(ingredientRequest.getId())

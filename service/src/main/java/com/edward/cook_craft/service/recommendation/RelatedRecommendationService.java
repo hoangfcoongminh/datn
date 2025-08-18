@@ -1,7 +1,6 @@
 package com.edward.cook_craft.service.recommendation;
 
 import com.edward.cook_craft.dto.response.RecipeResponse;
-import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.model.Favorite;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.Review;

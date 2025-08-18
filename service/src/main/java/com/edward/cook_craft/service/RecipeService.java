@@ -4,14 +4,19 @@ import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.dto.request.RecipeStepRequest;
-import com.edward.cook_craft.dto.response.*;
+import com.edward.cook_craft.dto.response.PagedResponse;
+import com.edward.cook_craft.dto.response.RecipeDetailResponse;
+import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.RecipeStepMapper;
-import com.edward.cook_craft.model.*;
+import com.edward.cook_craft.model.Recipe;
+import com.edward.cook_craft.model.RecipeIngredientDetail;
+import com.edward.cook_craft.model.RecipeStep;
+import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.*;
 import com.edward.cook_craft.service.batch.RecipeViewService;
 import com.edward.cook_craft.service.minio.MinioService;
@@ -24,17 +29,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.util.Pair;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -307,5 +307,14 @@ public class RecipeService {
         }
     }
 
+    public List<RecipeResponse> getPopular(String type) {
+        List<Recipe> data;
+        if ("favorite".equalsIgnoreCase(type)) {
+            data = repository.findMostFavoriteRecipes();
+        } else {
+            data = repository.findMostViewedRecipes();
+        }
+        return recipeUtils.mapWithExtraInfo(data);
+    }
 
 }

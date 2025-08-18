@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReviewRepository extends JpaRepository<Review,Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query(value = "SELECT r " +
             "FROM Review r " +
@@ -47,4 +47,19 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
             "WHERE r.recipeId = :recipeId " +
             "AND r.status = 1 ")
     List<Review> findByRecipeIdAndActive(@Param("recipeId") Long recipeId);
+
+    @Query(value = "SELECT r " +
+            "FROM Review r " +
+            "WHERE r.username = :username " +
+            "AND r.status = 1")
+    List<Review> findByUsername(@Param("username") String username);
+
+    @Query(value = "SELECT rv " +
+            "FROM Recipe rc " +
+            "LEFT JOIN Review rv " +
+            "ON rc.id = rv.recipeId " +
+            "WHERE rc.authorUsername = :username " +
+            "AND rc.status = 1 " +
+            "AND rv.status = 1 ")
+    List<Review> findAllReviewForUser(@Param("username") String username);
 }
