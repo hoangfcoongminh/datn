@@ -58,6 +58,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     interface RecipeLikeCount {
         Long getRecipeId();
+
         Integer getLikeCount();
     }
 }

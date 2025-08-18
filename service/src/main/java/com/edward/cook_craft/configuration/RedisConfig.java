@@ -38,7 +38,7 @@ public class RedisConfig {
         clientBuilder.connectTimeout(Duration.ofMillis(redisProperties.getTimeout()));
         clientBuilder.usePooling().poolConfig(redisProperties.getPool());
 
-        return new  JedisConnectionFactory(redisStandaloneConfiguration, clientBuilder.build());
+        return new JedisConnectionFactory(redisStandaloneConfiguration, clientBuilder.build());
     }
 
     @Bean

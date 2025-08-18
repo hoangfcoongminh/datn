@@ -1,13 +1,10 @@
 package com.edward.cook_craft.utils;
 
-import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.model.CustomUserDetails;
 import com.edward.cook_craft.model.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Optional;
 
 public final class SecurityUtils {
 

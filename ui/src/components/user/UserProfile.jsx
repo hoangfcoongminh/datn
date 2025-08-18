@@ -105,7 +105,7 @@
 //               {/* )} */}
 
 //               {/* Bio */}
-              
+
 //               {user.description && (
 //                 <>
 //                 <div style={{ marginTop: 10, marginBottom: 10}}>
@@ -205,7 +205,7 @@
 //     </div>
 //   );
 // }
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUserPublicProfile } from "../../api/user";
 import { filterRecipes } from "../../api/recipe";
@@ -226,6 +226,8 @@ export default function UserProfile() {
   const [size, setSize] = useState(12);
   const [averageRatingOfUser, setAverageRatingOfUser] = useState(0);
   const pageSizeOptions = [6, 12, 20, 30];
+  const background = ['background1.jpg', 'background2.jpg', 'background3.jpg', 'background4.jpg']
+  const randomBg = 'http://localhost:9000/images/' + background[Math.floor(Math.random() * background.length)];
 
   useEffect(() => {
     let mounted = true;
@@ -259,17 +261,9 @@ export default function UserProfile() {
         if (!mounted) return;
         setRecipes(data?.content || []);
         setTotal(data?.total || 0);
-        const totalAverageRating = data?.content?.reduce(
-          (sum, recipe) => sum + (recipe.averageRating || 0),
-          0
-        ) || 0;
-        setAverageRatingOfUser(
-          data?.content?.length ? totalAverageRating / data.content.length : 0
-        );
       } catch {
         setRecipes([]);
         setTotal(0);
-        setAverageRatingOfUser(0);
       }
     })();
     return () => {
@@ -285,7 +279,15 @@ export default function UserProfile() {
   return (
     <div className="user-profile-page">
       {/* Hero Section */}
-      <div className="user-hero">
+      <div
+        className="user-hero"
+        style={{
+          backgroundImage: `url(${randomBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         {profileLoading ? (
           <div className="center-row">
             <Spin size="large" />
@@ -302,7 +304,7 @@ export default function UserProfile() {
                   </div>
                 )}
               </div>
-              <h1 className="user-name">{displayName}</h1>
+              <div className="user-name">{displayName}</div>
             </div>
             <div className="user-details">
               <div className="user-info-card">
@@ -312,17 +314,28 @@ export default function UserProfile() {
                     <span>Công thức</span>
                   </div>
                   <div className="stat-item">
-                    <strong>{user.totalRating || 0}</strong>
+                    <strong>{user.totalReviewForUser || 0}</strong>
                     <span>Đánh giá</span>
+                  </div>
+                  <div className="stat-item">
+                    <strong>{user.totalFavoriteForUser || 0}</strong>
+                    <span>Lượt thích</span>
                   </div>
                 </div>
                 <div className="user-rating">
+                  <strong>Đánh giá trung bình: </strong>
                   <Rate
                     allowHalf
                     disabled
-                    value={averageRatingOfUser || 0}
-                    style={{ color: "#faad14", fontSize: 18 }}
-                  />
+                    value={user.averageRating || 0}
+                    style={{
+                      color: "#faad14",
+                      fontSize: 20,
+                      marginLeft: 8,
+                      marginRight: 8,
+                    }}
+                  />{" "}
+                  {user.averageRating.toFixed(1)}
                 </div>
                 {user.description && (
                   <div className="user-bio">
@@ -385,7 +398,11 @@ export default function UserProfile() {
                     </div>
                     <div className="meta-item">
                       <HeartOutlined
-                        style={{ fontSize: 16, color: "#f43f5e", marginRight: 4 }}
+                        style={{
+                          fontSize: 16,
+                          color: "#f43f5e",
+                          marginRight: 4,
+                        }}
                       />
                       <span className="likes-count">
                         {recipe.totalFavorite || 0} thích

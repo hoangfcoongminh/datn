@@ -100,4 +100,23 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "ORDER BY r.viewCount DESC " +
             "LIMIT 10")
     List<Recipe> findTop10ViewRecipes();
+
+    // Top recipes theo số lượt favorite
+    @Query("SELECT r " +
+            "FROM Recipe r " +
+            "JOIN Favorite f ON r.id = f.recipeId " +
+            "WHERE r.status = 1 AND f.status = 1 " +
+            "GROUP BY r " +
+            "ORDER BY COUNT(f) DESC " +
+            "LIMIT 10")
+    List<Recipe> findMostFavoriteRecipes();
+
+    // Top recipes theo viewCount
+    @Query("SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.status = 1 " +
+            "ORDER BY r.viewCount DESC " +
+            "LIMIT 10")
+    List<Recipe> findMostViewedRecipes();
+
 }

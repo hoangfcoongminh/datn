@@ -1,0 +1,47 @@
+/* Section chung cho NewsFeed */
+.section {
+  margin-bottom: 32px;
+  padding: 16px 0;
+  border-radius: 12px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #d32f2f; /* đỏ nổi bật */
+  margin-bottom: 16px;
+}
+
+.section-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.section-card {
+  min-width: 160px;
+  max-width: 220px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(165,0,52,0.08);
+  background: #fff;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.section-card:hover {
+  box-shadow: 0 8px 32px rgba(165,0,52,0.18);
+  transform: translateY(-4px) scale(1.04);
+}
+
+.section-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #a50034;
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+
+.section-card-meta {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 4px;
+}

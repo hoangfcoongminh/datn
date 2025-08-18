@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -140,9 +139,11 @@ public class UserService {
     private List<Review> getAllReviewForUser(String username) {
         return reviewRepository.findAllReviewForUser(username);
     }
+
     private int getTotalReviewForUser(String username) {
         return getAllReviewForUser(username).size();
     }
+
     private float getAverageRatingForUser(String username) {
         float total = getAllReviewForUser(username)
                 .stream()
@@ -151,6 +152,7 @@ public class UserService {
 
         return total / getTotalReviewForUser(username);
     }
+
     private int getTotalFavoriteForUser(String username) {
         return favoriteRepository.findTotalFavoriteForUser(username).size();
     }

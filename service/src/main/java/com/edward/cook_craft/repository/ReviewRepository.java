@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReviewRepository extends JpaRepository<Review,Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query(value = "SELECT r " +
             "FROM Review r " +
@@ -54,7 +54,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
             "AND r.status = 1")
     List<Review> findByUsername(@Param("username") String username);
 
-    @Query(value = "SELECT rc " +
+    @Query(value = "SELECT rv " +
             "FROM Recipe rc " +
             "LEFT JOIN Review rv " +
             "ON rc.id = rv.recipeId " +

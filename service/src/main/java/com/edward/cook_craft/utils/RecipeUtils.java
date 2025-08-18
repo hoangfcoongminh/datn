@@ -33,7 +33,7 @@ public class RecipeUtils {
 
         var ratingMap = getRatingMap(recipeIds);
         var totalFavoriteMap = checkTotalFavoriteForRecipe(recipeIds);
-        var authorInforMap  = getAuthorInforMap(recipes.stream().map(Recipe::getAuthorUsername).toList());
+        var authorInforMap = getAuthorInforMap(recipes.stream().map(Recipe::getAuthorUsername).toList());
 
         List<RecipeResponse> response = recipes.stream().map(recipeMapper::toResponse).toList();
         response.forEach(r -> {
@@ -102,6 +102,6 @@ public class RecipeUtils {
 
     private Map<String, Pair<String, String>> getAuthorInforMap(List<String> usernames) {
         List<User> users = userRepository.findByUsernameIn(usernames);
-        return users.stream().collect(Collectors.toMap(User::getUsername, u ->  Pair.of(u.getFullName(), u.getImgUrl())));
+        return users.stream().collect(Collectors.toMap(User::getUsername, u -> Pair.of(u.getFullName(), u.getImgUrl())));
     }
 }
