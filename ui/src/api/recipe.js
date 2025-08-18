@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 // API cho Recipe
 export async function filterRecipes({ keyword, categoryIds, ingredientIds, authorUsernames, page, size, sort }) {
   const token = localStorage.getItem('token');
@@ -25,7 +27,7 @@ export async function filterRecipes({ keyword, categoryIds, ingredientIds, autho
     } else if (data.error) {
       err = { message: data.error };
     }
-    throw err;
+    toast.error(err.message || "Lỗi khi tải công thức")
   }
   return data.data;
 }
@@ -60,7 +62,7 @@ export async function createRecipe(recipe, imageFile) {
     } else if (data.error) {
       err = { message: data.error }; 
     }
-    throw err;
+    toast.error(err.message || "Lỗi khi tải công thức")
   }
   return data.data;
 }
@@ -88,7 +90,7 @@ export async function getRecipeDetail(id) {
     } else if (data.error) {
       err = { message: data.error };
     }
-    throw err;
+    toast.error(err.message || "Lỗi khi tải công thức")
   }
   return data.data;
 }
@@ -123,7 +125,28 @@ export async function updateRecipe(recipe, imageFile) {
     } else if (data.error) {
       err = { message: data.error };
     }
-    throw err;
+    toast.error(err.message || "Lỗi khi tải công thức")
   }
   return data.data;
-} 
+}
+
+export async function getPopularRecipe(type) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`http://localhost:8080/api/recipes/popular-by/${type}`, {
+    headers: {
+      'accept': '*/*',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    }
+  });
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    toast.error('Lỗi không xác định từ máy chủ.')
+  }
+  if (!data.success) {
+    let err = data.message;
+    toast.error(err.message || "Lỗi khi tải công thức")
+  }
+  return data.data;
+}
