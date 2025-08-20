@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -99,5 +101,19 @@ public class CategoryService {
         }
 
         return mapper.toResponse(existed);
+    }
+
+    public List<CategoryResponse> getPopular() {
+        // Lấy tháng hiện tại
+        YearMonth currentMonth = YearMonth.now();
+
+        // Tính startOfMonth
+        LocalDateTime startOfMonth = currentMonth.atDay(1).atStartOfDay();
+
+        // Tính endOfMonth
+        LocalDateTime endOfMonth = currentMonth.atEndOfMonth().atTime(23, 59, 59);
+        List<Category> data = repository.findTop5CategoriesByRecipeCount(startOfMonth, endOfMonth);
+
+        return data.stream().map(mapper::toResponse).toList();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,4 +39,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "WHERE c.name = :name " +
             "AND c.status = 1")
     boolean existsByName(@Param("name") String name);
+
+    @Query("SELECT c " +
+            "FROM Recipe r INNER JOIN Category c ON r.categoryId = c.id " +
+            "WHERE r.createdAt >= :startOfMonth AND r.createdAt <= :endOfMonth " +
+            "GROUP BY c.id, c.name, c.imgUrl, c.description " +
+            "ORDER BY COUNT(r) DESC " +
+            "LIMIT 5")
+    List<Category> findTop5CategoriesByRecipeCount(
+            @Param("startOfMonth") LocalDateTime startOfMonth,
+            @Param("endOfMonth") LocalDateTime endOfMonth);
 }

@@ -17,6 +17,7 @@ import Review from "../common/review/Review";
 import Recommendation from "../common/recommendation/Recommendation";
 import { addFavorite } from "../../api/user";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
+import moment from 'moment';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -165,6 +166,7 @@ const RecipeDetail = () => {
                 icon={recipe.isFavorite ? <FaHeart /> : <FaRegHeart />}
               />
             </div>
+            <p style={{ color: 'grey', fontSize: '14px', fontStyle: 'italic'}}>Ngày đăng: {moment(recipe.createdAt).format('dd/MM/yyyy') || ''}</p>
             <h1 className="recipe-title">{recipe.title}</h1>
             {recipe.authorUsername && (
               <div className="rec-author" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
