@@ -46,11 +46,11 @@
 }
 
 /* Image inside card */
-.recipe-card img {
+/* .recipe-card img {
   height: 180px;
   width: 100%;
   object-fit: cover;
-}
+} */
 
 /* Body giữ khoảng cách đều */
 .ant-card-body {

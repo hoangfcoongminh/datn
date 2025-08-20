@@ -38,8 +38,24 @@ export async function getUserPublicProfile(username) {
     return data.data;
   } catch (err) {
     toast.error(err.message);
-    throw err;
   }
+}
 
-  throw { message: "Lấy thông tin người dùng thất bại." };
+export async function getPopularUsers(type) {
+  try {
+    const token = localStorage.getItem('token');
+
+    const res = await fetch(`http://localhost:8080/api/user/popular-by/${type}`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}`} : {}),
+      }
+    });
+    let data = await res.json();
+    if (!data.success) {
+      toast.error(data.message);
+    }
+    return data.data;
+  } catch (err) {
+    toast.error(err.message);
+  }
 }

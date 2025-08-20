@@ -1,12 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Form, Input, InputNumber, Button, Select, Space, Card } from 'antd';
-import { fetchAllCategories } from '../../api/category';
-import { fetchIngredients } from '../../api/ingredient';
-import { fetchUnits } from '../../api/unit';
-import { getRecipeDetail, updateRecipe } from '../../api/recipe';
-import { toast } from 'react-toastify';
-import ChatLauncher from '../common/chatbot/ChatLauncher';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Select,
+  Space,
+  Card,
+  Image,
+  Row,
+  Col,
+} from "antd";
+import { fetchAllCategories } from "../../api/category";
+import { fetchIngredients } from "../../api/ingredient";
+import { fetchUnits } from "../../api/unit";
+import { getRecipeDetail, updateRecipe } from "../../api/recipe";
+import { toast } from "react-toastify";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
+import "./AddRecipePage.css";
 
 const { Option } = Select;
 
@@ -21,6 +33,7 @@ const EditRecipePage = () => {
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
+  const [imageFileDetail, setImageFileDetail] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -31,26 +44,29 @@ const EditRecipePage = () => {
           getRecipeDetail(id),
           fetchAllCategories(),
           fetchIngredients(),
-          fetchUnits()
+          fetchUnits(),
         ]);
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem("user"));
+        setImageFileDetail(recipe.imgUrl);
         if (!user || recipe.authorId !== user.id) {
           setCanEdit(false);
-          setError('Bạn không có quyền sửa công thức này.');
+          setError("Bạn không có quyền sửa công thức này.");
         } else {
           setCanEdit(true);
           // Đổ dữ liệu vào form, chỉ khi form đã mount và recipe hợp lệ
           if (form && recipe) {
             form.setFieldsValue({
               ...recipe,
-              ingredients: (recipe.recipeIngredients || []).map(ing => ({
+              ingredients: (recipe.recipeIngredients || []).map((ing) => ({
                 ingredientId: ing.ingredientId,
                 actualUnitId: ing.actualUnitId,
-                quantity: ing.quantity
+                quantity: ing.quantity,
               })),
-              steps: (recipe.recipeSteps || []).sort((a, b) => a.stepNumber - b.stepNumber).map(step => ({
-                stepInstruction: step.stepInstruction
-              }))
+              steps: (recipe.recipeSteps || [])
+                .sort((a, b) => a.stepNumber - b.stepNumber)
+                .map((step) => ({
+                  stepInstruction: step.stepInstruction,
+                })),
             });
           }
         }
@@ -58,7 +74,7 @@ const EditRecipePage = () => {
         setIngredients(Array.isArray(ings) ? ings : []);
         setUnits(Array.isArray(uns) ? uns : []);
       } catch (err) {
-        setError(err.message || 'Lỗi khi tải dữ liệu.');
+        setError(err.message || "Lỗi khi tải dữ liệu.");
       } finally {
         setLoading(false);
       }
@@ -71,7 +87,7 @@ const EditRecipePage = () => {
     setLoading(true);
     setError(null);
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const recipe = {
         id: Number(id),
         categoryId: values.categoryId,
@@ -82,33 +98,71 @@ const EditRecipePage = () => {
         cookTime: values.cookTime,
         servings: values.servings,
         // imgUrl sẽ được backend xử lý từ file upload
-        ingredients: (values.ingredients || []).map(ing => ({
+        ingredients: (values.ingredients || []).map((ing) => ({
           ingredientId: ing.ingredientId,
           actualUnitId: ing.actualUnitId,
-          quantity: ing.quantity
+          quantity: ing.quantity,
         })),
         steps: (values.steps || []).map((step, idx) => ({
           stepNumber: idx + 1,
-          stepInstruction: step.stepInstruction
-        }))
+          stepInstruction: step.stepInstruction,
+        })),
       };
       await updateRecipe(recipe, imageFile);
-      toast.success('Cập nhật công thức thành công!');
+      toast.success("Cập nhật công thức thành công!");
       navigate(`/recipes/${id}`);
     } catch (err) {
-      setError(err.message || 'Có lỗi xảy ra khi cập nhật công thức.');
-      toast.error(err.message || 'Có lỗi xảy ra khi cập nhật công thức.');
+      setError(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
+      toast.error(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <div style={{ padding: 32 }}>Đang tải dữ liệu...</div>;
-  if (error && !canEdit) return <div style={{ color: 'red', padding: 32 }}>{error}</div>;
+  if (error && !canEdit)
+    return <div style={{ color: "red", padding: 32 }}>{error}</div>;
 
   return (
-    <div className="edit-recipe-page" style={{ maxWidth: 900, margin: '0 auto', padding: 24 }}>
-      <Card title={<span>Sửa công thức</span>} extra={<Link to={`/recipes/${id}`}>Quay lại chi tiết</Link>}>
+    <div
+      className="edit-recipe-page"
+      style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}
+    >
+      <Card
+        title={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {/* Nút quay lại bên trái */}
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ width: 90 }}
+              onClick={() => navigate(`/recipes/${id}`)}
+            >
+              Quay về
+            </Button>
+
+            {/* Title ở giữa */}
+            <h1
+              style={{
+                flex: 1,
+                textAlign: "center",
+                fontWeight: "bold",
+                color: "#a50034",
+              }}
+            >
+              Sửa công thức
+            </h1>
+
+            {/* Chừa 1 khoảng trống bên phải để giữ cân đối */}
+            <span style={{ width: "120px" }}></span>
+          </div>
+        }
+      >
         <Form layout="vertical" form={form} onFinish={handleFinish}>
           <Form.Item label="Tên công thức" name="title" required>
             <Input placeholder="Nhập tên công thức" />
@@ -118,59 +172,120 @@ const EditRecipePage = () => {
           </Form.Item>
           <Form.Item label="Danh mục" name="categoryId" required>
             <Select placeholder="Chọn danh mục">
-              {Array.isArray(categories) && categories.map(cat => (
-                <Option key={cat.id} value={cat.id}>{cat.name}</Option>
-              ))}
+              {Array.isArray(categories) &&
+                categories.map((cat) => (
+                  <Option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
-          <Form.Item label="Thời gian chuẩn bị (giờ)" name="prepTime">
-            <InputNumber min={0} step={0.1} style={{ width: '100%' }} placeholder="Nhập số giờ" />
-          </Form.Item>
-          <Form.Item label="Thời gian nấu (giờ)" name="cookTime">
-            <InputNumber min={0} step={0.1} style={{ width: '100%' }} placeholder="Nhập số giờ" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Thời gian chuẩn bị (giờ)" name="prepTime">
+                <InputNumber
+                  min={0}
+                  step={0.1}
+                  style={{ width: "100%" }}
+                  placeholder="Nhập số giờ"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Thời gian nấu (giờ)" name="cookTime">
+                <InputNumber
+                  min={0}
+                  step={0.1}
+                  style={{ width: "100%" }}
+                  placeholder="Nhập số giờ"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item label="Số người ăn" name="servings">
-            <InputNumber min={1} style={{ width: '100%' }} placeholder="Nhập số người" />
+            <InputNumber
+              min={1}
+              style={{ width: "50%" }}
+              placeholder="Nhập số người"
+            />
           </Form.Item>
           {/* Ảnh minh họa */}
-          <Form.Item label="Ảnh minh họa mới (nếu muốn thay đổi)" name="imgFile">
-            <input
+          <Form.Item label="Ảnh minh họa" name="imageFile" valuePropName="file">
+            <Input
               type="file"
               accept="image/*"
-              onChange={e => {
-                if (e.target.files && e.target.files[0]) {
-                  setImageFile(e.target.files[0]);
+              onChange={(e) => {
+                const file = e.target.files && e.target.files[0];
+                setImageFile(file || null);
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setImageFile(ev.target.result);
+                  reader.readAsDataURL(file);
                 } else {
                   setImageFile(null);
                 }
               }}
+              style={{ borderRadius: 8, width: "35%" }}
             />
           </Form.Item>
+
+          {(imageFile || imageFileDetail) && (
+            <div style={{ textAlign: "center" }}>
+              <Image
+                src={imageFile || imageFileDetail}
+                preview={true}
+                width={"50%"}
+                style={{ width: "80%", borderRadius: 8 }}
+              />
+            </div>
+          )}
           {/* Ingredient List */}
           <Form.List name="ingredients">
             {(fields, { add, remove }) => (
               <div>
-                <label><b>Nguyên liệu</b></label>
+                <label>
+                  <b>Nguyên liệu</b>
+                </label>
                 {fields.map(({ key, name, ...restField }) => (
-                  <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                    <Form.Item {...restField} name={[name, 'ingredientId']} rules={[{ required: true, message: 'Chọn nguyên liệu' }]}
-                      style={{ minWidth: 180 }}>
+                  <Space
+                    key={key}
+                    style={{ display: "flex", marginBottom: 8 }}
+                    align="baseline"
+                  >
+                    <Form.Item
+                      {...restField}
+                      name={[name, "ingredientId"]}
+                      rules={[{ required: true, message: "Chọn nguyên liệu" }]}
+                      style={{ minWidth: 180 }}
+                    >
                       <Select placeholder="Nguyên liệu">
-                        {ingredients.map(ing => (
-                          <Option key={ing.id} value={ing.id}>{ing.name}</Option>
+                        {ingredients.map((ing) => (
+                          <Option key={ing.id} value={ing.id}>
+                            {ing.name}
+                          </Option>
                         ))}
                       </Select>
                     </Form.Item>
-                    <Form.Item {...restField} name={[name, 'actualUnitId']} rules={[{ required: true, message: 'Chọn đơn vị' }]}
-                      style={{ minWidth: 120 }}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "actualUnitId"]}
+                      rules={[{ required: true, message: "Chọn đơn vị" }]}
+                      style={{ minWidth: 120 }}
+                    >
                       <Select placeholder="Đơn vị">
-                        {units.map(unit => (
-                          <Option key={unit.id} value={unit.id}>{unit.name}</Option>
+                        {units.map((unit) => (
+                          <Option key={unit.id} value={unit.id}>
+                            {unit.name}
+                          </Option>
                         ))}
                       </Select>
                     </Form.Item>
-                    <Form.Item {...restField} name={[name, 'quantity']} rules={[{ required: true, message: 'Nhập số lượng' }]}
-                      style={{ minWidth: 100 }}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "quantity"]}
+                      rules={[{ required: true, message: "Nhập số lượng" }]}
+                      style={{ minWidth: 100 }}
+                    >
                       <InputNumber min={0} step={0.01} placeholder="Số lượng" />
                     </Form.Item>
                     <Button type="link" danger onClick={() => remove(name)}>
@@ -178,7 +293,7 @@ const EditRecipePage = () => {
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
                   + Thêm nguyên liệu
                 </Button>
               </div>
@@ -188,27 +303,55 @@ const EditRecipePage = () => {
           <Form.List name="steps">
             {(fields, { add, remove }) => (
               <div style={{ marginTop: 24 }}>
-                <label><b>Các bước nấu ăn</b></label>
+                <label>
+                  <b>Các bước nấu ăn</b>
+                </label>
                 {fields.map(({ key, name, ...restField }) => (
-                  <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                    <Form.Item {...restField} name={[name, 'stepInstruction']} rules={[{ required: true, message: 'Nhập hướng dẫn' }]}
-                      style={{ minWidth: 300 }}>
-                      <Input.TextArea rows={1} placeholder={`Bước ${name + 1}`} />
+                  <Space
+                    key={key}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: 10,
+                      width: "100%",
+                    }}
+                  >
+                    <span style={{ minWidth: 80 }}>{`Bước ${name + 1}`}: </span>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "stepInstruction"]}
+                      rules={[{ required: true, message: "Nhập hướng dẫn" }]}
+                      style={{ flex: 1, marginBottom: 0, minWidth: 450 }}
+                    >
+                      <Input.TextArea
+                        rows={1}
+                        style={{ height: 50, padding: "5px 10px" }}
+                        placeholder={`Bước ${name + 1}`}
+                      />
                     </Form.Item>
-                    <Button type="link" danger onClick={() => remove(name)}>
+                    <Button
+                      type="link"
+                      danger
+                      onClick={() => remove(name)}
+                      style={{ marginBottom: 0 }}
+                    >
                       Xóa
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
                   + Thêm bước nấu
                 </Button>
               </div>
             )}
           </Form.List>
-          {error && <div style={{ color: 'red', marginBottom: 16 }}>{error}</div>}
+          {error && (
+            <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          )}
           <Form.Item style={{ marginTop: 32 }}>
-            <Button type="primary" htmlType="submit" loading={loading}>Lưu thay đổi</Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Lưu thay đổi
+            </Button>
           </Form.Item>
         </Form>
       </Card>
@@ -217,4 +360,4 @@ const EditRecipePage = () => {
   );
 };
 
-export default EditRecipePage; 
+export default EditRecipePage;

@@ -20,13 +20,17 @@ import com.edward.cook_craft.utils.CommonUtils;
 import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -155,5 +159,17 @@ public class UserService {
 
     private int getTotalFavoriteForUser(String username) {
         return favoriteRepository.findTotalFavoriteForUser(username).size();
+    }
+
+    public List<UserResponse> getPopular(String type) {
+        List<UserResponse> response = new ArrayList<>();
+        List<User> users = userRepository.findAllAndActive();
+        String defaultType = "review";
+        if (defaultType.equalsIgnoreCase(type)) {
+            response = reviewRepository.findTopUsersByRating(PageRequest.of(0, 3));
+        } else {
+            response = favoriteRepository.findTopUsersByFavorite(PageRequest.of(0, 3));
+        }
+        return response;
     }
 }

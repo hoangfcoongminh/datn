@@ -78,13 +78,6 @@ const RecipeDetail = () => {
   const isAuthor =
     user && recipe && recipe.authorUsername === user.user.username;
 
-  if (loading) {
-    return (
-      <div className="recipe-detail-container">
-        <div className="loading-state">Đang tải chi tiết công thức...</div>
-      </div>
-    );
-  }
   if (error) {
     return (
       <div className="recipe-detail-container">

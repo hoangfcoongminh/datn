@@ -1,0 +1,7 @@
+/* file AddRecipePage.css (import vào component) */
+.ant-input,
+.ant-input-number,
+.ant-select-selector,
+.ant-btn {
+  border-radius: 8px !important;
+}
