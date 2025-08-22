@@ -1,11 +1,9 @@
 package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.ReviewRequest;
-import com.edward.cook_craft.dto.response.PagedResponse;
 import com.edward.cook_craft.dto.response.ReviewResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
-import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.ReviewMapper;
 import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.model.User;
@@ -13,10 +11,7 @@ import com.edward.cook_craft.repository.ReviewRepository;
 import com.edward.cook_craft.repository.UserRepository;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +26,6 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
-    private final PageMapper pageMapper;
     private final UserRepository userRepository;
 
     @Transactional
@@ -72,7 +66,7 @@ public class ReviewService {
         return reviewMapper.toResponse(reviewRepository.save(r));
     }
 
-    public PagedResponse<?> getReviewByRecipeId(Long recipeId, Pageable pageable) {
+    public Page<ReviewResponse> getReviewByRecipeId(Long recipeId, Pageable pageable) {
         Pageable page = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -91,6 +85,6 @@ public class ReviewService {
             r.setFullName(avtUserMap.get(r.getUsername()).getFullName());
         });
 
-        return pageMapper.map(data, pageable, pageData.getTotalElements());
+        return new PageImpl<>(data, pageable, pageData.getTotalElements());
     }
 }

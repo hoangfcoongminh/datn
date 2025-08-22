@@ -2,7 +2,7 @@ package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.UpdateUserRequest;
-import com.edward.cook_craft.dto.response.PagedResponse;
+import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.dto.response.UserFavoritesResponse;
 import com.edward.cook_craft.dto.response.UserResponse;
 import com.edward.cook_craft.enums.EntityStatus;
@@ -20,6 +20,7 @@ import com.edward.cook_craft.utils.CommonUtils;
 import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +118,7 @@ public class UserService {
     }
 
 
-    public PagedResponse<?> getMyRecipes(RecipeFilterRequest request, Pageable pageable) {
+    public Page<RecipeResponse> getMyRecipes(RecipeFilterRequest request, Pageable pageable) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new CustomException("user.not.found");

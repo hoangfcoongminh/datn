@@ -4,12 +4,10 @@ import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.dto.request.RecipeStepRequest;
-import com.edward.cook_craft.dto.response.PagedResponse;
 import com.edward.cook_craft.dto.response.RecipeDetailResponse;
 import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
-import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.RecipeStepMapper;
@@ -27,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,6 @@ public class RecipeService {
     private final RecipeStepRepository recipeStepRepository;
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
-    private final PageMapper pageMapper;
     private final MinioService minioService;
     private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
     private final RecipeStepMapper recipeStepMapper;
@@ -63,7 +61,7 @@ public class RecipeService {
                 .map(recipeMapper::toResponse).toList();
     }
 
-    public PagedResponse<?> filter(RecipeFilterRequest request, Pageable pageable) {
+    public Page<RecipeResponse> filter(RecipeFilterRequest request, Pageable pageable) {
         String keyword = request.getKeyword() == null || request.getKeyword().isEmpty() ? null : request.getKeyword().toLowerCase();
         List<Long> categoryIds = request.getCategoryIds() == null || request.getCategoryIds().isEmpty() ? null : request.getCategoryIds();
         List<Long> ingredientIds = request.getIngredientIds() == null || request.getIngredientIds().isEmpty() ? null : request.getIngredientIds();
@@ -83,7 +81,7 @@ public class RecipeService {
         List<Recipe> data = paged.getContent();
         var response = recipeUtils.mapWithExtraInfo(data);
 
-        return pageMapper.map(response, pageable, paged.getTotalElements());
+        return new PageImpl<>(response, pageable, paged.getTotalElements());
     }
 
     public RecipeDetailResponse details(Long id) {

@@ -2,11 +2,9 @@ package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.IngredientRequest;
 import com.edward.cook_craft.dto.response.IngredientResponse;
-import com.edward.cook_craft.dto.response.PagedResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.IngredientMapper;
-import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.model.Ingredient;
 import com.edward.cook_craft.repository.IngredientRepository;
 import com.edward.cook_craft.repository.UnitRepository;
@@ -15,6 +13,7 @@ import com.edward.cook_craft.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ public class IngredientService {
     private final IngredientRepository repository;
     private final UnitRepository unitRepository;
     private final IngredientMapper ingredientMapper;
-    private final PageMapper pageMapper;
     private final MinioService minioService;
 
     public List<IngredientResponse> getAll() {
@@ -49,13 +47,13 @@ public class IngredientService {
         return ingredientMapper.toResponse(optional.get());
     }
 
-    public PagedResponse<IngredientResponse> filter(IngredientRequest request, Pageable pageable) {
+    public Page<IngredientResponse> filter(IngredientRequest request, Pageable pageable) {
         String search = (request.getSearch() == null || request.getSearch().isEmpty()) ? null : request.getSearch().toLowerCase();
         List<Long> unitIds = (request.getUnitIds() == null || request.getUnitIds().isEmpty()) ? null : request.getUnitIds();
 
         Page<Ingredient> page = repository.filter(search, unitIds, pageable);
-
-        return pageMapper.map(page, ingredientMapper::toResponse);
+        List<IngredientResponse> response = page.getContent().stream().map(ingredientMapper::toResponse).toList();
+        return new PageImpl<>(response, pageable, page.getTotalElements());
     }
 
     @Transactional
