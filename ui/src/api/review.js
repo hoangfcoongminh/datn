@@ -16,7 +16,7 @@ export async function fetchReviews(recipeId, page = 1, size = 10) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
     return { content: [], totalElements: 0 };
@@ -39,7 +39,7 @@ export async function postReview(comment) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
     throw err;
@@ -61,7 +61,7 @@ export async function updateReview(comment) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
     throw err;

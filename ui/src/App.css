@@ -26,3 +26,11 @@ body {
 .ant-rate-star-zero .ant-rate-star-second {
   color: #4A4A4A !important; /* xám đậm */
 }
+
+/* file app.css hoặc index.css */
+.slick-slide {
+  padding: 0 8px; /* tạo khoảng cách 8px giữa các card */
+}
+.slick-list {
+  margin: 0 -8px; /* bù lại padding để không bị lệch */
+}

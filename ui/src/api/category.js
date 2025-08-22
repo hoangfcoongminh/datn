@@ -75,7 +75,7 @@ export async function fetchCategories({ page, size, search, sort } = {}) {
     throw { message: data?.message || 'Lấy danh mục thất bại.' };
   }
   // Chuẩn hóa trả về: nếu có .data thì lấy .data, nếu không thì lấy luôn data
-  return data.data || data;
+  return data;
 }
 
 export async function fetchAllCategories() {
@@ -99,5 +99,29 @@ export async function fetchAllCategories() {
     throw { message: data?.message || 'Lấy danh mục thất bại.' };
   }
   // Chuẩn hóa trả về: nếu có .data thì lấy .data, nếu không thì lấy luôn data
-  return data.data || data;
+  return data;
+}
+
+export async function fetchPopularCategories() {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`http://localhost:8080/api/categories/popular`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    }
+  );
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw { message: 'Lỗi không xác định từ máy chủ.' };
+  }
+  if (!data.success) {
+    throw { message: data?.message || 'Lấy danh mục thất bại.' };
+  }
+  // Chuẩn hóa trả về: nếu có .data thì lấy .data, nếu không thì lấy luôn data
+  return data;
 }

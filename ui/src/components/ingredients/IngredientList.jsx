@@ -70,7 +70,7 @@ const IngredientList = () => {
         search: keyword,
         unitIds: unitIds || undefined,
       });
-      setIngredients(data.content || []);
+      setIngredients(data.data || []);
       setTotal(data.total || 0);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải nguyên liệu");
@@ -89,8 +89,8 @@ const IngredientList = () => {
     setDetailLoading(true);
     try {
       const data = await detailIngredient(id);
-      setIngredientDetail(data);
-      setFormData(data);
+      setIngredientDetail(data.data);
+      setFormData(data.data);
       setIsEditing(false);
     } catch (err) {
       setIngredientDetail(null);
@@ -103,18 +103,15 @@ const IngredientList = () => {
   const handleShowToEdit = async (id) => {
     if (localStorage.getItem("token")) {
       setDetailOpen(true);
-      setDetailLoading(true);
       try {
         const data = await detailIngredient(id);
-        setIngredientDetail(data);
-        setFormData(data);
+        setIngredientDetail(data.data);
+        setFormData(data.data);
         setIsEditing(true);
       } catch (err) {
         setIngredientDetail(null);
         setFormData(null);
         toast.error(err.message || "Lỗi khi tải chi tiết nguyên liệu");
-      } finally {
-        setDetailLoading(false);
       }
     } else {
       toast.warning("Bạn phải Đăng nhập để chỉnh sửa nguyên liệu!");
@@ -136,6 +133,8 @@ const IngredientList = () => {
       await updateIngredient({ ingredient: jsonRequest, imageFile: img });
 
       toast.success("Cập nhật thành công!");
+        handleShowDetail(ingredient.id);
+
       // setTimeout(() => {
       //   handleShowDetail(formData.id);
       fetchData();

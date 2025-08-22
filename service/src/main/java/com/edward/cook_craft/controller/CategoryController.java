@@ -52,4 +52,9 @@ public class CategoryController {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularCategories() {
+        return ResponseUtils.handleSuccess(service.getPopular());
+    }
+
 }

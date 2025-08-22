@@ -1,233 +1,155 @@
 import React, { useEffect, useState } from "react";
-import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa";
-import {
-  recommendForUser,
-  recommendForRecipe,
-} from "../../../api/recommendation";
+import Slider from "react-slick";
+import { Card, Button, Rate, Avatar } from "antd";
+import { FaHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { Button, Rate } from "antd";
-import "./Recommendation.css";
 import { toast } from "react-toastify";
+
+import { recommendForUser, recommendForRecipe } from "../../../api/recommendation";
 import { addFavorite } from "../../../api/user";
 
-/**
- * props:
- *   type: string ("category", "ingredient", "user", ...)
- *   id: id để truyền vào api
- *   title: tiêu đề hiển thị
- *   apiParams: object (tùy api)
- */
-export default function Recommendation({
-  type,
-  id,
-  title = "Gợi ý cho bạn",
-  apiParams = {},
-}) {
+import "./Recommendation.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+export default function Recommendation({ type, id, title = "Gợi ý cho bạn" }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [slide, setSlide] = useState(0);
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [favoriteLoading, setFavoriteLoading] = useState({});
   const navigate = useNavigate();
 
-  const fetchRecommend = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       let data = [];
-      if (type === "user") {
-        data = await recommendForUser();
-      } else if (type === "recipe") {
-        data = await recommendForRecipe(id);
-      }
-      setRecipes(Array.isArray(data) ? data : []);
-    } catch (err) {
+      if (type === "user") data = await recommendForUser();
+      if (type === "recipe") data = await recommendForRecipe(id);
+      setRecipes(Array.isArray(data.data) ? data.data : []);
+    } catch {
+      toast.error("Không tải được dữ liệu gợi ý");
       setRecipes([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const [favoriteLoading, setFavoriteLoading] = useState({});
-  const handleAddFavorite = async (id) => {
-    setFavoriteLoading((prev) => ({ ...prev, [id]: true }));
+  useEffect(() => {
+    fetchData();
+  }, [type, id]);
+
+  const handleFavorite = async (recipeId) => {
+    setFavoriteLoading((prev) => ({ ...prev, [recipeId]: true }));
     try {
-      await addFavorite(id);
-      // Không cập nhật cục bộ isFavorite nữa, fetch lại danh sách để lấy totalFavorite mới nhất
-      await fetchRecommend();
-    } catch (err) {
+      await addFavorite(recipeId);
+      await fetchData();
+    } catch {
       toast.error("Lỗi khi thêm vào yêu thích");
     } finally {
-      setFavoriteLoading((prev) => ({ ...prev, [id]: false }));
+      setFavoriteLoading((prev) => ({ ...prev, [recipeId]: false }));
     }
   };
 
-  useEffect(() => {
-    // Responsive: 4 desktop, 2 tablet, 1 mobile
-    const handleResize = () => {
-      if (window.innerWidth < 600) setVisibleCount(1);
-      else if (window.innerWidth < 900) setVisibleCount(2);
-      else setVisibleCount(4);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    fetchRecommend();
-  }, [type, id, JSON.stringify(apiParams)]);
-
-  // Vòng tròn, luôn hiển thị hết các card
-  const maxSlide = Math.max(0, recipes.length - visibleCount);
-  const next = () => setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
-  const prev = () => setSlide((s) => (s - 1 < 0 ? maxSlide : s - 1));
-
-  // Auto slide vòng tròn
-  useEffect(() => {
-    if (recipes.length <= visibleCount) return;
-    const timer = setInterval(() => {
-      setSlide((s) => (s + 1 > maxSlide ? 0 : s + 1));
-    }, 50000000);
-    return () => clearInterval(timer);
-  }, [recipes.length, visibleCount, maxSlide]);
-
-  if (loading)
-    return (
-      <div className="recommendation-root">
-        <div className="rec-loading">Đang tải...</div>
-      </div>
-    );
+  if (loading) return <div className="rec-loading">Đang tải...</div>;
   if (!recipes.length) return null;
+
+  const PrevArrow = ({ onClick }) => (
+    <button className="slick-arrow custom-prev" onClick={onClick}>
+      <FaChevronLeft />
+    </button>
+  );
+
+  const NextArrow = ({ onClick }) => (
+    <button className="slick-arrow custom-next" onClick={onClick}>
+      <FaChevronRight />
+    </button>
+  );
+
+  const settings = {
+    dots: false,
+    infinite: recipes.length > 4,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    arrows: true,
+    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow />,
+    responsive: [
+      { breakpoint: 900, settings: { slidesToShow: 2 } },
+      { breakpoint: 600, settings: { slidesToShow: 1 } },
+    ],
+  };
 
   return (
     <div className="recommendation-root">
       <div className="rec-header">
         <h3>{title}</h3>
       </div>
-      <div className="rec-slider">
-        <div className="rec-nav">
-          <button className="rec-btn" onClick={prev} disabled={slide === 0}>
-            <FaChevronLeft />
-          </button>
-          <button
-            className="rec-btn"
-            onClick={next}
-            disabled={slide >= recipes.length - visibleCount}
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-        <div
-          className="rec-track"
-          style={{ transform: `translateX(-${slide * (100 / visibleCount)}%)` }}
-        >
-          {recipes.map((recipe, idx) => (
-            <div
-              className="rec-card"
-              key={recipe.id || idx}
-              style={{ width: `${100 / visibleCount}%` }}
-            >
-              <div className="rec-img-wrap">
+
+      <Slider {...settings}>
+        {recipes.map((r) => (
+          <div key={r.id} className="rec-card">
+            <Card
+              hoverable
+              cover={
                 <img
-                  src={
-                    recipe.imgUrl ||
-                    "https://via.placeholder.com/300x180?text=No+Image"
-                  }
-                  alt={recipe.title}
+                  src={r.imgUrl || "https://via.placeholder.com/300x180?text=No+Image"}
+                  alt={r.title}
+                  onClick={() => navigate(`/recipes/${r.id}`)}
                 />
-              </div>
-              <div className="rec-info" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
-                {/* Tác giả */}
-                {recipe.authorUsername && (
-                  <div className="rec-author">
-                    {recipe.authorAvtUrl ? (
-                      <img
-                        src={recipe.authorAvtUrl}
-                        alt="avatar"
-                        className="rec-author-avatar"
-                      />
-                    ) : (
-                      <span
-                        className="rec-author-avatar"
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          background: "#eee",
-                          color: "#a50034",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {recipe.authorFullName.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                    {recipe.authorFullName}
-                  </div>
+              }
+              className="recipe-card"
+            >
+              <Card.Meta
+                avatar={
+                  r.authorAvtUrl ? (
+                    <Avatar src={r.authorAvtUrl} />
+                  ) : (
+                    <Avatar style={{ backgroundColor: "#f56a00" }}>
+                      {r.authorFullName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  )
+                }
+                title={r.authorFullName}
+                description={r.title}
+                onClick={() => navigate(`/user/${r.authorUsername}`)}
+                style={{ cursor: "pointer" }}
+              />
+
+              <div className="rec-meta">
+                {typeof r.averageRating === "number" && (
+                  <span>
+                    <Rate allowHalf disabled value={r.averageRating} style={{ fontSize: 18 }} />
+                    {r.totalReview}
+                  </span>
                 )}
-                <div className="rec-title">{recipe.title}</div>
-                <div className="rec-meta">
-                  {typeof recipe.averageRating === "number" &&
-                    !isNaN(recipe.averageRating) && (
-                      <span title="Đánh giá">
-                        <Rate
-                          allowHalf
-                          disabled
-                          value={recipe.averageRating || 0}
-                          style={{ fontSize: 22, color: "#faad14" }}
-                        />
-                        {recipe.totalReview}
-                      </span>
-                    )}
-                  {typeof recipe.totalFavorite === "number" &&
-                    !isNaN(recipe.totalFavorite) && (
-                      <span
-                        title="Lượt thích"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px", // khoảng cách giữa icon và số
-                        }}
-                      >
-                        <button
-                          className="like-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            handleAddFavorite(recipe.id);
-                          }}
-                          disabled={favoriteLoading[recipe.id]}
-                          title={
-                            recipe.isFavorite ? "Bỏ yêu thích" : "Yêu thích"
-                          }
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {recipe.isFavorite ? (
-                            <FaHeart />
-                          ) : (
-                            <FaHeart style={{ opacity: 0.3 }} />
-                          )}
-                        </button>
-                        <span>{recipe.totalFavorite}</span>
-                      </span>
-                    )}
-                </div>
-                <Button
-                  type="primary"
-                  style={{ padding: 0, fontWeight: 600, borderRadius: 8 }}
-                  onClick={() => navigate(`/recipes/${recipe.id}`)}
-                >
-                  Chi tiết
-                </Button>
+                <span className="rec-fav">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    onClick={() => handleFavorite(r.id)}
+                    disabled={favoriteLoading[r.id]}
+                    icon={
+                      <FaHeart
+                        style={{ color: r.isFavorite ? "red" : "gray", fontSize: 18 }}
+                      />
+                    }
+                  />
+                  <span>{r.totalFavorite}</span>
+                </span>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+
+              <Button
+                type="primary"
+                block
+                style={{ borderRadius: 8, fontWeight: 600 }}
+                onClick={() => navigate(`/recipes/${r.id}`)}
+              >
+                Chi tiết
+              </Button>
+            </Card>
+          </div>
+        ))}
+      </Slider>
     </div>
   );
 }

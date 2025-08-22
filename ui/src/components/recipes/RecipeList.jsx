@@ -71,7 +71,7 @@ const RecipeList = () => {
         size: size,
         sort: sortField,
       });
-      setRecipes(data.content || []);
+      setRecipes(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {
       setError(err.message || "Lỗi khi tải công thức");

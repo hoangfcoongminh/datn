@@ -45,7 +45,7 @@ public class RecipeController {
     @PostMapping
     @Operation(summary = "Create a new recipe", description = "Add a new recipe to the system")
     public ResponseEntity<?> create(
-            @RequestPart String jsonRequest,
+            @RequestPart("jsonRequest") String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile img
     ) {
         return ResponseUtils.handleSuccess(service.create(jsonRequest, img));

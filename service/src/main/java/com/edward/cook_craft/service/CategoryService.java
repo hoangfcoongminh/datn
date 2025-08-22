@@ -2,11 +2,9 @@ package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.CategoryRequest;
 import com.edward.cook_craft.dto.response.CategoryResponse;
-import com.edward.cook_craft.dto.response.PagedResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.CategoryMapper;
-import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.model.Category;
 import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.repository.CategoryRepository;
@@ -16,11 +14,14 @@ import com.edward.cook_craft.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -31,7 +32,6 @@ public class CategoryService {
     private String defaultCategory;
 
     private final CategoryRepository repository;
-    private final PageMapper pageMapper;
     private final CategoryMapper mapper;
     private final RecipeRepository recipeRepository;
     private final MinioService minioService;
@@ -41,12 +41,12 @@ public class CategoryService {
                 .map(mapper::toResponse).toList();
     }
 
-    public PagedResponse<CategoryResponse> filter(CategoryRequest request, Pageable pageable) {
+    public Page<CategoryResponse> filter(CategoryRequest request, Pageable pageable) {
 
         String search = (request.getSearch() != null) ? request.getSearch().toLowerCase() : null;
 
         Page<Category> data = repository.filter(search, pageable);
-        return pageMapper.map(data, mapper::toResponse);
+        return new PageImpl<>(data.getContent().stream().map(mapper::toResponse).toList(), pageable, data.getTotalElements());
     }
 
     @Transactional
@@ -99,5 +99,19 @@ public class CategoryService {
         }
 
         return mapper.toResponse(existed);
+    }
+
+    public List<CategoryResponse> getPopular() {
+        // Lấy tháng hiện tại
+        YearMonth currentMonth = YearMonth.now();
+
+        // Tính startOfMonth
+        LocalDateTime startOfMonth = currentMonth.atDay(1).atStartOfDay();
+
+        // Tính endOfMonth
+        LocalDateTime endOfMonth = currentMonth.atEndOfMonth().atTime(23, 59, 59);
+        List<Category> data = repository.findTop5CategoriesByRecipeCount(startOfMonth, endOfMonth);
+
+        return data.stream().map(mapper::toResponse).toList();
     }
 }

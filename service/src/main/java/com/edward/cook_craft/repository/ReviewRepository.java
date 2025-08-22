@@ -1,5 +1,6 @@
 package com.edward.cook_craft.repository;
 
+import com.edward.cook_craft.dto.response.UserResponse;
 import com.edward.cook_craft.model.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,4 +63,24 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND rc.status = 1 " +
             "AND rv.status = 1 ")
     List<Review> findAllReviewForUser(@Param("username") String username);
+
+    @Query("""
+    SELECT new com.edward.cook_craft.dto.response.UserResponse(
+        u.username,
+        u.email,
+        u.fullName,
+        u.description,
+        u.imgUrl,
+        u.role,
+        COUNT(r.id),
+        COALESCE(AVG(r.rating), 0),
+        (SELECT COUNT(f.id) FROM Favorite f WHERE f.userId = u.id AND f.status = 1)
+    )
+    FROM User u
+    LEFT JOIN Review r ON u.id = r.userId
+    WHERE u.status = 1 AND r.status = 1
+    GROUP BY u.id, u.username, u.email, u.fullName, u.description, u.imgUrl, u.role
+    ORDER BY AVG(r.rating) DESC
+    """)
+    List<UserResponse> findTopUsersByRating(Pageable pageable);
 }

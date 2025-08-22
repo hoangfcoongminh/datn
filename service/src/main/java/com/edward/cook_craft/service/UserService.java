@@ -2,7 +2,7 @@ package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.UpdateUserRequest;
-import com.edward.cook_craft.dto.response.PagedResponse;
+import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.dto.response.UserFavoritesResponse;
 import com.edward.cook_craft.dto.response.UserResponse;
 import com.edward.cook_craft.enums.EntityStatus;
@@ -20,11 +20,14 @@ import com.edward.cook_craft.utils.CommonUtils;
 import com.edward.cook_craft.utils.JsonUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -115,7 +118,7 @@ public class UserService {
     }
 
 
-    public PagedResponse<?> getMyRecipes(RecipeFilterRequest request, Pageable pageable) {
+    public Page<RecipeResponse> getMyRecipes(RecipeFilterRequest request, Pageable pageable) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new CustomException("user.not.found");
@@ -155,5 +158,17 @@ public class UserService {
 
     private int getTotalFavoriteForUser(String username) {
         return favoriteRepository.findTotalFavoriteForUser(username).size();
+    }
+
+    public List<UserResponse> getPopular(String type) {
+        List<UserResponse> response = new ArrayList<>();
+        List<User> users = userRepository.findAllAndActive();
+        String defaultType = "review";
+        if (defaultType.equalsIgnoreCase(type)) {
+            response = reviewRepository.findTopUsersByRating(PageRequest.of(0, 3));
+        } else {
+            response = favoriteRepository.findTopUsersByFavorite(PageRequest.of(0, 3));
+        }
+        return response;
     }
 }

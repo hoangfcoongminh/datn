@@ -14,5 +14,5 @@ export async function fetchUnits() {
   if (!data.success) {
     throw { message: data?.message || 'Lấy đơn vị tính thất bại.' };
   }
-  return data.data;
+  return data;
 } 

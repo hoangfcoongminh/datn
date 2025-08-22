@@ -14,11 +14,13 @@ import {
   FaFire,
   FaThumbsUp
 } from 'react-icons/fa';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsVisible(true);
@@ -133,12 +135,9 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
                     <span className="welcome-icon">👋</span>
                     Chào mừng trở lại, {user.username}!
                   </div>
-                  <button className="cta-button primary" onClick={() => window.location.href = '/recipes'}>
+                  <button className="cta-button primary" onClick={() => navigate('/recipes')}>
                     Khám phá công thức
                     <FaArrowRight />
-                  </button>
-                  <button className="cta-button secondary" onClick={onLogout}>
-                    Đăng xuất
                   </button>
                 </div>
               ) : (
