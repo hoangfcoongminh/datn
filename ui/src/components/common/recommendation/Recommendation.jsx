@@ -24,7 +24,7 @@ export default function Recommendation({ type, id, title = "Gợi ý cho bạn" 
       let data = [];
       if (type === "user") data = await recommendForUser();
       if (type === "recipe") data = await recommendForRecipe(id);
-      setRecipes(Array.isArray(data) ? data : []);
+      setRecipes(Array.isArray(data.data) ? data.data : []);
     } catch {
       toast.error("Không tải được dữ liệu gợi ý");
       setRecipes([]);

@@ -42,7 +42,7 @@ export default function Review({ recipeId, user, allowPost = true, averageRating
   const loadReviews = async (p = page) => {
     setLoading(true);
     const data = await fetchReviews(recipeId, p, pageSize);
-    setReviews(data.content || []);
+    setReviews(data.data || []);
     setTotal(() => {
       return data.total || 0;
     });

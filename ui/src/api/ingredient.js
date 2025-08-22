@@ -16,7 +16,7 @@ export async function fetchIngredients() {
   if (!data.success) {
     throw { message: data?.message || 'Lấy nguyên liệu thất bại.' };
   }
-  return data.data;
+  return data;
 } 
 
 export async function filterIngredients({ page, size, sort, search, unitIds }) {
@@ -42,7 +42,7 @@ export async function filterIngredients({ page, size, sort, search, unitIds }) {
   if (!data.success) {
     throw { message: data?.message || 'Lấy nguyên liệu thất bại.' };
   }
-  return data.data;
+  return data;
 } 
 
 export async function detailIngredient(id) {
@@ -62,7 +62,7 @@ export async function detailIngredient(id) {
   if (!data.success) {
     throw { message: data?.message || 'Lấy chi tiết nguyên liệu thất bại.' };
   }
-  return data.data;
+  return data;
 }
 
 export async function updateIngredient({ ingredient, imageFile }) {
@@ -90,5 +90,5 @@ export async function updateIngredient({ ingredient, imageFile }) {
     throw new Error(data?.message || 'Lỗi khi cập nhật nguyên liệu');
     
   }
-  return data.data;
+  return data;
 }

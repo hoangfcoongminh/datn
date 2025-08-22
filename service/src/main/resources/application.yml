@@ -14,6 +14,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 100MB
 
   redis-cook-craft:
     port: 6379           # Cổng mặc định của Redis server

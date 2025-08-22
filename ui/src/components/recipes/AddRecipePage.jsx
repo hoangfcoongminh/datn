@@ -15,7 +15,7 @@ import {
 import { fetchAllCategories } from "../../api/category";
 import { fetchIngredients } from "../../api/ingredient";
 import { fetchUnits } from "../../api/unit";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createRecipe } from "../../api/recipe";
 import { toast } from "react-toastify";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
@@ -32,6 +32,7 @@ const AddRecipePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [preImageFile, setPreImageFile] = useState(null);
 
   useEffect(() => {
     fetchAllCategories()
@@ -178,14 +179,15 @@ const AddRecipePage = () => {
               type="file"
               accept="image/*"
               onChange={(e) => {
-                const file = e.target.files && e.target.files[0];
-                setImageFile(file || null);
+                const file = e.target.files[0];
                 if (file) {
+                setImageFile(file);
                   const reader = new FileReader();
-                  reader.onload = (ev) => setImageFile(ev.target.result);
+                  reader.onload = (ev) => setPreImageFile(ev.target.result);
                   reader.readAsDataURL(file);
                 } else {
                   setImageFile(null);
+                  setPreImageFile(null);
                 }
               }}
               style={{ borderRadius: 8, width: "35%" }}
@@ -195,7 +197,7 @@ const AddRecipePage = () => {
           {imageFile && (
             <div style={{ textAlign: "center" }}>
               <Image
-                src={imageFile}
+                src={preImageFile}
                 preview={true}
                 width={"50%"}
                 style={{ width: "80%", borderRadius: 8 }}
@@ -207,9 +209,9 @@ const AddRecipePage = () => {
           <Form.List name="ingredients">
             {(fields, { add, remove }) => (
               <div>
-                <label>
+                <p>
                   <b>Nguyên liệu</b>
-                </label>
+                </p>
                 {fields.map(({ key, name, ...restField }) => (
                   <Space
                     key={key}
@@ -268,9 +270,9 @@ const AddRecipePage = () => {
           <Form.List name="steps">
             {(fields, { add, remove }) => (
               <div style={{ marginTop: 24 }}>
-                <label>
+                <p>
                   <b>Các bước nấu ăn</b>
-                </label>
+                </p>
                 {fields.map(({ key, name, ...restField }) => (
                   <Space
                     key={key}

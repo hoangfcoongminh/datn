@@ -14,7 +14,7 @@ export async function addFavorite(recipeId) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
     throw err;
@@ -35,7 +35,7 @@ export async function getUserPublicProfile(username) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
   }
@@ -54,7 +54,7 @@ export async function getPopularUsers(type) {
     if (!data.success) {
       toast.error(data.message);
     }
-    return data.data;
+    return data;
   } catch (err) {
     toast.error(err.message);
   }

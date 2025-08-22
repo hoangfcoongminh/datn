@@ -9,46 +9,42 @@ export default function TopUsersCarousel({ users = [], type = "rating" }) {
   const navigate = useNavigate();
 
   const middle = users[0];
-  const rest = users.slice(1);
+  const left = users[1];
+  const right = users[2];
 
-  const left = [];
-  const right = [];
-
-  rest.forEach((u, i) => {
-    if (i % 2 === 0) left.push(u);
-    else right.push(u);
-  });
-
-  const renderCard = (user, highlight = false) => (
-    <Card
-      key={user.id}
-      hoverable
-      onClick={() => navigate(`/user/${user.username}`)}
-      className={`top-user-card ${highlight ? "highlight" : ""}`}
-    >
-      <Avatar src={user.imgUrl} size={highlight ? 80 : 64} />
-      <div className="card-title">{user.fullName}</div>
-      <div className="user-meta">
-        {type === "rating" ? (
-          <>
-            <Rate allowHalf disabled value={user.averageRating} />
-            <div>Tổng đánh giá: {user.totalReviewForUser}</div>
-          </>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <HeartOutlined />
-            {user.totalFavoriteForUser || 0} thích
-          </div>
-        )}
-      </div>
-    </Card>
-  );
+  const renderCard = (user, highlight = false) => {
+    if (!user) return null;
+    return (
+      <Card
+        key={user.id}
+        hoverable
+        onClick={() => navigate(`/user/${user.username}`)}
+        className={`top-user-card ${highlight ? "highlight" : ""}`}
+      >
+        <Avatar src={user.imgUrl} size={highlight ? 80 : 64} />
+        <div className="card-title">{user.fullName}</div>
+        <div className="user-meta">
+          {type === "rating" ? (
+            <>
+              <Rate allowHalf disabled value={user.averageRating} />
+              <div>Tổng đánh giá: {user.totalReviewForUser}</div>
+            </>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <HeartOutlined />
+              {user.totalFavoriteForUser || 0} thích
+            </div>
+          )}
+        </div>
+      </Card>
+    )
+  };
 
   return (
     <div
@@ -62,7 +58,7 @@ export default function TopUsersCarousel({ users = [], type = "rating" }) {
     >
       {/* Left side */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {left.map((u) => renderCard(u))}
+        {renderCard(left, false)}
       </div>
 
       {/* Middle */}
@@ -70,7 +66,7 @@ export default function TopUsersCarousel({ users = [], type = "rating" }) {
 
       {/* Right side */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {right.map((u) => renderCard(u))}
+        {renderCard(right, false)}
       </div>
     </div>
   );

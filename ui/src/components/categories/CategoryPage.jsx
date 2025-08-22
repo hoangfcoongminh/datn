@@ -88,7 +88,8 @@ const CategoryPage = () => {
         sort: sortField,
         search: search,
       });
-      setCategories(data.content || []);
+      
+      setCategories(data.data || []);
       setTotal(data.total || 0);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải danh mục");

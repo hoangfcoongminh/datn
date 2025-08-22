@@ -38,9 +38,9 @@ const RecipeDetail = () => {
         fetchIngredients(),
         fetchUnits(),
       ]);
-      setRecipe(recipeData);
-      setIngredients(ingredientList);
-      setUnits(unitList);
+      setRecipe(recipeData.data);
+      setIngredients(ingredientList.data);
+      setUnits(unitList.data);
     } catch (err) {
       setError(err.message || "Lỗi khi tải chi tiết công thức.");
     } finally {
@@ -115,7 +115,6 @@ const RecipeDetail = () => {
                 src={"https://www.youtube.com/embed/Xw7v-w6kc_0"}
                 className="recipe-main-image"
                 title="Recipe Video"
-                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               >
@@ -166,7 +165,7 @@ const RecipeDetail = () => {
                 icon={recipe.isFavorite ? <FaHeart /> : <FaRegHeart />}
               />
             </div>
-            <p style={{ color: 'grey', fontSize: '14px', fontStyle: 'italic'}}>Ngày đăng: {moment(recipe.createdAt).format('dd/MM/yyyy') || ''}</p>
+            <p style={{ color: 'grey', fontSize: '14px', fontStyle: 'italic'}}>Ngày đăng: {moment(recipe.createdAt, "HH:mm:ss DD-MM-YYYY").format('DD/MM/YYYY') || ''}</p>
             <h1 className="recipe-title">{recipe.title}</h1>
             {recipe.authorUsername && (
               <div className="rec-author" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
@@ -199,7 +198,7 @@ const RecipeDetail = () => {
               className="recipe-stats"
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColuGmns: "1fr 1fr",
                 gap: 16,
               }}
             >

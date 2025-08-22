@@ -38,7 +38,7 @@ const IngredientList = () => {
         search: keyword,
         unitIds: unitIds || undefined
       });
-      setIngredients(data.content || []);
+      setIngredients(data.data || []);
       setTotal(data.total || 0);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải danh sách nguyên liệu");

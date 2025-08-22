@@ -29,7 +29,7 @@ export default function UserProfile() {
         setProfileLoading(true);
         const data = await getUserPublicProfile(username);
         if (!mounted) return;
-        setUser(data || null);
+        setUser(data.data || null);
       } catch {
         setUser(null);
       } finally {
@@ -52,7 +52,7 @@ export default function UserProfile() {
           sort: "id,desc",
         });
         if (!mounted) return;
-        setRecipes(data?.content || []);
+        setRecipes(data?.data || []);
         setTotal(data?.total || 0);
       } catch {
         setRecipes([]);

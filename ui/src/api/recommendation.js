@@ -15,7 +15,7 @@ export async function recommendForUser() {
   if (!data.success) {
     throw { message: data?.message || "Lấy đơn vị tính thất bại." };
   }
-  return data.data;
+  return data;
 }
 
 export async function recommendForRecipe(recipeId) {
@@ -37,5 +37,5 @@ export async function recommendForRecipe(recipeId) {
   if (!data.success) {
     throw { message: data?.message || "Lấy đơn vị tính thất bại." };
   }
-  return data.data;
+  return data;
 }

@@ -5,6 +5,7 @@ import Slider from "react-slick";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import "./NewsFeed.css";
 import { filterRecipes, getPopularRecipe } from "../../api/recipe";
+import { fetchPopularCategories } from "../../api/category";
 import { getPopularUsers } from "../../api/user";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -41,12 +42,7 @@ export default function NewsFeed() {
     activeUsers: 1847
   });
 
-  const [trendingCategories] = useState([
-    { name: "Món Việt", count: 245, growth: "+15%" },
-    { name: "Dessert", count: 198, growth: "+22%" },
-    { name: "Healthy", count: 167, growth: "+8%" },
-    { name: "Quick Meals", count: 143, growth: "+31%" }
-  ]);
+  const [trendingCategories, setTrendingCategories] = useState([]);
 
   const [recentActivities] = useState([
     { user: "Minh Anh", action: "đã thêm công thức", recipe: "Bánh flan caramel", time: "2 phút trước", avatar: "/api/placeholder/32/32" },
@@ -67,7 +63,7 @@ export default function NewsFeed() {
         size: size,
         sort: sortField,
       });
-      setRecipeList(data.content || []);
+      setRecipeList(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải công thức");
@@ -112,7 +108,21 @@ export default function NewsFeed() {
     }
   };
 
+  const getPopularCategories = async () => {
+    try {
+      const data = await fetchPopularCategories();
+      setTrendingCategories(data || [])
+    } catch (err) {
+      toast.error(err.message || 'Đã có lỗi xảy ra');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
   useEffect(() => {
+    let isMounted = true; // ✅ tránh setState khi unmount
+
     const loadData = async () => {
       try {
         setLoading(true);
@@ -121,14 +131,20 @@ export default function NewsFeed() {
           fetchPopularByFavorite(),
           fetchPopularByView(),
           fetchPopularUsers(),
+          getPopularCategories(),
         ]);
       } catch (err) {
-        toast.error(err);
+        toast.error(err?.message || "Có lỗi xảy ra");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+
     loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const sliderSettings = {

@@ -27,9 +27,9 @@ export async function filterRecipes({ keyword, categoryIds, ingredientIds, autho
     } else if (data.error) {
       err = { message: data.error };
     }
-    toast.error(err.message || "Lỗi khi tải công thức")
+    throw new Error(err.message || "Lỗi khi tải công thức");
   }
-  return data.data;
+  return data;
 }
 
 export async function createRecipe(recipe, imageFile) {
@@ -39,6 +39,11 @@ export async function createRecipe(recipe, imageFile) {
   if (imageFile) {
     formData.append('img', imageFile);
   }
+  console.log('img: ', imageFile);
+  for (let pair of formData.entries()) {
+  console.log(pair[0]+ ': ' + pair[1]);
+}
+  
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'POST',
       headers: {
@@ -55,16 +60,10 @@ export async function createRecipe(recipe, imageFile) {
   }
   if (!data.success) {
     let err = { message: 'Tạo công thức thất bại.' };
-    if (Array.isArray(data.message)) {
-      err = { message: data.message };
-    } else if (data.message) {
-      err = { message: data.message };
-    } else if (data.error) {
-      err = { message: data.error }; 
-    }
-    toast.error(err.message || "Lỗi khi tải công thức")
+    err = { message: data.message };
+    throw new Error(err.message || "Lỗi khi tải công thức");
   }
-  return data.data;
+  return data;
 }
 
 export async function getRecipeDetail(id) {
@@ -90,9 +89,9 @@ export async function getRecipeDetail(id) {
     } else if (data.error) {
       err = { message: data.error };
     }
-    toast.error(err.message || "Lỗi khi tải công thức")
+    throw new Error(data?.message || 'Đã có lỗi xảy ra');
   }
-  return data.data;
+  return data;
 }
 
 export async function updateRecipe(recipe, imageFile) {
@@ -125,9 +124,9 @@ export async function updateRecipe(recipe, imageFile) {
     } else if (data.error) {
       err = { message: data.error };
     }
-    toast.error(err.message || "Lỗi khi tải công thức")
+    throw new Error(data?.message || 'Đã có lỗi xảy ra');
   }
-  return data.data;
+  return data;
 }
 
 export async function getPopularRecipe(type) {
@@ -146,7 +145,7 @@ export async function getPopularRecipe(type) {
   }
   if (!data.success) {
     let err = data.message;
-    toast.error(err.message || "Lỗi khi tải công thức")
+    throw new Error(err.message || "Lỗi khi tải công thức")
   }
-  return data.data;
+  return data;
 }
