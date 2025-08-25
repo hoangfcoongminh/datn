@@ -51,10 +51,10 @@ const RecipeList = () => {
       setPage(0);
     }
     fetchAllCategories()
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .then((data) => setCategories(data.data || []))
       .catch(() => setCategories([]));
     fetchIngredients()
-      .then((data) => setIngredients(Array.isArray(data) ? data : []))
+      .then((data) => setIngredients(data.data || []))
       .catch(() => setIngredients([]));
   }, []);
 
@@ -70,7 +70,7 @@ const RecipeList = () => {
         page,
         size: size,
         sort: sortField,
-      });
+      });      
       setRecipes(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {

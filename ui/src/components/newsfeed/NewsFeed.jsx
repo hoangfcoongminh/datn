@@ -75,7 +75,7 @@ export default function NewsFeed() {
   const fetchPopularByFavorite = async () => {
     try {
       const data = await getPopularRecipe("favorite");
-      setPopularByFavorite(data || []);
+      setPopularByFavorite(data.data || []);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải công thức");
     } finally {
@@ -86,7 +86,7 @@ export default function NewsFeed() {
   const fetchPopularByView = async () => {
     try {
       const data = await getPopularRecipe("view");
-      setPopularByView(data || []);
+      setPopularByView(data.data);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải công thức");
     } finally {
@@ -97,10 +97,10 @@ export default function NewsFeed() {
   const fetchPopularUsers = async () => {
     try {
       const data1 = await getPopularUsers("review");
-      setTopRatingUsers(data1 || []);
+      setTopRatingUsers(data1.data);
 
       const data2 = await getPopularUsers("favorite");
-      setTopFavUsers(data2 || []);
+      setTopFavUsers(data2.data);
     } catch (err) {
       toast.error(err.message || "Lỗi khi tải công thức");
     } finally {
@@ -111,7 +111,9 @@ export default function NewsFeed() {
   const getPopularCategories = async () => {
     try {
       const data = await fetchPopularCategories();
-      setTrendingCategories(data || [])
+      setTrendingCategories(data.data)
+      console.log('popular categories', trendingCategories);
+      
     } catch (err) {
       toast.error(err.message || 'Đã có lỗi xảy ra');
     } finally {
@@ -213,7 +215,7 @@ export default function NewsFeed() {
         </h3>
         <div className="trending-categories">
           {trendingCategories.map((category, index) => (
-            <Card key={index} className="category-card" hoverable>
+            <Card key={index} className="category-card" hoverable onClick={() => navigate(`/recipes?categoryId=${category.id}`)}>
               <div className="category-info">
                 <h4>{category.name}</h4>
                 <p>{category.count} công thức</p>
