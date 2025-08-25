@@ -121,7 +121,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
                 items: [
                   {
                     key: "account",
-                    label: <span onClick={onAccount}>Quản lý tài khoản</span>,
+                    label: <span onClick={() => navigate('/profile/edit')}>Quản lý tài khoản</span>,
                   },
                   {
                     key: "myrecipe",

@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,14 +105,44 @@ public class CategoryService {
     public List<CategoryResponse> getPopular() {
         // Lấy tháng hiện tại
         YearMonth currentMonth = YearMonth.now();
+        YearMonth lastMonth = currentMonth.minusMonths(1);
 
         // Tính startOfMonth
         LocalDateTime startOfMonth = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime startOfLastMonth = lastMonth.atDay(1).atStartOfDay();
 
         // Tính endOfMonth
         LocalDateTime endOfMonth = currentMonth.atEndOfMonth().atTime(23, 59, 59);
-        List<Category> data = repository.findTop5CategoriesByRecipeCount(startOfMonth, endOfMonth);
+        LocalDateTime endOfLastMonth = currentMonth.atDay(1).atStartOfDay();
 
-        return data.stream().map(mapper::toResponse).toList();
+        List<Category> data = repository.findTop4CategoriesByRecipeCount(startOfMonth, endOfMonth);
+        var categoryIds = data.stream().map(Category::getId).toList();
+
+        var totalOfCatLastMonth = recipeRepository.findTotalRecipeInMonthByCategory(startOfLastMonth, endOfLastMonth, categoryIds)
+                .stream().collect(Collectors.groupingBy(Recipe::getCategoryId, Collectors.counting()));
+
+        var totalOfCatThisMonth = recipeRepository.findTotalRecipeInMonthByCategory(startOfMonth, endOfMonth, categoryIds)
+                .stream().collect(Collectors.groupingBy(Recipe::getCategoryId, Collectors.counting()));
+
+        var response = data.stream().map(mapper::toResponse).toList();
+
+        response.forEach(r -> {
+            Long lastTotal = totalOfCatLastMonth.get(r.getId());
+            Long thisTotal = totalOfCatThisMonth.get(r.getId());
+
+            float growth;
+
+            if (thisTotal == null) {
+                growth = 0f; // tháng này không có dữ liệu → growth = 0
+            } else if (lastTotal == null || lastTotal == 0) {
+                growth = (float) thisTotal * 100f; // tháng trước không có dữ liệu → coi là tăng trưởng 100%
+            } else {
+                growth = ((float) thisTotal / lastTotal) * 100 - 100; // tính % tăng trưởng thực sự
+            }
+
+            r.setGrowth(growth);
+        });
+
+        return response;
     }
 }

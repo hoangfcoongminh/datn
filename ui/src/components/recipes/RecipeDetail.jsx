@@ -91,7 +91,7 @@ const RecipeDetail = () => {
   return (
     <div className="recipe-detail-container">
       <div className="recipe-detail-content">
-        <Link to="/recipes" className="back-button">
+        <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
           <FaArrowLeft />
           Quay lại
         </Link>

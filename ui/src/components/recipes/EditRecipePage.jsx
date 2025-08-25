@@ -142,7 +142,7 @@ const EditRecipePage = () => {
               type="primary"
               htmlType="submit"
               style={{ width: 90 }}
-              onClick={() => navigate(`/recipes/${id}`)}
+              onClick={() => navigate(-1)}
             >
               Quay về
             </Button>

@@ -15,4 +15,5 @@ public class CategoryResponse extends BaseResponse {
     private String name;
     private String imgUrl;
     private String description;
+    private float growth;
 }

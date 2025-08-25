@@ -21,7 +21,7 @@ import Recommendation from "../common/recommendation/Recommendation";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 const { Option } = Select;
-const PAGE_SIZE_OPTIONS = [8, 12, 24, 48];
+const PAGE_SIZE_OPTIONS = [9, 12, 24, 48];
 
 const RecipeList = () => {
   const location = useLocation();
