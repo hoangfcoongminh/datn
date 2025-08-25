@@ -25,6 +25,7 @@ import IngredientList from "./components/ingredients/IngredientList";
 import NewsFeed from "./components/newsfeed/NewsFeed";
 import { ToastContainer } from "react-toastify";
 import DashBoard  from "./components/admin/DashBoard";
+import EditProfile from "./components/user/EditProfile";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -157,6 +158,7 @@ function AppContent() {
         <Route path="/recipes/add" element={<AddRecipePage />} />
         <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
         <Route path="/user/:username" element={<UserProfile />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

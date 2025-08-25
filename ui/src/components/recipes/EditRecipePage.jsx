@@ -40,12 +40,13 @@ const EditRecipePage = () => {
       setLoading(true);
       setError(null);
       try {
-        const [recipe, cats, ings, uns] = await Promise.all([
+        const [{ data: recipe }, { data: cats }, { data: ings }, { data: uns }] = await Promise.all([
           getRecipeDetail(id),
           fetchAllCategories(),
           fetchIngredients(),
           fetchUnits(),
         ]);
+        
         const user = JSON.parse(localStorage.getItem("user"));
         setImageFileDetail(recipe.imgUrl);
         if (!user || recipe.authorId !== user.id) {
@@ -70,9 +71,9 @@ const EditRecipePage = () => {
             });
           }
         }
-        setCategories(Array.isArray(cats) ? cats : []);
-        setIngredients(Array.isArray(ings) ? ings : []);
-        setUnits(Array.isArray(uns) ? uns : []);
+        setCategories(cats.data || []);
+        setIngredients(ings.data || []);
+        setUnits(uns.data || []);
       } catch (err) {
         setError(err.message || "Lỗi khi tải dữ liệu.");
       } finally {
@@ -141,7 +142,7 @@ const EditRecipePage = () => {
               type="primary"
               htmlType="submit"
               style={{ width: 90 }}
-              onClick={() => navigate(`/recipes/${id}`)}
+              onClick={() => navigate(-1)}
             >
               Quay về
             </Button>

@@ -12,7 +12,7 @@ export default function ChatLauncher() {
       {open && (
         <div className="chatlauncher-panel">
           <div className="chatlauncher-header">
-            <div className="chatlauncher-title">Trợ lý công thức</div>
+            <div className="chatlauncher-title">Trợ lý ORDER</div>
             <button className="chatlauncher-close" onClick={() => setOpen(false)}>
               <CloseOutlined />
             </button>

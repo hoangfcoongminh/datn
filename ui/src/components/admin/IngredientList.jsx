@@ -58,7 +58,7 @@ const IngredientList = () => {
     setDetailLoading(true);
     try {
       const data = await detailIngredient(id);
-      setIngredientDetail(data);
+      setIngredientDetail(data.data);
       setIsEditing(false);
     } catch (err) {
       setIngredientDetail(null);
@@ -72,7 +72,7 @@ const IngredientList = () => {
     setDetailLoading(true);
     try {
       const data = await detailIngredient(id);
-      setIngredientDetail(data);
+      setIngredientDetail(data.data);
       setIsEditing(true);
     } catch (err) {
       setIngredientDetail(null);

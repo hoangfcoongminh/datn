@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getUserPublicProfile } from "../../api/user";
 import { filterRecipes } from "../../api/recipe";
 import { Button, Spin, Rate, Pagination } from "antd";
-import { HeartOutlined } from "@ant-design/icons";
+import { HeartOutlined, EditOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "./UserProfile.css";
 
@@ -64,6 +64,9 @@ export default function UserProfile() {
     };
   }, [username, page, size]);
 
+  const currentUser = JSON.parse(localStorage.getItem("user"))?.user;
+  const isOwnProfile = currentUser?.username === username;
+
   const displayName = useMemo(
     () => user?.fullName || user?.username || username,
     [user, username]
@@ -98,6 +101,16 @@ export default function UserProfile() {
                 )}
               </div>
               <div className="user-name">{displayName}</div>
+              {isOwnProfile && (
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate(`/profile/edit`)}
+                  style={{ marginTop: '10px' }}
+                >
+                  Sửa trang cá nhân
+                </Button>
+              )}
             </div>
             <div className="user-details">
               <div className="user-info-card">
@@ -128,7 +141,7 @@ export default function UserProfile() {
                       marginRight: 8,
                     }}
                   />{" "}
-                  {user.averageRating.toFixed(1)}
+                  {(user.averageRating || 0).toFixed(1)}
                 </div>
                 {user.description && (
                   <div className="user-bio">

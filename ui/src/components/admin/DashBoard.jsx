@@ -72,7 +72,7 @@ const DashBoard = () => {
         }
 
         const recipeData = await fetchRecipeStats(type, params);
-        setRecipeStats(recipeData);
+        setRecipeStats(recipeData.data);
 
         // const userData = await fetchUserStats(type, params);
         // setUserStats(userData);

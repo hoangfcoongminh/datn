@@ -119,4 +119,12 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "LIMIT 10")
     List<Recipe> findMostViewedRecipes();
 
+    @Query("SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.createdAt >= :start AND r.createdAt <= :end " +
+            "AND r.categoryId IN :categoryIds ")
+    List<Recipe> findTotalRecipeInMonthByCategory(@Param("start") LocalDateTime start,
+                                                  @Param("end") LocalDateTime end,
+                                                  @Param("categoryIds") List<Long> categoryIds);
+
 }

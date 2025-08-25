@@ -45,8 +45,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "WHERE r.createdAt >= :startOfMonth AND r.createdAt <= :endOfMonth " +
             "GROUP BY c.id, c.name, c.imgUrl, c.description " +
             "ORDER BY COUNT(r) DESC " +
-            "LIMIT 5")
-    List<Category> findTop5CategoriesByRecipeCount(
+            "LIMIT 4")
+    List<Category> findTop4CategoriesByRecipeCount(
             @Param("startOfMonth") LocalDateTime startOfMonth,
             @Param("endOfMonth") LocalDateTime endOfMonth);
 }

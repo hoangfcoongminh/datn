@@ -72,7 +72,7 @@ public class UserService {
     }
 
     private void validate(UpdateUserRequest request) {
-        if (!CommonUtils.isValidEmail(request.getEmail())) {
+        if (request.getEmail() != null && !CommonUtils.isValidEmail(request.getEmail())) {
             throw new CustomException("email.invalid");
         }
     }
@@ -152,7 +152,8 @@ public class UserService {
                 .stream()
                 .map(Review::getRating)
                 .reduce(0f, Float::sum);
-
+        if (getTotalReviewForUser(username) == 0)
+            return 0f;
         return total / getTotalReviewForUser(username);
     }
 

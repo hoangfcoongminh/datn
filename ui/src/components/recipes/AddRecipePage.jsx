@@ -35,15 +35,24 @@ const AddRecipePage = () => {
   const [preImageFile, setPreImageFile] = useState(null);
 
   useEffect(() => {
-    fetchAllCategories()
-      .then(setCategories)
-      .catch(() => setCategories([]));
-    fetchIngredients()
-      .then(setIngredients)
-      .catch(() => setIngredients([]));
-    fetchUnits()
-      .then(setUnits)
-      .catch(() => setUnits([]));
+    const loadData = async () => {
+      try {
+        const [categoriesData, ingredientsData, unitsData] = await Promise.all([
+          fetchAllCategories(),
+          fetchIngredients(),
+          fetchUnits()
+        ]);
+        
+        setCategories(categoriesData.data || []);
+        setIngredients(ingredientsData.data || []);
+        setUnits(unitsData.data || []);
+      } catch (err) {
+        toast.error("Có lỗi khi tải dữ liệu ban đầu");
+        setError("Có lỗi khi tải dữ liệu ban đầu");
+      }
+    };
+
+    loadData();
   }, []);
 
   const handleFinish = async (values) => {
@@ -101,7 +110,7 @@ const AddRecipePage = () => {
               htmlType="submit"
               style={{ width: 90 }}
               loading={loading}
-              onClick={() => navigate("/recipes")}
+              onClick={() => navigate(-1)}
             >
               Quay về
             </Button>

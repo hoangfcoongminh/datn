@@ -38,12 +38,7 @@ export async function createRecipe(recipe, imageFile) {
   formData.append('jsonRequest', JSON.stringify(recipe));
   if (imageFile) {
     formData.append('img', imageFile);
-  }
-  console.log('img: ', imageFile);
-  for (let pair of formData.entries()) {
-  console.log(pair[0]+ ': ' + pair[1]);
-}
-  
+  }  
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'POST',
       headers: {
