@@ -1,0 +1,293 @@
+[
+  {
+    "id": 1,
+    "title": "Bánh kếp chuối",
+    "description": "Bánh mềm xốp từ chuối",
+    "category": "Món chính",
+    "prepTime": 0,
+    "cookTime": 0,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Bột mì",
+        "quantity": 100.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Đường",
+        "quantity": 30.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Sữa tươi",
+        "quantity": 100.0,
+        "unit": "Ml"
+      },
+      {
+        "name": "Trứng gà",
+        "quantity": 1.0,
+        "unit": "Cái"
+      },
+      {
+        "name": "Chuối",
+        "quantity": 1.0,
+        "unit": "Quả"
+      },
+      {
+        "name": "Thịt gà",
+        "quantity": 150.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Cà rốt",
+        "quantity": 50.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Tỏi băm",
+        "quantity": 1.0,
+        "unit": "Muỗng cà phê"
+      },
+      {
+        "name": "Nước tương",
+        "quantity": 30.0,
+        "unit": "Ml"
+      }
+    ],
+    "steps": [
+      "Nghiền chuối chín",
+      "Trộn bột mì, đường, sữa và trứng vào chuối",
+      "Chiên bánh trên chảo chống dính đến vàng 2 mặt"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Sữa chua cam",
+    "description": "Thức uống mát lạnh từ cam và sữa chua",
+    "category": "Khai vị",
+    "prepTime": 0,
+    "cookTime": 0,
+    "servings": 1,
+    "ingredients": [
+      {
+        "name": "Đường",
+        "quantity": 100.0,
+        "unit": "Muỗng cà phê"
+      },
+      {
+        "name": "Đường",
+        "quantity": 1.0,
+        "unit": "Miếng"
+      }
+    ],
+    "steps": [
+      "Vắt nước cam",
+      "Trộn sữa chua và nước cam"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Khoai tây chiên",
+    "description": "Món ăn vặt đơn giản, giòn tan",
+    "category": "Tráng miệng",
+    "prepTime": 0,
+    "cookTime": 0,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Sữa tươi",
+        "quantity": 6.0,
+        "unit": ""
+      },
+      {
+        "name": "Sữa tươi",
+        "quantity": 4.0,
+        "unit": "Cái"
+      },
+      {
+        "name": "Muối",
+        "quantity": 1.0,
+        "unit": "Muỗng cà phê"
+      }
+    ],
+    "steps": [
+      "Gọt khoai, cắt miếng dài và ngâm nước muối",
+      "Chiên khoai trong dầu sôi đến khi vàng"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Salad gà sốt mè",
+    "description": "Salad thanh mát với gà xé và sốt mè",
+    "category": "Ăn vặt",
+    "prepTime": 0,
+    "cookTime": 0,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Bột mì",
+        "quantity": 2.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Sữa tươi",
+        "quantity": 3.0,
+        "unit": "Muỗng cà phê"
+      }
+    ],
+    "steps": [
+      "Luộc thịt gà và xé sợi",
+      "Trộn các nguyên liệu với sốt mè và tỏi"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Cơm chiên trứng xúc xích",
+    "description": "Món cơm chiên quen thuộc cho bữa sáng",
+    "category": "Thức uống",
+    "prepTime": 0,
+    "cookTime": 0,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Trứng gà",
+        "quantity": 1.0,
+        "unit": "Cái"
+      },
+      {
+        "name": "Xúc xích",
+        "quantity": 2.0,
+        "unit": "Cái"
+      },
+      {
+        "name": "Hành tím",
+        "quantity": 30.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Dầu ăn",
+        "quantity": 1.0,
+        "unit": "Muỗng canh"
+      }
+    ],
+    "steps": [
+      "Phi hành với dầu ăn cho thơm",
+      "Thêm xúc xích và trứng đảo đều",
+      "Cho cơm vào chiên cùng, nêm nếm gia vị vừa ăn"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "TESTING",
+    "description": "FOR TEST",
+    "category": "TEST CATEGORY",
+    "prepTime": 2,
+    "cookTime": 3,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Bột mì",
+        "quantity": 1.0,
+        "unit": "Gram"
+      },
+      {
+        "name": "Đường",
+        "quantity": 1.0,
+        "unit": "Ml"
+      },
+      {
+        "name": "Cam",
+        "quantity": 3.0,
+        "unit": "Trái"
+      }
+    ],
+    "steps": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "TEST 2",
+    "description": "FOR TESTING",
+    "category": "TEST CATEGORY",
+    "prepTime": 1,
+    "cookTime": 1,
+    "servings": 1,
+    "ingredients": [
+      {
+        "name": "Đường",
+        "quantity": 1.0,
+        "unit": "Gói"
+      }
+    ],
+    "steps": [
+      "232323"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "cong thuc 2",
+    "description": "cong thuc",
+    "category": "TEST CATEGORY",
+    "prepTime": 1,
+    "cookTime": 1,
+    "servings": 3,
+    "ingredients": [
+      {
+        "name": "Đường",
+        "quantity": 3.0,
+        "unit": "Muỗng canh"
+      },
+      {
+        "name": "Bột mì",
+        "quantity": 34.0,
+        "unit": "Cái"
+      },
+      {
+        "name": "Tiêu",
+        "quantity": 1.0,
+        "unit": "Quả"
+      }
+    ],
+    "steps": [
+      "12346",
+      "12345678",
+      "654321",
+      "64321",
+      "6432"
+    ]
+  },
+  {
+    "id": 10,
+    "title": "hoangfcoongminh",
+    "description": "heheeheheheh",
+    "category": "TEST CATEGORY",
+    "prepTime": 1,
+    "cookTime": 1,
+    "servings": 5,
+    "ingredients": [
+      {
+        "name": "Bột mì",
+        "quantity": 1.0,
+        "unit": "Ml"
+      },
+      {
+        "name": "Trứng gà",
+        "quantity": 2.0,
+        "unit": "Muỗng cà phê"
+      },
+      {
+        "name": "Cà rốt",
+        "quantity": 4.0,
+        "unit": "Gói"
+      }
+    ],
+    "steps": [
+      "1",
+      "2",
+      "3"
+    ]
+  }
+]
