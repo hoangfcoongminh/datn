@@ -60,6 +60,8 @@ public class SecurityConfig {
                                 "/api/units/**",
                                 "/api/review/**").hasAuthority("USER")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "api/chatbot/training-data/**").hasAuthority("ADMIN")
+                        .requestMatchers("api/chatbot/**").hasAuthority("USER")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -13,4 +13,6 @@ public interface RecipeStepRepository extends JpaRepository<RecipeStep, Long> {
             "WHERE r.recipeId = :recipeId " +
             "AND r.status = 1")
     List<RecipeStep> findByRecipeId(Long recipeId);
+
+    List<RecipeStep> findAllByOrderByRecipeIdAscStepNumberAsc();
 }
