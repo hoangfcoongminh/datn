@@ -24,8 +24,13 @@ import { CategoryPage } from "./components/categories";
 import IngredientList from "./components/ingredients/IngredientList";
 import NewsFeed from "./components/newsfeed/NewsFeed";
 import { ToastContainer } from "react-toastify";
-import DashBoard  from "./components/admin/DashBoard";
+import DashBoard  from "./components/admin/dashboard/DashBoard";
 import EditProfile from "./components/user/EditProfile";
+import AdminSidebar from "./components/admin/common/AdminSidebar";
+import CategoryAdmin from "./components/admin/categories/CategoryAdmin";
+import RecipeAdmin from "./components/admin/recipes/RecipeAdmin";
+import IngredientAdmin from "./components/admin/ingredients/IngredientAdmin";
+import UserAdmin from "./components/admin/users/UserAdmin";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -159,6 +164,10 @@ function AppContent() {
         <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
         <Route path="/user/:username" element={<UserProfile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/admin/categories" element={<CategoryAdmin />} />
+        <Route path="/admin/recipes" element={<RecipeAdmin />} />
+        <Route path="/admin/ingredients" element={<IngredientAdmin />} />
+        <Route path="/admin/users" element={<UserAdmin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
