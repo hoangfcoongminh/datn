@@ -11,8 +11,6 @@ import java.time.LocalDate;
 @Builder
 public class DashBoardRequest {
 
-    private Integer year;
-    private Integer month;
     private LocalDate startDate;
     private LocalDate endDate;
 }
