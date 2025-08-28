@@ -1,5 +1,6 @@
 package com.edward.cook_craft.repository;
 
+import com.edward.cook_craft.model.Ingredient;
 import com.edward.cook_craft.model.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -36,4 +37,12 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
             "WHERE u.id = :id " +
             "AND u.status = 1")
     Optional<Unit> findById(@NotNull @Param("id") Long id);
+
+    @Query(value = "SELECT u " +
+            "FROM Unit u " +
+            "WHERE (COALESCE(:search, '') = '' OR LOWER(u.name) LIKE CONCAT('%',LOWER(:search),'%')) " +
+            "AND (:status IS NULL OR u.status = :status)")
+    Page<Unit> getAllUnitsForAdmin(@Param("search") String search,
+                                               @Param("status") Integer status,
+                                               Pageable pageable);
 }

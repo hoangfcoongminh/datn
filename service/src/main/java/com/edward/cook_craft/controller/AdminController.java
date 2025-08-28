@@ -4,7 +4,7 @@ import com.edward.cook_craft.dto.request.DashBoardRequest;
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.service.admin.AdminService;
 import com.edward.cook_craft.service.admin.DashboardService;
-import com.edward.cook_craft.service.admin.dto.request.UserRequest;
+import com.edward.cook_craft.service.admin.dto.request.*;
 import com.edward.cook_craft.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -77,9 +77,33 @@ public class AdminController {
 
     @PostMapping("/recipes")
     public ResponseEntity<?> getAllRecipes(
-            @RequestBody RecipeFilterRequest request,
+            @RequestBody RecipeRequest request,
             Pageable pageable
     ) {
         return ResponseUtils.handleSuccess(adminService.getAllRecipes(request, pageable));
     }
+
+    @PostMapping("/categories")
+    public ResponseEntity<?> getAllCategories(
+            @RequestBody CategoryRequest request,
+            Pageable pageable
+    ) {
+        return ResponseUtils.handleSuccess(adminService.getAllCategories(request, pageable));
     }
+
+    @PostMapping("/ingredients")
+    public ResponseEntity<?> getAllIngredients(
+            @RequestBody IngredientRequest request,
+            Pageable pageable
+    ) {
+        return ResponseUtils.handleSuccess(adminService.getAllIngredients(request, pageable));
+    }
+
+    @PostMapping("/units")
+    public ResponseEntity<?> getAllUnits(
+            @RequestBody UnitRequest request,
+            Pageable pageable
+    ) {
+        return ResponseUtils.handleSuccess(adminService.getAllUnits(request, pageable));
+    }
+}

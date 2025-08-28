@@ -127,4 +127,15 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                                                   @Param("end") LocalDateTime end,
                                                   @Param("categoryIds") List<Long> categoryIds);
 
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE (COALESCE(:search, '') = '' OR CONCAT(LOWER(r.title),'#',LOWER(r.description)) LIKE CONCAT('%',LOWER(:search),'%')) " +
+            "AND (:categoryIds IS NULL OR r.categoryId IN :categoryIds) " +
+            "AND (:authorUsernames IS NULL OR r.authorUsername IN :authorUsernames) " +
+            "AND (:status IS NULL OR r.status = :status) ")
+    Page<Recipe> getAllRecipesForAdmin(@Param("search") String search,
+                                       @Param("categoryIds") List<Long> categoryIds,
+                                       @Param("authorUsernames") List<String> authorUsernames,
+                                       @Param("status") Integer status,
+                                       Pageable pageable);
 }

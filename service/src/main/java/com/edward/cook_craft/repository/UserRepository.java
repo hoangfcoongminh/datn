@@ -42,9 +42,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT u " +
             "FROM User u " +
-            "WHERE :search IS NULL OR CONCAT('%',LOWER(u.username), '#', LOWER(u.fullName),'#',LOWER(u.email),'%') LIKE CONCAT('%',:search,'%') " +
-            "AND :status IS NULL OR u.status = :status " +
-            "AND :role IS NULL OR u.role = :role")
+            "WHERE ((COALESCE(:search, '') = '' OR CONCAT('%',LOWER(u.username), '#', LOWER(u.fullName),'#',LOWER(u.email),'%') LIKE CONCAT('%',LOWER(:search),'%'))) " +
+            "AND (:status IS NULL OR u.status = :status) " +
+            "AND (:role IS NULL OR u.role = :role)")
     Page<User> getUserForAdmin(@Param("search") String search,
                                @Param("status") EntityStatus status,
                                @Param("role") Role role,
