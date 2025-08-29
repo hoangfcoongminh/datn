@@ -24,7 +24,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
   const handleMenuClick = (key) => {
     setMenuOpen(false);
     onNavigate(key);
-  };
+  };  
 
   return (
     <AntHeader className="main-header">

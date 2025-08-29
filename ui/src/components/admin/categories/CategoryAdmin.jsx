@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select } from "antd";
 import { fetchCategories } from "../../../api/admin";
 import { toast } from "react-toastify";
+import { StopOutlined } from "@ant-design/icons";
+import AdminSidebar from "../common/AdminSidebar";
+import ChatLauncher from "../../common/chatbot/ChatLauncher";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -20,7 +23,7 @@ const CategoryAdmin = () => {
       setLoading(true);
       try {
         const response = await fetchCategories({
-          ...categoriesRequest,
+          categoriesRequest, // Send categoriesRequest directly
           page: page - 1, // Adjust for zero-based index
           size,
           sort,
@@ -51,6 +54,12 @@ const CategoryAdmin = () => {
 
   const columns = [
     {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) => (page - 1)  * size + index + 1, // Calculate serial number based on pagination
+    },
+    {
       title: "Tên danh mục",
       dataIndex: "name",
       key: "name",
@@ -65,7 +74,7 @@ const CategoryAdmin = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === "1" ? "green" : "red"}>{status === "1" ? "Hoạt động" : "Ngưng hoạt động"}</Tag>
+        <Tag color={status === 1 ? "green" : "red"}>{status === 1 ? "Hoạt động" : "Ngưng hoạt động"}</Tag>
       ),
     },
     {
@@ -73,11 +82,10 @@ const CategoryAdmin = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" onClick={() => console.log("View", record.id)}>
+          <Button type="primary" onClick={() => console.log("View", record.id)}>
             Xem
           </Button>
-          <Button type="link" danger>
-            Ngưng hoạt động
+          <Button type="danger" icon={<StopOutlined />} onClick={() => console.log("Deactivate", record.id)}>
           </Button>
         </Space>
       ),
@@ -85,11 +93,28 @@ const CategoryAdmin = () => {
   ];
 
   return (
-    <div className="admin-page" style={{ display: "flex", justifyContent: "center", padding: "16px" }}>
-      <div style={{ width: "80%", maxWidth: "1200px" }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Quản lý Danh mục</h2>
+    <div style={{ display: "flex" }}>
+      <AdminSidebar />
+      <div style={{ flex: 1, padding: 32 }}>
+        <h2
+          style={{
+            color: "#a50034",
+            fontWeight: 700,
+            fontSize: 32,
+            marginBottom: 24,
+          }}
+        >
+          Quản lý Danh mục
+        </h2>
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          marginBottom: 16, 
+          gap: 16, 
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
           <Search
             placeholder="Tìm kiếm danh mục"
             onSearch={handleSearch}
@@ -125,6 +150,8 @@ const CategoryAdmin = () => {
             pageSize: size,
             total: total,
             showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} danh mục`,
             onChange: (page, pageSize) => {
               setPage(page);
               setSize(pageSize);
@@ -132,6 +159,7 @@ const CategoryAdmin = () => {
           }}
         />
       </div>
+      <ChatLauncher />
     </div>
   );
 };

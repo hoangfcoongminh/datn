@@ -1,52 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Space, Tag, Input, Select, Image } from "antd";
-import { fetchIngredients } from "../../../api/admin";
+import { Table, Button, Space, Tag, Input, Select } from "antd";
+import { fetchUnits } from "../../../api/admin";
 import { toast } from "react-toastify";
 import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
-import { fetchUnits } from "../../../api/unit";
 
 const { Search } = Input;
 const { Option } = Select;
 
-const IngredientAdmin = () => {
-  const [ingredients, setIngredients] = useState([]);
-  const [loading, setLoading] = useState(false);
+const UnitAdmin = () => {
   const [units, setUnits] = useState([]);
-  const [ingredientsRequest, setIngredientsRequest] = useState({ search: "", status: "" });
+  const [loading, setLoading] = useState(false);
+  const [unitsRequest, setUnitsRequest] = useState({ search: "", status: "" });
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sort, setSort] = useState("id,asc");
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadUnits = async () => {
       setLoading(true);
       try {
-        const ingredients = await fetchIngredients({
-          ingredientsRequest,
+        const response = await fetchUnits({
+          unitsRequest,
           page: page - 1,
           size,
           sort,
         });
-        setIngredients(ingredients.data);
-        setTotal(ingredients.total);
-
-        const units = await fetchUnits();
-        setUnits(units.data);
+        setUnits(response.data);
+        setTotal(response.total);
       } catch (error) {
-        toast.error("Failed to fetch ingredients");
+        toast.error("Failed to fetch units");
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
-  }, [ingredientsRequest, page, size, sort]);
+    loadUnits();
+  }, [unitsRequest, page, size, sort]);
 
   const handleSearch = (value) => {
-    setIngredientsRequest({ ...ingredientsRequest, search: value });
+    setUnitsRequest({ ...unitsRequest, search: value });
   };
 
   const handleSortChange = (value) => {
@@ -54,7 +49,7 @@ const IngredientAdmin = () => {
   };
 
   const handleStatusFilterChange = (value) => {
-    setIngredientsRequest((prev) => ({ ...prev, status: value }));
+    setUnitsRequest((prev) => ({ ...prev, status: value }));
   };
 
   const columns = [
@@ -66,22 +61,7 @@ const IngredientAdmin = () => {
       width: 80,
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "image",
-      key: "image",
-      render: (image) => (
-        <Image
-          width={50}
-          height={50}
-          src={image}
-          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
-          style={{ objectFit: 'cover', borderRadius: '6px' }}
-        />
-      ),
-      width: 80,
-    },
-    {
-      title: "Tên nguyên liệu",
+      title: "Tên đơn vị",
       dataIndex: "name",
       key: "name",
       render: (name) => (
@@ -90,13 +70,23 @@ const IngredientAdmin = () => {
         </div>
       ),
     },
+    // {
+    //   title: "Ký hiệu",
+    //   dataIndex: "symbol",
+    //   key: "symbol",
+    //   render: (symbol) => (
+    //     <Tag color="blue" style={{ fontSize: 12, fontWeight: 600 }}>
+    //       {symbol}
+    //     </Tag>
+    //   ),
+    // },
     {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
       render: (description) => (
         <div style={{ 
-          maxWidth: 200, 
+          maxWidth: 250, 
           overflow: 'hidden', 
           textOverflow: 'ellipsis', 
           whiteSpace: 'nowrap',
@@ -106,38 +96,31 @@ const IngredientAdmin = () => {
         </div>
       ),
     },
-    {
-      title: "Đơn vị chuẩn",
-      dataIndex: "unitId",
-      key: "unitId",
-      render: (unitId) => {
-        const unit = units.find(unit => unit.id === unitId);
-        return (
-          <Tag color="orange">
-            {unit?.name || "Không xác định"}
-          </Tag>
-        );
-      }
-    },
     // {
-    //   title: "Calories",
-    //   dataIndex: "calories",
-    //   key: "calories",
-    //   render: (calories) => (
-    //     <div style={{ color: '#52c41a', fontWeight: 500 }}>
-    //       {calories ? `${calories} kcal` : "Chưa cập nhật"}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: "Protein",
-    //   dataIndex: "protein",
-    //   key: "protein",
-    //   render: (protein) => (
-    //     <div style={{ color: '#722ed1', fontWeight: 500 }}>
-    //       {protein ? `${protein}g` : "Chưa cập nhật"}
-    //     </div>
-    //   ),
+    //   title: "Loại đơn vị",
+    //   dataIndex: "type",
+    //   key: "type",
+    //   render: (type) => {
+    //     const colorMap = {
+    //       'WEIGHT': 'green',
+    //       'VOLUME': 'blue',
+    //       'LENGTH': 'orange',
+    //       'COUNT': 'purple',
+    //       'TIME': 'red'
+    //     };
+    //     const labelMap = {
+    //       'WEIGHT': 'Khối lượng',
+    //       'VOLUME': 'Thể tích',
+    //       'LENGTH': 'Chiều dài',
+    //       'COUNT': 'Số lượng',
+    //       'TIME': 'Thời gian'
+    //     };
+    //     return (
+    //       <Tag color={colorMap[type] || 'default'}>
+    //         {labelMap[type] || type}
+    //       </Tag>
+    //     );
+    //   },
     // },
     {
       title: "Trạng thái",
@@ -196,7 +179,7 @@ const IngredientAdmin = () => {
             marginBottom: 24,
           }}
         >
-          Quản lý Nguyên liệu
+          Quản lý Đơn vị
         </h2>
 
         <div style={{ 
@@ -208,7 +191,7 @@ const IngredientAdmin = () => {
           alignItems: 'center'
         }}>
           <Search
-            placeholder="Tìm kiếm nguyên liệu theo tên"
+            placeholder="Tìm kiếm đơn vị theo tên hoặc ký hiệu"
             onSearch={handleSearch}
             style={{ width: 300 }}
             enterButton
@@ -219,10 +202,8 @@ const IngredientAdmin = () => {
             <Option value="id,desc">ID Giảm dần</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
-            <Option value="calories,desc">Calories cao nhất</Option>
-            <Option value="calories,asc">Calories thấp nhất</Option>
-            <Option value="protein,desc">Protein cao nhất</Option>
-            <Option value="protein,asc">Protein thấp nhất</Option>
+            <Option value="symbol,asc">Ký hiệu A-Z</Option>
+            <Option value="symbol,desc">Ký hiệu Z-A</Option>
           </Select>
 
           <Select
@@ -238,7 +219,7 @@ const IngredientAdmin = () => {
 
         <Table
           columns={columns}
-          dataSource={ingredients}
+          dataSource={units}
           rowKey="id"
           loading={loading}
           pagination={{
@@ -247,13 +228,13 @@ const IngredientAdmin = () => {
             total: total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} nguyên liệu`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} đơn vị`,
             onChange: (page, pageSize) => {
               setPage(page);
               setSize(pageSize);
             },
           }}
-          scroll={{ x: 1300 }}
+          scroll={{ x: 1000 }}
         />
       </div>
       <ChatLauncher />
@@ -261,4 +242,4 @@ const IngredientAdmin = () => {
   );
 };
 
-export default IngredientAdmin;
+export default UnitAdmin; 

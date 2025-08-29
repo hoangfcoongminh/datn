@@ -70,7 +70,7 @@ const RecipeList = () => {
         page,
         size: size,
         sort: sortField,
-      });      
+      });
       setRecipes(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {
@@ -84,7 +84,7 @@ const RecipeList = () => {
     setLoading(true);
     fetchData();
     // Scroll lên đầu trang mỗi khi đổi trang
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, behavior: "smooth" });
     // eslint-disable-next-line
   }, [
     keyword,
@@ -444,7 +444,7 @@ const RecipeList = () => {
                       </div>
                       <div className="card-footer">
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <button
+                          {/* <button 
                             className="like-button"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -461,7 +461,20 @@ const RecipeList = () => {
                             ) : (
                               <FaHeart style={{ opacity: 0.3 }} />
                             )}
-                          </button>
+                          </button> */}
+                          <span className="rec-fav">
+                            <Button
+                              type="text"
+                              shape="circle"
+                              onClick={() => handleAddFavorite(recipe.id)}
+                              disabled={favoriteLoading[recipe.id]}
+                              icon={
+                                <FaHeart
+                                  style={{ color: recipe.isFavorite ? "red" : "gray", fontSize: 18 }}
+                                />
+                              }
+                            />
+                          </span>
                           <span className="likes-count">
                             {recipe.totalFavorite} lượt thích
                           </span>

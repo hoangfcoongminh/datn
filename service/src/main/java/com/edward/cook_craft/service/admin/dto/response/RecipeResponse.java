@@ -31,6 +31,10 @@ public class RecipeResponse {
 
     private Long viewCount = 0L;
 
+    private Float averageRating;
+
+    private Integer totalRating;
+
     private Integer status;
 
 }

@@ -9,9 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class AdminService {
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
     private final UnitRepository unitRepository;
+    private final ReviewRepository reviewRepository;
 
     public Page<UserResponse> getAllUsers(UserRequest request, Pageable pageable) {
         Page<User> users = userRepository.getUserForAdmin(request.getSearch(), request.getStatus(), request.getRole(), pageable);
@@ -35,6 +40,29 @@ public class AdminService {
         Page<Recipe> recipes = recipeRepository.getAllRecipesForAdmin(request.getSearch(), request.getCategoryIds(), request.getAuthorUsernames(), request.getStatus(), pageable);
 
         List<RecipeResponse> response = GenericMapper.mapList(recipes.getContent(), RecipeResponse.class);
+
+        Map<Long, List<Review>> reviewMap = reviewRepository.findAllActive().stream()
+                .collect(Collectors.groupingBy(Review::getRecipeId, Collectors.toList()));
+
+        Map<Long, Pair<Float, Integer>> recipeReviewMap = new HashMap<>();
+
+        recipes.getContent().forEach(recipe -> {
+            List<Review> reviews = reviewMap.get(recipe.getId());
+            float average = 0.0f;
+            int total = 0;
+            if (reviews != null) {
+                average = (float) reviews.stream().mapToDouble(Review::getRating)  // lấy rating
+                        .average()                       // tính trung bình
+                        .orElse(0.0);              // nếu list rỗng thì trả về 0
+                total = reviews.size();
+            }
+            recipeReviewMap.put(recipe.getId(), Pair.of(average, total));
+        });
+
+        response.forEach(r -> {
+            r.setAverageRating(recipeReviewMap.get(r.getId()).getFirst());
+            r.setTotalRating(recipeReviewMap.get(r.getId()).getSecond());
+        });
 
         return new PageImpl<>(response, pageable, recipes.getTotalElements());
     }
