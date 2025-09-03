@@ -32,6 +32,7 @@ const EditRecipePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [imageFileDetail, setImageFileDetail] = useState(null);
 
@@ -220,20 +221,20 @@ const EditRecipePage = () => {
                 setImageFile(file || null);
                 if (file) {
                   const reader = new FileReader();
-                  reader.onload = (ev) => setImageFile(ev.target.result);
+                  reader.onload = (ev) => setImagePreview(ev.target.result);
                   reader.readAsDataURL(file);
                 } else {
-                  setImageFile(null);
+                  setImagePreview(null);
                 }
               }}
               style={{ borderRadius: 8, width: "35%" }}
             />
           </Form.Item>
 
-          {(imageFile || imageFileDetail) && (
+          {(imagePreview || imageFileDetail) && (
             <div style={{ textAlign: "center" }}>
               <Image
-                src={imageFile || imageFileDetail}
+                src={imagePreview || imageFileDetail}
                 preview={true}
                 width={"50%"}
                 style={{ width: "80%", borderRadius: 8 }}

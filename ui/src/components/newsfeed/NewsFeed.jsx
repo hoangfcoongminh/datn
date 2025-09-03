@@ -218,11 +218,15 @@ export default function NewsFeed() {
           <p className="hero-subtitle">Khám phá hàng ngàn công thức từ những người đầu bếp tài năng</p>
         </div>
         <div className="hero-search-section">
-          <Search
+          <Input
+          allowClear
             placeholder="Tìm kiếm công thức yêu thích..."
-            enterButton={<SearchOutlined />}
-            size="large"
-            onSearch={handleSearch}
+            value={keyword}
+                  onChange={(e) => {
+                    setPage(0);
+                    setKeyword(e.target.value);
+                  }}
+                  style={{ maxWidth: 320, borderRadius: 8 }}
             className="hero-search"
           />
         </div>
@@ -244,122 +248,6 @@ export default function NewsFeed() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <h3 className="section-title">
-          <TrophyOutlined /> Thể loại thịnh hành
-        </h3>
-        <div className="trending-categories" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '20px',
-          padding: '20px'
-        }}>
-          {trendingCategories.map((category, index) => (
-            <Card
-              key={index}
-              hoverable
-              cover={
-                <div style={{ 
-                  height: '160px', 
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  <img
-                    src={category.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
-                    alt={category.name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))'
-                  }} />
-                </div>
-              }
-              className="category-card"
-              onClick={() => navigate(`/recipes?categoryId=${category.id}`)}
-              style={{ position: 'relative' }}
-            >
-              <div className="category-info" style={{ position: 'relative' }}>
-                <h4 style={{ 
-                  fontSize: '18px',
-                  fontWeight: 600,
-                  marginBottom: '8px',
-                  color: '#000'
-                }}>{category.name}</h4>
-                <p style={{
-                  color: '#666',
-                  marginBottom: '8px'
-                }}>{category.count} công thức</p>
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '-4px',
-                    padding: '0 8px',
-                    fontSize: '12px',
-                    lineHeight: '20px',
-                    borderRadius: '6px',
-                    fontWeight: 500,
-                    backgroundColor: category.growth >= 0 ? '#52c41a' : '#ff4d4f',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  {category.growth > 0 ? '+' : ''}
-                  <CountUp
-                    end={Math.abs(category.growth)}
-                    duration={2}
-                    decimals={1}
-                  />
-                  %
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Recent Activities */}
-      <div className="newsfeed-section">
-        <h3 className="newsfeed-section-title">
-          <ClockCircleOutlined /> Hoạt động gần đây
-        </h3>
-        <Card className="activity-card">
-          <List
-            itemLayout="horizontal"
-            dataSource={recentActivities}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={
-                    <span>
-                      <strong>{item.user}</strong> {item.action} <em>{item.recipe}</em>
-                      {item.rating && (
-                        <Rate disabled defaultValue={item.rating} style={{ marginLeft: 8, fontSize: 12 }} />
-                      )}
-                    </span>
-                  }
-                  description={item.time}
-                />
-              </List.Item>
-            )}
-          />
-        </Card>
-      </div>
-
-      <h2 className="newsfeed-title">Khám phá công thức</h2>
-
       {/* Section: Danh sách công thức */}
       <div className="newsfeed-section">
         <h3 className="newsfeed-section-title">Danh sách công thức</h3>
@@ -370,8 +258,8 @@ export default function NewsFeed() {
             onChange={(value) => setSortField(value)}
             value={sortField}
           >
-            <Option value="id,asc">Mới nhất</Option>
-            <Option value="totalFavorite,desc">Phổ biến nhất</Option>
+            <Option value="createdAt,desc">Mới nhất</Option>
+            <Option value="title,asc">Tên</Option>
             <Option value="averageRating,desc">Đánh giá cao nhất</Option>
           </Select>
         </div>
@@ -469,6 +357,120 @@ export default function NewsFeed() {
           />
         </div>
       </div>
+
+      {/* Quick Actions */}
+      <div className="quick-actions">
+        <h3 className="section-title">
+          <TrophyOutlined /> Thể loại thịnh hành
+        </h3>
+        <div className="trending-categories" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '20px',
+          padding: '20px'
+        }}>
+          {trendingCategories.map((category, index) => (
+            <Card
+              key={index}
+              hoverable
+              cover={
+                <div style={{ 
+                  height: '160px', 
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  <img
+                    src={category.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
+                    alt={category.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))'
+                  }} />
+                </div>
+              }
+              className="category-card"
+              onClick={() => navigate(`/recipes?categoryId=${category.id}`)}
+              style={{ position: 'relative' }}
+            >
+              <div className="category-info" style={{ position: 'relative' }}>
+                <h4 style={{ 
+                  fontSize: '18px',
+                  fontWeight: 600,
+                  marginBottom: '8px',
+                  color: '#000'
+                }}>{category.name}</h4>
+                <p style={{
+                  color: '#666',
+                  marginBottom: '8px'
+                }}>{category.count} công thức</p>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '-4px',
+                    padding: '0 8px',
+                    fontSize: '12px',
+                    lineHeight: '20px',
+                    borderRadius: '6px',
+                    fontWeight: 500,
+                    backgroundColor: category.growth >= 0 ? '#52c41a' : '#ff4d4f',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {category.growth > 0 ? '+' : ''}
+                  <CountUp
+                    end={Math.abs(category.growth)}
+                    duration={2}
+                    decimals={1}
+                  />
+                  %
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Activities */}
+      {/* <div className="newsfeed-section">
+        <h3 className="newsfeed-section-title">
+          <ClockCircleOutlined /> Hoạt động gần đây
+        </h3>
+        <Card className="activity-card">
+          <List
+            itemLayout="horizontal"
+            dataSource={recentActivities}
+            renderItem={(item) => (
+              <List.Item>
+                <List.Item.Meta
+                  avatar={<Avatar src={item.avatar} />}
+                  title={
+                    <span>
+                      <strong>{item.user}</strong> {item.action} <em>{item.recipe}</em>
+                      {item.rating && (
+                        <Rate disabled defaultValue={item.rating} style={{ marginLeft: 8, fontSize: 12 }} />
+                      )}
+                    </span>
+                  }
+                  description={item.time}
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
+      </div> */}
 
       {/* Section: Công thức phổ biến (slide) */}
       <div className="newsfeed-section">
