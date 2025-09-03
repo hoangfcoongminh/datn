@@ -148,7 +148,7 @@ const IngredientList = () => {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: 24, width: '75%', margin: '40px auto' }}>
+    <div style={{ margin: "0 auto", padding: 24, width: '75%', margin: '40px auto' }}>
       <h1
         style={{
           color: "#a50034",
