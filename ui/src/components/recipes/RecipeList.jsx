@@ -207,7 +207,7 @@ const RecipeList = () => {
                   optionFilterProp="children"
                   showSearch
                   style={{ width: 300 }}
-                >
+                > 
                   {categories.map((cat) => (
                     <Option key={cat.id} value={cat.id}>
                       {cat.name}

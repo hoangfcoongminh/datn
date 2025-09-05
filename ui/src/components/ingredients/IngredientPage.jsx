@@ -76,9 +76,9 @@ const IngredientPage = () => {
   });
 
   useEffect(() => {
-    fetchUnits().then((data) => setUnits(Array.isArray(data.data) ? data.data : []));
-    console.log('unit: ', units);
-    
+    fetchUnits().then((data) =>
+      setUnits(Array.isArray(data.data) ? data.data : [])
+    );
   }, []);
 
   const fetchData = async () => {
@@ -131,8 +131,6 @@ const IngredientPage = () => {
         unitId: ingredient.unitId,
       };
 
-      console.log("Dữ liệu gửi lên (add):", cleaned);
-
       await addIngredient({ addingIngredient: cleaned, imageFile: file });
       toast.success("Đã thêm nguyên liệu!");
       setPopUp(false);
@@ -163,8 +161,6 @@ const IngredientPage = () => {
         status: ing.status,
         unitId: ing.unitId,
       };
-
-      console.log("Dữ liệu gửi lên (update):", req);
 
       await updateIngredient({ ingredient: req, imageFile: file });
       toast.success("Cập nhật nguyên liệu thành công!");
@@ -272,40 +268,48 @@ const IngredientPage = () => {
             <Spin size="large" />
           </div>
         ) : ingredients.length === 0 ? (
-          <Empty description="Chưa có nguyên liệu" style={{ margin: "40px 0" }} />
+          <Empty
+            description="Chưa có nguyên liệu"
+            style={{ margin: "40px 0" }}
+          />
         ) : (
           <div className="ingredient-grid">
             {ingredients.map((ing) => (
               <Card
-  key={ing.id}
-  hoverable
-  className="ingredient-card"
-  cover={
-    ing.imgUrl && (
-      <div className="ingredient-image-wrapper">
-        <img src={ing.imgUrl} alt={ing.name} className="ingredient-image" />
-      </div>
-    )
-  }
-  style={{
-    borderRadius: 18,
-    overflow: "hidden",
-    position: "relative",
-  }}
-  bodyStyle={{ minHeight: 120, padding: "16px" }}   // ✅ bodyStyle đúng
->
-  <h2>{ing.name}</h2>
-  <p>{ing.description}</p>
-  <Tooltip title="Xem chi tiết" className="detail-ingredient">
-    <Button
-      icon={<EyeOutlined style={{ fontSize: 18, color: "#a50034" }} />}
-      type="text"
-      onClick={() => handleShowDetail(ing)}
-      style={{ padding: 0 }}
-    />
-  </Tooltip>
-</Card>
-
+                key={ing.id}
+                hoverable
+                className="ingredient-card"
+                cover={
+                  ing.imgUrl && (
+                    <div className="ingredient-image-wrapper">
+                      <img
+                        src={ing.imgUrl}
+                        alt={ing.name}
+                        className="ingredient-image"
+                      />
+                    </div>
+                  )
+                }
+                style={{
+                  borderRadius: 18,
+                  overflow: "hidden",
+                  position: "relative",
+                  minHeight: 120, padding: "16px"
+                }}
+              >
+                <h2>{ing.name}</h2>
+                <p>{ing.description || 'Chưa có mô tả'}</p>
+                <Tooltip title="Xem chi tiết" className="detail-ingredient">
+                  <Button
+                    icon={
+                      <EyeOutlined style={{ fontSize: 18, color: "#a50034" }} />
+                    }
+                    type="text"
+                    onClick={() => handleShowDetail(ing)}
+                    style={{ padding: 0 }}
+                  />
+                </Tooltip>
+              </Card>
             ))}
           </div>
         )}
@@ -344,7 +348,10 @@ const IngredientPage = () => {
               size="large"
               value={addingIngredient.name}
               onChange={(e) =>
-                setAddingIngredient({ ...addingIngredient, name: e.target.value })
+                setAddingIngredient({
+                  ...addingIngredient,
+                  name: e.target.value,
+                })
               }
             />
           </div>
@@ -384,7 +391,10 @@ const IngredientPage = () => {
             />
             {previewImg && (
               <div style={{ textAlign: "center", marginTop: 12 }}>
-                <Image src={previewImg} style={{ width: "80%", borderRadius: 8 }} />
+                <Image
+                  src={previewImg}
+                  style={{ width: "80%", borderRadius: 8 }}
+                />
               </div>
             )}
           </div>
@@ -414,10 +424,7 @@ const IngredientPage = () => {
             >
               Thêm
             </Button>
-            <Button
-              icon={<CloseOutlined />}
-              onClick={() => setPopUp(false)}
-            >
+            <Button icon={<CloseOutlined />} onClick={() => setPopUp(false)}>
               Đóng
             </Button>
           </div>
@@ -526,13 +533,17 @@ const IngredientPage = () => {
           </div>
 
           <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
-            {user && user.user.username === detail.createdBy && (
-              isEditing ? (
+            {user &&
+              user.user.username === detail.createdBy &&
+              (isEditing ? (
                 <Button
                   type="primary"
                   icon={<SaveOutlined />}
                   onClick={async () =>
-                    await handleUpdateIngredient(editingIngredient, selectedFile)
+                    await handleUpdateIngredient(
+                      editingIngredient,
+                      selectedFile
+                    )
                   }
                   loading={btnLoading}
                 >
@@ -546,8 +557,7 @@ const IngredientPage = () => {
                 >
                   Sửa
                 </Button>
-              )
-            )}
+              ))}
             <Button
               icon={<CloseOutlined />}
               onClick={() => setDetailOpen(false)}
@@ -562,7 +572,10 @@ const IngredientPage = () => {
       <ConfirmModal
         open={confirmOpen}
         onOk={() => {
-          const updated = { ...editingIngredient, status: ModelStatus.INACTIVE };
+          const updated = {
+            ...editingIngredient,
+            status: ModelStatus.INACTIVE,
+          };
           setEditingIngredient(updated);
           handleUpdateIngredient(updated);
         }}

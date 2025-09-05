@@ -91,7 +91,7 @@ const UserAdmin = () => {
       render: (email) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <MailOutlined style={{ color: '#52c41a' }} />
-          {email}
+          {email || "Chưa cập nhật"}
         </div>
       ),
     },
