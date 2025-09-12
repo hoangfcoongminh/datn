@@ -1,5 +1,4 @@
 import React, { use, useEffect, useState } from "react";
-import ScrollToTopButton from "../common/ScrollToTopButton";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button, Spin } from "antd";
 import {
@@ -19,6 +18,7 @@ import { toast } from "react-toastify";
 import { addFavorite } from "../../api/user";
 import Recommendation from "../common/recommendation/Recommendation";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Option } = Select;
 const PAGE_SIZE_OPTIONS = [9, 12, 24, 48];
@@ -70,7 +70,7 @@ const RecipeList = () => {
         page,
         size: size,
         sort: sortField,
-      });      
+      });
       setRecipes(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {
@@ -81,10 +81,10 @@ const RecipeList = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
+    // setLoading(true);
     fetchData();
     // Scroll lên đầu trang mỗi khi đổi trang
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, behavior: "smooth" });
     // eslint-disable-next-line
   }, [
     keyword,
@@ -207,7 +207,7 @@ const RecipeList = () => {
                   optionFilterProp="children"
                   showSearch
                   style={{ width: 300 }}
-                >
+                > 
                   {categories.map((cat) => (
                     <Option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -400,7 +400,7 @@ const RecipeList = () => {
                         {recipe.authorFullName}
                       </div>
                       <h3 className="recipe-title">{recipe.title}</h3>
-                      <p className="recipe-description">{recipe.description}</p>
+                      {/* <p className="recipe-description">{recipe.description}</p> */}
                       <div
                         className="recipe-meta"
                         style={{
@@ -444,7 +444,7 @@ const RecipeList = () => {
                       </div>
                       <div className="card-footer">
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <button
+                          {/* <button 
                             className="like-button"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -461,7 +461,20 @@ const RecipeList = () => {
                             ) : (
                               <FaHeart style={{ opacity: 0.3 }} />
                             )}
-                          </button>
+                          </button> */}
+                          <span className="rec-fav">
+                            <Button
+                              type="text"
+                              shape="circle"
+                              onClick={() => handleAddFavorite(recipe.id)}
+                              disabled={favoriteLoading[recipe.id]}
+                              icon={
+                                <FaHeart
+                                  style={{ color: recipe.isFavorite ? "red" : "gray", fontSize: 18 }}
+                                />
+                              }
+                            />
+                          </span>
                           <span className="likes-count">
                             {recipe.totalFavorite} lượt thích
                           </span>
@@ -494,11 +507,15 @@ const RecipeList = () => {
                   onChange={(p, ps) => {
                     setPage(p - 1);
                     setSize(ps);
+                    // Scroll to the top of the recipe cards
+                    const recipeGrid = document.querySelector(".content-section");
+                    if (recipeGrid) {
+                      recipeGrid.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
                   }}
                 />
               </div>
             </div>
-            <ScrollToTopButton />
             <div style={{ marginTop: 48 }}>
               <Recommendation
                 type={"user"}
@@ -510,6 +527,7 @@ const RecipeList = () => {
           </>
         )}
       </div>
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

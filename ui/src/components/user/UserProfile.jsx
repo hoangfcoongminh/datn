@@ -6,6 +6,8 @@ import { Button, Spin, Rate, Pagination } from "antd";
 import { HeartOutlined, EditOutlined } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import "./UserProfile.css";
+import ScrollToTopButton from "../common/ScrollToTopButton";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 export default function UserProfile() {
   const { username } = useParams();
@@ -236,6 +238,8 @@ export default function UserProfile() {
           />
         </div>
       </div>
+      <ScrollToTopButton />
+      <ChatLauncher />
     </div>
   );
 }

@@ -32,6 +32,7 @@ import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 // const PAGE_SIZE_OPTIONS = [5, 10, 20];
 const { Option } = Select;
@@ -675,6 +676,7 @@ const CategoryPage = () => {
           cancelText="Huỷ"
         />
       </div>
+      <ScrollToTopButton />
       <ChatLauncher />
     </>
   );

@@ -1,16 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { List, Spin, Avatar, Button, Card, Pagination, Rate, Input, Select, Badge, Progress, Statistic, Row, Col } from "antd";
-import { SearchOutlined, TrophyOutlined, FireOutlined, HeartOutlined, EyeOutlined, ClockCircleOutlined, UserOutlined, BookOutlined, StarOutlined } from "@ant-design/icons";
+import {
+  List,
+  Spin,
+  Avatar,
+  Button,
+  Card,
+  Pagination,
+  Rate,
+  Input,
+  Select,
+  Badge,
+  Progress,
+  Statistic,
+  Row,
+  Col,
+} from "antd";
+import {
+  SearchOutlined,
+  TrophyOutlined,
+  FireOutlined,
+  HeartOutlined,
+  EyeOutlined,
+  ClockCircleOutlined,
+  UserOutlined,
+  BookOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
 import Slider from "react-slick";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import "./NewsFeed.css";
 import { filterRecipes, getPopularRecipe } from "../../api/recipe";
-import { fetchPopularCategories } from "../../api/category";
+import { fetchPopularCategories, fetchAllCategories } from "../../api/category";
 import { getPopularUsers } from "../../api/user";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import TopUsersCarousel from "../common/rating/Rating";
-import CountUp from 'react-countup';
+import CountUp from "react-countup";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -27,12 +53,13 @@ export default function NewsFeed() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(10);
-  const [sortField, setSortField] = useState("id,asc");
+  const [sortField, setSortField] = useState("id,desc");
   const [keyword, setKeyword] = useState("");
   const [minTime, setMinTime] = useState("");
   const [maxTime, setMaxTime] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
   // Mock data for new sections
@@ -40,17 +67,10 @@ export default function NewsFeed() {
     totalRecipes: 1250,
     newRecipes: 45,
     totalUsers: 8924,
-    activeUsers: 1847
+    activeUsers: 1847,
   });
 
   const [trendingCategories, setTrendingCategories] = useState([]);
-
-  const [recentActivities] = useState([
-    { user: "Minh Anh", action: "đã thêm công thức", recipe: "Bánh flan caramel", time: "2 phút trước", avatar: "/api/placeholder/32/32" },
-    { user: "Thanh Hoa", action: "đã đánh giá", recipe: "Phở bò Hà Nội", time: "15 phút trước", avatar: "/api/placeholder/32/32", rating: 5 },
-    { user: "Quang Minh", action: "đã yêu thích", recipe: "Bánh mì thịt nướng", time: "1 giờ trước", avatar: "/api/placeholder/32/32" },
-    { user: "Thu Hà", action: "đã bình luận về", recipe: "Cơm tấm sườn nướng", time: "2 giờ trước", avatar: "/api/placeholder/32/32" }
-  ]);
 
   const fetchRecipeList = async () => {
     try {
@@ -112,16 +132,25 @@ export default function NewsFeed() {
   const getPopularCategories = async () => {
     try {
       const data = await fetchPopularCategories();
-      setTrendingCategories(data.data)
-      console.log('popular categories', trendingCategories);
-      
+      setTrendingCategories(data.data);
     } catch (err) {
-      toast.error(err.message || 'Đã có lỗi xảy ra');
+      toast.error(err.message || "Đã có lỗi xảy ra");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
+  const getCategories = async () => {
+    try {
+      const data = await fetchAllCategories();
+      setCategories(data.data);
+    } catch (err) {
+      toast.error(err.message || "Đã có lỗi xảy ra");
+    } finally {
+      setLoading(false);
+    }
+  
+  };
 
   // Effect cho việc fetch dữ liệu ban đầu
   useEffect(() => {
@@ -135,6 +164,7 @@ export default function NewsFeed() {
           fetchPopularByView(),
           fetchPopularUsers(),
           getPopularCategories(),
+          getCategories(),
         ]);
       } catch (err) {
         if (isMounted) toast.error(err?.message || "Có lỗi xảy ra");
@@ -153,7 +183,7 @@ export default function NewsFeed() {
   // Effect riêng cho recipe list, chạy khi page, size hoặc các filter thay đổi
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadRecipes = async () => {
       try {
         setLoading(true);
@@ -183,7 +213,16 @@ export default function NewsFeed() {
     return () => {
       isMounted = false;
     };
-  }, [page, size, keyword, categoryIds, ingredientIds, minTime, maxTime, sortField]);
+  }, [
+    page,
+    size,
+    keyword,
+    categoryIds,
+    ingredientIds,
+    minTime,
+    maxTime,
+    sortField,
+  ]);
 
   const sliderSettings = {
     dots: true,
@@ -215,32 +254,220 @@ export default function NewsFeed() {
       <div className="hero-banner">
         <div className="hero-content">
           <h1 className="hero-title">Chào mừng đến với Cộng đồng Ẩm thực</h1>
-          <p className="hero-subtitle">Khám phá hàng ngàn công thức từ những người đầu bếp tài năng</p>
+          <p className="hero-subtitle">
+            Khám phá hàng ngàn công thức từ những người đầu bếp tài năng
+          </p>
         </div>
         <div className="hero-search-section">
-          <Search
-            placeholder="Tìm kiếm công thức yêu thích..."
-            enterButton={<SearchOutlined />}
-            size="large"
-            onSearch={handleSearch}
+          <Input
+            allowClear
+            placeholder="Tìm kiếm công thức theo tên hoặc mô tả..."
+            value={keyword}
+            onChange={(e) => {
+              setPage(0);
+              setKeyword(e.target.value);
+            }}
+            style={{ maxWidth: 320, borderRadius: 8 }}
             className="hero-search"
           />
         </div>
         <div className="hero-stats">
           <Row gutter={16} justify="center">
             <Col span={6}>
-              <Statistic title="Tổng công thức" valueRender={() => <CountUp end={weeklyStats.totalRecipes} duration={1.5} />} prefix={<BookOutlined />} />
+              <Statistic
+                title="Tổng công thức"
+                valueRender={() => (
+                  <CountUp end={weeklyStats.totalRecipes} duration={1.5} />
+                )}
+                prefix={<BookOutlined />}
+              />
             </Col>
             <Col span={6}>
-              <Statistic title="Công thức mới" valueRender={() => <CountUp end={weeklyStats.newRecipes} duration={1.5} />} prefix={<FireOutlined />} />
+              <Statistic
+                title="Công thức mới"
+                valueRender={() => (
+                  <CountUp end={weeklyStats.newRecipes} duration={1.5} />
+                )}
+                prefix={<FireOutlined />}
+              />
             </Col>
             <Col span={6}>
-              <Statistic title="Người dùng" valueRender={() => <CountUp end={weeklyStats.totalUsers} duration={1.5} />} prefix={<UserOutlined />} />
+              <Statistic
+                title="Người dùng"
+                valueRender={() => (
+                  <CountUp end={weeklyStats.totalUsers} duration={1.5} />
+                )}
+                prefix={<UserOutlined />}
+              />
             </Col>
             <Col span={6}>
-              <Statistic title="Đang hoạt động" valueRender={() => <CountUp end={weeklyStats.activeUsers} duration={1.5} />} prefix={<EyeOutlined />} />
+              <Statistic
+                title="Đang hoạt động"
+                valueRender={() => (
+                  <CountUp end={weeklyStats.activeUsers} duration={1.5} />
+                )}
+                prefix={<EyeOutlined />}
+              />
             </Col>
           </Row>
+        </div>
+      </div>
+
+      {/* Section: Danh sách công thức */}
+      <div className="newsfeed-section">
+        <h3 className="newsfeed-section-title">Danh sách công thức</h3>
+        <div className="filter-bar">
+          <div>
+            <span>Sắp xếp theo: </span>
+            <Select
+              placeholder="Sắp xếp theo"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => {
+                setSortField(value);
+                setPage(0);
+              }}
+              value={sortField}
+            >
+              <Option value="id,desc">Mới nhất</Option>
+              <Option value="id,asc">Cũ nhất</Option>
+              <Option value="title,asc">Tên tăng dần</Option>
+              <Option value="title,desc">Tên giảm dần</Option>
+              <Option value="averageRating,desc">Đánh giá cao nhất</Option>
+            </Select>
+          </div>
+
+          <div>
+            <span>Danh mục: </span>
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Chọn danh mục"
+              value={categoryIds}
+              onChange={(vals) => {
+                setCategoryIds(vals);
+                setPage(0);
+              }}
+              optionFilterProp="children"
+              showSearch
+              style={{ width: 250 }}
+            >
+              {categories.map((cat) => (
+                <Option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </Option>
+              ))}
+            </Select>
+          </div>
+        </div>
+        <div className="recipes-grid">
+          {recipeList.map((r) => (
+            <div key={r.id} className="recipe-card">
+              <div className="card-image">
+                <img
+                  src={
+                    r.imgUrl ||
+                    "https://via.placeholder.com/400x250?text=No+Image"
+                  }
+                  alt={r.title}
+                />
+                <div className="card-overlay">
+                  <div
+                    onClick={() => handleCardClick(r.id)}
+                    className="view-button"
+                  >
+                    Xem chi tiết
+                  </div>
+                </div>
+              </div>
+              <div className="card-content">
+                <div
+                  className="rec-author"
+                  onClick={() => navigate(`/user/${r.authorUsername}`)}
+                >
+                  {r.authorAvtUrl ? (
+                    <img
+                      src={r.authorAvtUrl}
+                      alt="avatar"
+                      className="rec-author-avatar"
+                    />
+                  ) : (
+                    <span
+                      className="rec-author-avatar"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "#eee",
+                        color: "#a50034",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {r.authorFullName?.charAt(0).toUpperCase() || "U"}
+                    </span>
+                  )}
+                  {r.authorFullName || "Unknown"}
+                </div>
+                <h3 className="recipe-title">{r.title}</h3>
+                {/* <p className="recipe-description">{r.description}</p> */}
+                <div className="recipe-meta">
+                  <div className="meta-item">
+                    <Rate
+                      allowHalf
+                      disabled
+                      value={r.averageRating || 0}
+                      style={{ fontSize: 18, color: "#faad14" }}
+                    />
+                    <span style={{ color: "#000", fontWeight: 500 }}>
+                      {r.totalReview || 0} đánh giá
+                    </span>
+                  </div>
+                </div>
+                <div className="card-footer">
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <button className="like-button">
+                      <HeartOutlined />
+                    </button>
+                    <span className="likes-count">
+                      {r.totalFavorite} lượt thích
+                    </span>
+                  </div>
+                  <div
+                    onClick={() => handleCardClick(r.id)}
+                    className="cta-button"
+                    style={{ cursor: "pointer" }}
+                  >
+                    Xem công thức
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 32,
+            marginBottom: 32,
+          }}
+        >
+          <Pagination
+            current={page + 1}
+            pageSize={size}
+            total={total}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
+            showSizeChanger
+            showTotal={(total, range) =>
+              `${range[0]}-${range[1]} của ${total} công thức`
+            }
+            onChange={(p, s) => {
+              setPage(p - 1);
+              setSize(s);
+            }}
+          />
         </div>
       </div>
 
@@ -249,73 +476,93 @@ export default function NewsFeed() {
         <h3 className="section-title">
           <TrophyOutlined /> Thể loại thịnh hành
         </h3>
-        <div className="trending-categories" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '20px',
-          padding: '20px'
-        }}>
+        <div
+          className="trending-categories"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "20px",
+            padding: "20px",
+          }}
+        >
           {trendingCategories.map((category, index) => (
             <Card
               key={index}
               hoverable
               cover={
-                <div style={{ 
-                  height: '160px', 
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
+                <div
+                  style={{
+                    height: "160px",
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                >
                   <img
-                    src={category.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
+                    src={
+                      category.imgUrl ||
+                      "https://via.placeholder.com/400x250?text=No+Image"
+                    }
                     alt={category.name}
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
                     }}
                   />
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))'
-                  }} />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background:
+                        "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6))",
+                    }}
+                  />
                 </div>
               }
               className="category-card"
               onClick={() => navigate(`/recipes?categoryId=${category.id}`)}
-              style={{ position: 'relative' }}
+              style={{ position: "relative" }}
             >
-              <div className="category-info" style={{ position: 'relative' }}>
-                <h4 style={{ 
-                  fontSize: '18px',
-                  fontWeight: 600,
-                  marginBottom: '8px',
-                  color: '#000'
-                }}>{category.name}</h4>
-                <p style={{
-                  color: '#666',
-                  marginBottom: '8px'
-                }}>{category.count} công thức</p>
-                <div
+              <div className="category-info" style={{ position: "relative" }}>
+                <h4
                   style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '-4px',
-                    padding: '0 8px',
-                    fontSize: '12px',
-                    lineHeight: '20px',
-                    borderRadius: '6px',
-                    fontWeight: 500,
-                    backgroundColor: category.growth >= 0 ? '#52c41a' : '#ff4d4f',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center'
+                    fontSize: "18px",
+                    fontWeight: 600,
+                    marginBottom: "8px",
+                    color: "#000",
                   }}
                 >
-                  {category.growth > 0 ? '+' : ''}
+                  {category.name}
+                </h4>
+                <p
+                  style={{
+                    color: "#666",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {category.count} công thức
+                </p>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "8px",
+                    right: "-4px",
+                    padding: "0 8px",
+                    fontSize: "12px",
+                    lineHeight: "20px",
+                    borderRadius: "6px",
+                    fontWeight: 500,
+                    backgroundColor:
+                      category.growth >= 0 ? "#52c41a" : "#ff4d4f",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  {category.growth > 0 ? "+" : ""}
                   <CountUp
                     end={Math.abs(category.growth)}
                     duration={2}
@@ -330,7 +577,7 @@ export default function NewsFeed() {
       </div>
 
       {/* Recent Activities */}
-      <div className="newsfeed-section">
+      {/* <div className="newsfeed-section">
         <h3 className="newsfeed-section-title">
           <ClockCircleOutlined /> Hoạt động gần đây
         </h3>
@@ -356,119 +603,7 @@ export default function NewsFeed() {
             )}
           />
         </Card>
-      </div>
-
-      <h2 className="newsfeed-title">Khám phá công thức</h2>
-
-      {/* Section: Danh sách công thức */}
-      <div className="newsfeed-section">
-        <h3 className="newsfeed-section-title">Danh sách công thức</h3>
-        <div className="filter-bar">
-          <Select
-            placeholder="Sắp xếp theo"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => setSortField(value)}
-            value={sortField}
-          >
-            <Option value="id,asc">Mới nhất</Option>
-            <Option value="totalFavorite,desc">Phổ biến nhất</Option>
-            <Option value="averageRating,desc">Đánh giá cao nhất</Option>
-          </Select>
-        </div>
-        <div className="recipes-grid">
-          {recipeList.map((r) => (
-            <div key={r.id} className="recipe-card">
-              <div className="card-image">
-                <img
-                  src={r.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
-                  alt={r.title}
-                />
-                <div className="card-overlay">
-                  <div
-                    onClick={() => handleCardClick(r.id)}
-                    className="view-button"
-                  >
-                    Xem chi tiết
-                  </div>
-                </div>
-              </div>
-              <div className="card-content">
-                <div className="rec-author" onClick={() => navigate(`/user/${r.authorUsername}`)}>
-                  {r.authorAvtUrl ? (
-                    <img
-                      src={r.authorAvtUrl}
-                      alt="avatar"
-                      className="rec-author-avatar"
-                    />
-                  ) : (
-                    <span
-                      className="rec-author-avatar"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: "#eee",
-                        color: "#a50034",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {r.authorFullName?.charAt(0).toUpperCase() || 'U'}
-                    </span>
-                  )}
-                  {r.authorFullName || 'Unknown'}
-                </div>
-                <h3 className="recipe-title">{r.title}</h3>
-                <p className="recipe-description">{r.description}</p>
-                <div className="recipe-meta">
-                  <div className="meta-item">
-                    <Rate
-                      allowHalf
-                      disabled
-                      value={r.averageRating || 0}
-                      style={{ fontSize: 18, color: "#faad14" }}
-                    />
-                    <span style={{ color: "#000", fontWeight: 500 }}>
-                      {r.totalReview || 0} đánh giá
-                    </span>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <button className="like-button">
-                      <HeartOutlined />
-                    </button>
-                    <span className="likes-count">
-                      {r.totalFavorite} lượt thích
-                    </span>
-                  </div>
-                  <div
-                    onClick={() => handleCardClick(r.id)}
-                    className="cta-button"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Xem công thức
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, marginBottom: 32 }}>
-          <Pagination
-            current={page + 1}
-            pageSize={size}
-            total={total}
-            pageSizeOptions={PAGE_SIZE_OPTIONS}
-            showSizeChanger
-            showTotal={(total, range) => `${range[0]}-${range[1]} của ${total} công thức`}
-            onChange={(p, s) => {
-              setPage(p - 1);
-              setSize(s);
-            }}
-          />
-        </div>
-      </div>
+      </div> */}
 
       {/* Section: Công thức phổ biến (slide) */}
       <div className="newsfeed-section">
@@ -482,7 +617,10 @@ export default function NewsFeed() {
                 <div className="recipe-card slider-card">
                   <div className="card-image">
                     <img
-                      src={r.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
+                      src={
+                        r.imgUrl ||
+                        "https://via.placeholder.com/400x250?text=No+Image"
+                      }
                       alt={r.title}
                     />
                     <div className="card-overlay">
@@ -496,10 +634,16 @@ export default function NewsFeed() {
                   </div>
                   <div className="card-content">
                     <h3 className="recipe-title">{r.title}</h3>
-                    <p className="recipe-description">{r.description}</p>
+                    {/* <p className="recipe-description">{r.description}</p> */}
                     <div className="card-footer">
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <HeartOutlined style={{ color: '#f43f5e' }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <HeartOutlined style={{ color: "#f43f5e" }} />
                         <span className="likes-count">
                           {r.totalFavorite} lượt thích
                         </span>
@@ -507,7 +651,7 @@ export default function NewsFeed() {
                       <div
                         onClick={() => handleCardClick(r.id)}
                         className="cta-button"
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                       >
                         Xem
                       </div>
@@ -532,7 +676,10 @@ export default function NewsFeed() {
                 <div className="recipe-card slider-card">
                   <div className="card-image">
                     <img
-                      src={r.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
+                      src={
+                        r.imgUrl ||
+                        "https://via.placeholder.com/400x250?text=No+Image"
+                      }
                       alt={r.title}
                     />
                     <div className="card-overlay">
@@ -546,10 +693,16 @@ export default function NewsFeed() {
                   </div>
                   <div className="card-content">
                     <h3 className="recipe-title">{r.title}</h3>
-                    <p className="recipe-description">{r.description}</p>
+                    {/* <p className="recipe-description">{r.description}</p> */}
                     <div className="card-footer">
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <HeartOutlined style={{ color: '#f43f5e' }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <HeartOutlined style={{ color: "#f43f5e" }} />
                         <span className="likes-count">
                           {r.totalFavorite} lượt thích
                         </span>
@@ -557,7 +710,7 @@ export default function NewsFeed() {
                       <div
                         onClick={() => handleCardClick(r.id)}
                         className="cta-button"
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: "pointer" }}
                       >
                         Xem
                       </div>
@@ -573,13 +726,23 @@ export default function NewsFeed() {
       {/* Người dùng có lượt đánh giá cao nhất */}
       <div className="newsfeed-section">
         <h3 className="newsfeed-section-title">Người dùng được đánh giá cao</h3>
-        <TopUsersCarousel users={topRatingUsers} type="rating" />
+        {topRatingUsers.length > 0 ? (
+          <TopUsersCarousel users={topRatingUsers} type="rating" />
+        ) : (
+          <p>Không có người dùng nào được đánh giá cao.</p>
+        )}
       </div>
 
       {/* Người dùng có nhiều lượt thích nhất */}
       <div className="newsfeed-section">
-        <h3 className="newsfeed-section-title">Người dùng được yêu thích nhất</h3>
-        <TopUsersCarousel users={topFavUsers} type="favorite" />
+        <h3 className="newsfeed-section-title">
+          Người dùng được yêu thích nhất
+        </h3>
+        {topFavUsers.length > 0 ? (
+          <TopUsersCarousel users={topFavUsers} type="favorite" />
+        ) : (
+          <p>Không có người dùng nào được yêu thích.</p>
+        )}
       </div>
 
       {/* Weekly Challenge */}
@@ -591,7 +754,11 @@ export default function NewsFeed() {
           <Row gutter={16}>
             <Col span={16}>
               <h4>Thử thách: "Món ăn healthy dưới 30 phút"</h4>
-              <p>Hãy chia sẻ công thức món ăn healthy có thể hoàn thành trong vòng 30 phút. Công thức hay nhất sẽ nhận được phần thưởng đặc biệt!</p>
+              <p>
+                Hãy chia sẻ công thức món ăn healthy có thể hoàn thành trong
+                vòng 30 phút. Công thức hay nhất sẽ nhận được phần thưởng đặc
+                biệt!
+              </p>
               <Button type="primary">Tham gia ngay</Button>
             </Col>
             <Col span={8}>
@@ -604,7 +771,7 @@ export default function NewsFeed() {
           </Row>
         </Card>
       </div>
-
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

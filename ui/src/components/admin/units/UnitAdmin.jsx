@@ -1,0 +1,245 @@
+import React, { useState, useEffect } from "react";
+import { Table, Button, Space, Tag, Input, Select } from "antd";
+import { fetchUnits } from "../../../api/admin";
+import { toast } from "react-toastify";
+import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import AdminSidebar from "../common/AdminSidebar";
+import ChatLauncher from "../../common/chatbot/ChatLauncher";
+
+const { Search } = Input;
+const { Option } = Select;
+
+const UnitAdmin = () => {
+  const [units, setUnits] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [unitsRequest, setUnitsRequest] = useState({ search: "", status: "" });
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [sort, setSort] = useState("id,asc");
+
+  useEffect(() => {
+    const loadUnits = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchUnits({
+          unitsRequest,
+          page: page - 1,
+          size,
+          sort,
+        });
+        setUnits(response.data);
+        setTotal(response.total);
+      } catch (error) {
+        toast.error("Failed to fetch units");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUnits();
+  }, [unitsRequest, page, size, sort]);
+
+  const handleSearch = (value) => {
+    setUnitsRequest({ ...unitsRequest, search: value });
+  };
+
+  const handleSortChange = (value) => {
+    setSort(value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setUnitsRequest((prev) => ({ ...prev, status: value }));
+  };
+
+  const columns = [
+    {
+      title: "STT",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) => (page - 1) * size + index + 1,
+      width: 80,
+    },
+    {
+      title: "Tên đơn vị",
+      dataIndex: "name",
+      key: "name",
+      render: (name) => (
+        <div style={{ fontWeight: 600, color: '#1890ff' }}>
+          {name}
+        </div>
+      ),
+    },
+    // {
+    //   title: "Ký hiệu",
+    //   dataIndex: "symbol",
+    //   key: "symbol",
+    //   render: (symbol) => (
+    //     <Tag color="blue" style={{ fontSize: 12, fontWeight: 600 }}>
+    //       {symbol}
+    //     </Tag>
+    //   ),
+    // },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      render: (description) => (
+        <div style={{ 
+          maxWidth: 250, 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          whiteSpace: 'nowrap',
+          color: '#666'
+        }}>
+          {description || "Không có mô tả"}
+        </div>
+      ),
+    },
+    // {
+    //   title: "Loại đơn vị",
+    //   dataIndex: "type",
+    //   key: "type",
+    //   render: (type) => {
+    //     const colorMap = {
+    //       'WEIGHT': 'green',
+    //       'VOLUME': 'blue',
+    //       'LENGTH': 'orange',
+    //       'COUNT': 'purple',
+    //       'TIME': 'red'
+    //     };
+    //     const labelMap = {
+    //       'WEIGHT': 'Khối lượng',
+    //       'VOLUME': 'Thể tích',
+    //       'LENGTH': 'Chiều dài',
+    //       'COUNT': 'Số lượng',
+    //       'TIME': 'Thời gian'
+    //     };
+    //     return (
+    //       <Tag color={colorMap[type] || 'default'}>
+    //         {labelMap[type] || type}
+    //       </Tag>
+    //     );
+    //   },
+    // },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={status === 1 ? "green" : "red"}>
+          {status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Hành động",
+      key: "action",
+      render: (_, record) => (
+        <Space size="small">
+          <Button 
+            type="primary" 
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => console.log("View", record.id)}
+          >
+            Xem
+          </Button>
+          <Button 
+            type="default" 
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => console.log("Edit", record.id)}
+          >
+            Sửa
+          </Button>
+          <Button 
+            type="danger" 
+            size="small"
+            icon={<StopOutlined />} 
+            onClick={() => console.log("Deactivate", record.id)}
+          >
+            Khóa
+          </Button>
+        </Space>
+      ),
+      width: 180,
+    },
+  ];
+
+  return (
+    <div style={{ display: "flex" }}>
+      <AdminSidebar />
+      <div style={{ flex: 1, padding: 32 }}>
+        <h2
+          style={{
+            color: "#a50034",
+            fontWeight: 700,
+            fontSize: 32,
+            marginBottom: 24,
+          }}
+        >
+          Quản lý Đơn vị
+        </h2>
+
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          marginBottom: 16,
+          gap: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          <Search
+            placeholder="Tìm kiếm đơn vị theo tên hoặc ký hiệu"
+            onSearch={handleSearch}
+            style={{ width: 300 }}
+            enterButton
+          />
+
+          <Select defaultValue={sort} onChange={handleSortChange} style={{ width: 200 }}>
+            <Option value="id,asc">ID Tăng dần</Option>
+            <Option value="id,desc">ID Giảm dần</Option>
+            <Option value="name,asc">Tên A-Z</Option>
+            <Option value="name,desc">Tên Z-A</Option>
+            <Option value="symbol,asc">Ký hiệu A-Z</Option>
+            <Option value="symbol,desc">Ký hiệu Z-A</Option>
+          </Select>
+
+          <Select
+            placeholder="Lọc theo trạng thái"
+            onChange={(value) => handleStatusFilterChange(value)}
+            style={{ width: 200 }}
+            allowClear
+          >
+            <Option value="1">Hoạt động</Option>
+            <Option value="0">Ngưng hoạt động</Option>
+          </Select>
+        </div>
+
+        <Table
+          columns={columns}
+          dataSource={units}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: page,
+            pageSize: size,
+            total: total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} đơn vị`,
+            onChange: (page, pageSize) => {
+              setPage(page);
+              setSize(pageSize);
+            },
+          }}
+          scroll={{ x: 1000 }}
+        />
+      </div>
+      <ChatLauncher />
+    </div>
+  );
+};
+
+export default UnitAdmin; 

@@ -21,11 +21,18 @@ import { Header, Footer } from "./components/common";
 import { logout as apiLogout } from "./api/auth";
 import { AddRecipePage, EditRecipePage } from "./components/recipes";
 import { CategoryPage } from "./components/categories";
-import IngredientList from "./components/ingredients/IngredientList";
+import IngredientPage from "./components/ingredients/IngredientPage";
 import NewsFeed from "./components/newsfeed/NewsFeed";
 import { ToastContainer } from "react-toastify";
-import DashBoard  from "./components/admin/DashBoard";
+import DashBoard from "./components/admin/dashboard/DashBoard";
 import EditProfile from "./components/user/EditProfile";
+import AdminSidebar from "./components/admin/common/AdminSidebar";
+import CategoryAdmin from "./components/admin/categories/CategoryAdmin";
+import RecipeAdmin from "./components/admin/recipes/RecipeAdmin";
+import IngredientAdmin from "./components/admin/ingredients/IngredientAdmin";
+import UserAdmin from "./components/admin/users/UserAdmin";
+import UnitAdmin from "./components/admin/units/UnitAdmin";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -34,21 +41,33 @@ function AppContent() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    const syncUser = () => {
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
 
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+      if (token && savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (error) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setUser(null);
       }
-    }
-    setLoading(false);
+    };
+
+    // Gọi ngay lần đầu khi component mount
+    syncUser();
+
+    // Lắng nghe sự kiện thay đổi localStorage (vd: khi update profile)
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
   }, []);
+
 
   const handleLogin = (username, data) => {
     const userData = { username, ...data };
@@ -67,7 +86,7 @@ function AppContent() {
   const handleLogout = async () => {
     try {
       await apiLogout();
-    } catch {}
+    } catch { }
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -144,7 +163,7 @@ function AppContent() {
           path="/admin/dashboard"
           element={
             user && user.user.role === "ADMIN" ? (
-              <DashBoard/>
+              <DashBoard />
             ) : (
               <NotFound />
             )
@@ -152,13 +171,18 @@ function AppContent() {
         />
         <Route path="/newsfeed" element={<NewsFeed />} />
         <Route path="/categories" element={<CategoryPage />} />
-        <Route path="/ingredients" element={<IngredientList />} />
+        <Route path="/ingredients" element={<IngredientPage />} />
         <Route path="/recipes" element={<RecipeList />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
         <Route path="/recipes/add" element={<AddRecipePage />} />
         <Route path="/recipes/edit/:id" element={<EditRecipePage />} />
         <Route path="/user/:username" element={<UserProfile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/admin/categories" element={<CategoryAdmin />} />
+        <Route path="/admin/recipes" element={<RecipeAdmin />} />
+        <Route path="/admin/ingredients" element={<IngredientAdmin />} />
+        <Route path="/admin/users" element={<UserAdmin />} />
+        <Route path="/admin/units" element={<UnitAdmin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
@@ -170,6 +194,7 @@ function App() {
   return (
     <>
       <Router>
+        <ScrollToTop />
         <div className="App">
           <AppContent />
         </div>

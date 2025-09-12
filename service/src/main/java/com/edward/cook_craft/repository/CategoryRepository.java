@@ -49,4 +49,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findTop4CategoriesByRecipeCount(
             @Param("startOfMonth") LocalDateTime startOfMonth,
             @Param("endOfMonth") LocalDateTime endOfMonth);
+
+    @Query(value = "SELECT c " +
+            "FROM Category c " +
+            "WHERE (COALESCE(:search, '') = '' OR CONCAT(LOWER(c.name),'#',LOWER(c.description)) LIKE CONCAT('%',LOWER(:search),'%')) " +
+            "AND (:status IS NULL OR c.status = :status)")
+    Page<Category> getAllCategoriesForAdmin(@Param("search") String search,
+                                            @Param("status") Integer status,
+                                            Pageable pageable);
 }

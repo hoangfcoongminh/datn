@@ -18,6 +18,7 @@ import Recommendation from "../common/recommendation/Recommendation";
 import { addFavorite } from "../../api/user";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import moment from 'moment';
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -311,6 +312,7 @@ const RecipeDetail = () => {
           apiParams
         />
       </div>
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

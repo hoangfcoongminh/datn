@@ -65,30 +65,68 @@ export async function detailIngredient(id) {
   return data;
 }
 
-export async function updateIngredient({ ingredient, imageFile }) {
+export async function addIngredient({ addingIngredient, imageFile }) {
   const token = localStorage.getItem('token');
   const formData = new FormData();
-  formData.append('jsonRequest', JSON.stringify(ingredient));
+
+  // Properly serialize the JSON request
+  formData.append('jsonRequest', JSON.stringify(addingIngredient));
+
   if (imageFile) {
     formData.append('img', imageFile);
   }
-  const res = await fetch(`http://localhost:8080/api/ingredients`, {
-    method: 'PUT',
+
+  const res = await fetch('http://localhost:8080/api/ingredients', {
+    method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     },
-    body: formData
+    body: formData,
   });
+
   let data;
-  
   try {
     data = await res.json();
   } catch {
     throw new Error('Lỗi không xác định từ máy chủ.');
   }
+
+  if (!data.success) {
+    throw new Error(data?.message || 'Lỗi khi thêm nguyên liệu');
+  }
+
+  return data;
+}
+
+export async function updateIngredient({ ingredient, imageFile }) {
+  const token = localStorage.getItem('token');
+  const formData = new FormData();
+
+  // Properly serialize the JSON request
+  formData.append('jsonRequest', JSON.stringify(ingredient));
+
+  if (imageFile) {
+    formData.append('img', imageFile);
+  }
+
+  const res = await fetch('http://localhost:8080/api/ingredients', {
+    method: 'PUT',
+    headers: {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Lỗi không xác định từ máy chủ.');
+  }
+
   if (!data.success) {
     throw new Error(data?.message || 'Lỗi khi cập nhật nguyên liệu');
-    
   }
+
   return data;
 }

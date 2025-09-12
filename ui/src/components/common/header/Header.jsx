@@ -28,29 +28,52 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
 
   return (
     <AntHeader className="main-header">
-      <div className="header-left" style={{ display: "flex", alignItems: "center", gap: 18 }}>
+      <div
+        className="header-left"
+        style={{ display: "flex", alignItems: "center", gap: 18 }}
+      >
         <img
           src={logo}
           alt="logo"
           className="header-logo"
           onClick={() => onNavigate("home")}
-          style={{ cursor: "pointer", marginLeft: 40, height: 60, width: "auto", borderRadius: 5, border: "none", backgroundColor: "white" }}
+          style={{
+            cursor: "pointer",
+            marginLeft: 40,
+            height: 60,
+            width: "auto",
+            borderRadius: 5,
+            border: "none",
+            backgroundColor: "white",
+          }}
         />
         <Menu
           mode="horizontal"
           selectedKeys={[]}
           className="header-menu"
-          style={{ borderBottom: "none", fontWeight: 600, fontSize: 16, background: "transparent" }}
+          style={{
+            borderBottom: "none",
+            fontWeight: 600,
+            fontSize: 16,
+            background: "transparent",
+          }}
           items={menuItems.map((item) => ({
             key: item.key,
             label: (
-              <span onClick={() => onNavigate(item.key)} style={{ color: "#a50034" }}>
+              <span
+                onClick={() => onNavigate(item.key)}
+                style={{ color: "#a50034" }}
+              >
                 {item.label}
               </span>
             ),
           }))}
         />
-        <button className="header-hamburger" onClick={handleHamburger} aria-label="menu">
+        <button
+          className="header-hamburger"
+          onClick={handleHamburger}
+          aria-label="menu"
+        >
           <span style={{ fontSize: 28, lineHeight: 1 }}>&#9776;</span>
         </button>
       </div>
@@ -82,12 +105,18 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
               flexDirection: "column",
               gap: 18,
             }}
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             {menuItems.map((item) => (
               <span
                 key={item.key}
-                style={{ color: "#a50034", fontWeight: 600, fontSize: 18, padding: "8px 0", cursor: "pointer" }}
+                style={{
+                  color: "#a50034",
+                  fontWeight: 600,
+                  fontSize: 18,
+                  padding: "8px 0",
+                  cursor: "pointer",
+                }}
                 onClick={() => handleMenuClick(item.key)}
               >
                 {item.label}
@@ -96,65 +125,70 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
           </div>
         </div>
       )}
-      <div className="header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        className="header-right"
+        style={{ display: "flex", alignItems: "center", gap: 12 }}
+      >
         {user ? (
-          <Space size={16}>
-            {user.user.role === "ADMIN" && (
-              <Button
-                type="primary"
-                style={{ background: "#a50034", borderColor: "#a50034", borderRadius: 8 }}
-                onClick={() => navigate("/admin/dashboard")}
-              >
-                ADMIN HOME
-              </Button>
-            )}
-            <Badge count={0} size="small">
-              <Button
-                type="text"
-                icon={
-                  <BellOutlined style={{ fontSize: 20, color: "#a50034" }} />
-                }
-              />
-            </Badge>
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "account",
-                    label: <span onClick={() => navigate('/profile/edit')}>Quản lý tài khoản</span>,
-                  },
-                  {
-                    key: "myrecipe",
-                    label: (
-                      <span onClick={() => onNavigate("myrecipe")}>
-                        Công thức của tôi
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "logout",
-                    label: <span onClick={onLogout}>Đăng xuất</span>,
-                  },
-                ],
-              }}
-              placement="bottomRight"
-              trigger={["click"]}
-            >
-              <Button
-                type="text"
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                {/* <Avatar icon={<UserOutlined />} style={{ background: '#a50034' }} /> */}
-                <Avatar
-                  src={user.user.imgUrl}
-                  style={{ backgroundColor: "#a50034" }}
+          <>
+            <Space size={16}>
+              {user.user.role === "ADMIN" && (
+                <Button
+                  type="primary"
+                  style={{
+                    background: "#a50034",
+                    borderColor: "#a50034",
+                    borderRadius: 8,
+                  }}
+                  onClick={() => navigate("/admin/dashboard")}
                 >
-                  {!user.user.imgUrl && user.user.fullName.charAt(0)?.toUpperCase()}
-                </Avatar>
-                <DownOutlined style={{ color: "#a50034", fontSize: 12 }} />
-              </Button>
-            </Dropdown>
-          </Space>
+                  ADMIN HOME
+                </Button>
+              )}
+              <Badge count={0} size="small">
+                <Button
+                  type="text"
+                  icon={
+                    <BellOutlined style={{ fontSize: 20, color: "#a50034" }} />
+                  }
+                />
+              </Badge>
+              <Dropdown
+                menu={{
+                  items: [
+                    { key: "account", label: "Quản lý tài khoản" },
+                    { key: "myrecipe", label: "Công thức của tôi" },
+                    { key: "logout", label: "Đăng xuất" },
+                  ],
+                  onClick: ({ key }) => {
+                    if (key === "account") navigate("/profile/edit");
+                    if (key === "myrecipe") onNavigate("myrecipe");
+                    if (key === "logout") onLogout();
+                  },
+                }}
+                placement="bottomRight"
+                trigger={["click"]}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span>Xin chào {user.user.fullName}</span>
+                  <Button
+                    type="text"
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    {/* <Avatar icon={<UserOutlined />} style={{ background: '#a50034' }} /> */}
+                    <Avatar
+                      src={user.user.imgUrl}
+                      style={{ backgroundColor: "#a50034" }}
+                    >
+                      {!user.user.imgUrl &&
+                        user.user.fullName.charAt(0)?.toUpperCase()}
+                    </Avatar>
+                    <DownOutlined style={{ color: "#a50034", fontSize: 12 }} />
+                  </Button>
+                </div>
+              </Dropdown>
+            </Space>
+          </>
         ) : (
           <Space size={12}>
             <Button
