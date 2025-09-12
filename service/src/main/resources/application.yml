@@ -18,7 +18,7 @@ spring:
     multipart:
       enabled: true
       max-file-size: 50MB
-      max-request-size: 100MB
+      max-request-size: 150MB
 
   redis-cook-craft:
     port: 6379           # Cổng mặc định của Redis server
@@ -39,7 +39,8 @@ minio:
   url: http://localhost:9000
   access-key: minioadmin
   secret-key: minioadmin
-  bucket: images
+  bucket-images: images
+  bucket-videos: videos
 
 image:
   default:

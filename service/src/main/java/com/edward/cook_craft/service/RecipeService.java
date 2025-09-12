@@ -109,7 +109,7 @@ public class RecipeService {
     }
 
     @Transactional
-    public RecipeDetailResponse create(String jsonRequest, MultipartFile file) {
+    public RecipeDetailResponse create(String jsonRequest, MultipartFile img, MultipartFile video) {
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
         var ingredients = request.getIngredients();
@@ -117,12 +117,14 @@ public class RecipeService {
 
         Recipe recipe = recipeMapper.of(request);
         recipe.setId(null);
-        if (file != null && !file.isEmpty()) {
-            recipe.setImgUrl(minioService.uploadFile(file));
+        if (img != null && !img.isEmpty()) {
+            recipe.setImgUrl(minioService.uploadFile(img));
         } else {
             recipe.setImgUrl(defaultRecipe);
         }
-
+        if (video != null && !video.isEmpty()) {
+            recipe.setVideoUrl(minioService.uploadFile(video));
+        }
         Recipe finalRecipe = repository.save(recipe);
 
         var savedIngredients = ingredients.stream().map(i -> {
@@ -151,7 +153,7 @@ public class RecipeService {
     }
 
     @Transactional
-    public RecipeResponse update(String jsonRequest, MultipartFile file) {
+    public RecipeResponse update(String jsonRequest, MultipartFile img, MultipartFile video) {
         User user = SecurityUtils.getCurrentUser();
         if (user == null) {
             throw new CustomException("not.authenticated");
@@ -162,7 +164,7 @@ public class RecipeService {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();
-        updateRecipeData(recipe, request, file);
+        updateRecipeData(recipe, request, img);
 
         return details(recipe.getId());
     }
