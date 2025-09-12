@@ -1,0 +1,144 @@
+/* =====================
+   Recommendation Slider
+   ===================== */
+
+.recommendation-root {
+  padding: 20px;
+}
+
+.rec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.rec-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Slick carousel spacing */
+.slick-slide {
+  padding: 0 10px;
+  height: 100%;
+}
+
+.slick-list {
+  margin: 0 -10px;
+}
+
+/* Card styling */
+.recipe-card {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+}
+
+.recipe-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Image inside card */
+/* .recipe-card img {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+} */
+
+/* Body giữ khoảng cách đều */
+.ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Author info */
+.rec-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rec-author-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Title */
+.rec-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Meta info (rating, likes) */
+.rec-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+  min-height: 40px; /* giữ chiều cao đồng đều */
+}
+
+/* Like button */
+.like-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a50034;
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.2);
+}
+
+/* Loading */
+.rec-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #555;
+}
+
+.custom-prev,
+.custom-next {
+  position: absolute;
+  top: 40%;
+  z-index: 2;
+  background: white;
+  border-radius: 50%;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.custom-prev { left: -20px; }
+.custom-next { right: -20px; }
+
+.custom-next:hover,
+.custom-prev:hover {
+  background: rgba(0, 0, 0, 0.6); /* ví dụ đổi nền */
+  color: #fff;                    /* đổi màu icon */
+  transform: scale(1.1);
+  transition: 0.5s;       /* hiệu ứng phóng to nhẹ */
+}

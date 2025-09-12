@@ -29,6 +29,9 @@ public class User extends BaseModel {
 
     private String imgUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

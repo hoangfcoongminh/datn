@@ -4,9 +4,12 @@ import "./index.css";
 import "antd/dist/reset.css";
 import App from "./App.jsx";
 import { ConfigProvider } from "antd";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <ConfigProvider
       theme={{
         token: {
@@ -22,5 +25,5 @@ createRoot(document.getElementById("root")).render(
       <App />
 
     </ConfigProvider>,
-  </StrictMode>,
+  /* </StrictMode>, */
 );

@@ -1,0 +1,67 @@
+/* Card user */
+.top-user-card {
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(165, 0, 52, 0.08);
+  background: #fff;
+  transition: transform 0.3s, box-shadow 0.3s;
+  padding: 12px 8px;
+  width: 200px;/* độ rộng cố định */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* căn giữa nội dung */
+  min-height: 220px;
+  transform-origin: bottom center;
+}
+
+/* Hover effect */
+.top-user-card:hover {
+  box-shadow: 0 8px 32px rgba(165, 0, 52, 0.18);
+  transform: translateY(-4px) scale(1.04);
+}
+
+/* Card nổi bật (middle) */
+.top-user-card.highlight {
+  transform: scale(1.2);
+  box-shadow: 0 12px 40px rgba(165, 0, 52, 0.22);
+  z-index: 10;
+}
+
+/* Avatar */
+.top-user-card .ant-avatar {
+  margin-bottom: 8px;
+  display: block; /* chắc chắn ảnh là block */
+  margin-left: auto;
+  margin-right: auto; /* căn giữa */
+}
+
+/* Tên user */
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #a50034;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* Thông tin rating / favorite */
+.user-meta {
+  font-size: 14px;
+  color: #888;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Rate stars */
+.user-meta .ant-rate {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+/* Icon heart */
+.user-meta .anticon-heart {
+  color: #f43f5e;
+  margin-right: 4px;
+}

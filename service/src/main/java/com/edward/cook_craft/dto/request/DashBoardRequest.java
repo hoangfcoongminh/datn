@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 @Getter
 @Setter
 @Builder
 public class DashBoardRequest {
 
-    private Integer year;
-    private Integer month;
     private LocalDate startDate;
     private LocalDate endDate;
 }

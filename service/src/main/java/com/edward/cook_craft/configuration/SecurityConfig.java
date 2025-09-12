@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 "/api/categories/filter",
                                 "/api/ingredients/filter",
                                 "/api/recipes/filter",
-                                "/api/units/filter").permitAll()
+                                "/api/units/filter",
+                                "/api/recommendation/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ingredients").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ingredients/**").permitAll()
@@ -50,11 +51,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/units").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/units/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/recipes/filter/**").permitAll()
                         .requestMatchers(
                                 "/api/categories/**",
                                 "/api/ingredients/**",
                                 "/api/recipes/**",
-                                "/api/units/**").hasAuthority("USER")
+                                "/api/units/**",
+                                "/api/review/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

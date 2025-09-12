@@ -5,7 +5,6 @@ import com.edward.cook_craft.service.CategoryService;
 import com.edward.cook_craft.utils.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +50,11 @@ public class CategoryController {
             @RequestPart(name = "img", required = false) MultipartFile file
     ) {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularCategories() {
+        return ResponseUtils.handleSuccess(service.getPopular());
     }
 
 }

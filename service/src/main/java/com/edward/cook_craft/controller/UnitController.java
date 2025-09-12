@@ -1,6 +1,5 @@
 package com.edward.cook_craft.controller;
 
-import com.edward.cook_craft.dto.request.IngredientRequest;
 import com.edward.cook_craft.dto.request.UnitRequest;
 import com.edward.cook_craft.service.UnitService;
 import com.edward.cook_craft.utils.ResponseUtils;

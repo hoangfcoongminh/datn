@@ -1,6 +1,5 @@
 package com.edward.cook_craft.configuration;
 
-import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.utils.SecurityUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

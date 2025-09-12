@@ -142,3 +142,6 @@ UPDATE categories c SET img_url = 'http://localhost:9000/images/default-category
 UPDATE users u SET img_url = 'http://localhost:9000/images/default-avt.jpg';
 UPDATE recipes r SET img_url = 'http://localhost:9000/images/default-recipe.jpg';
 UPDATE ingredients i SET img_url = 'http://localhost:9000/images/default-ingredien.jpg';
+
+ALTER TABLE reviews 
+MODIFY comment TEXT;

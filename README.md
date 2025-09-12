@@ -17,3 +17,7 @@ THÊM BẢNG ĐÁNH GIÁ CÔNG THỨC: 1-5 SAO + CMT VỀ CÔNG THỨC
 SHOP: TÍNH NĂNG MUA SẮM TRANG THIẾT BỊ NẤU ĂN   
 
 VIDEO FOR RECIPE
+
+#### features/review + base-code
+
+Function: follow other user

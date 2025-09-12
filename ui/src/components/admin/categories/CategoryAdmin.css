@@ -1,0 +1,37 @@
+/* Custom styles for CategoryAdmin */
+.admin-page {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-page h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.admin-page .ant-table {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-page .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.admin-page .ant-table-tbody > tr > td {
+  padding: 12px;
+}
+
+.admin-page .ant-btn-link {
+  color: #1890ff;
+}
+
+.admin-page .ant-btn-link:hover {
+  color: #40a9ff;
+}

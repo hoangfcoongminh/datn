@@ -1,11 +1,6 @@
 package com.edward.cook_craft.model;
 
-import com.edward.cook_craft.dto.request.UnitRequest;
-import com.edward.cook_craft.dto.response.UnitResponse;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class Unit extends BaseModel {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;

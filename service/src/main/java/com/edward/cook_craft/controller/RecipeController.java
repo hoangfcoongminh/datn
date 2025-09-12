@@ -1,19 +1,15 @@
 package com.edward.cook_craft.controller;
 
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
-import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.service.RecipeService;
 import com.edward.cook_craft.utils.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -49,7 +45,7 @@ public class RecipeController {
     @PostMapping
     @Operation(summary = "Create a new recipe", description = "Add a new recipe to the system")
     public ResponseEntity<?> create(
-            @RequestPart String jsonRequest,
+            @RequestPart("jsonRequest") String jsonRequest,
             @RequestPart(name = "img", required = false) MultipartFile img
     ) {
         return ResponseUtils.handleSuccess(service.create(jsonRequest, img));
@@ -62,6 +58,14 @@ public class RecipeController {
             @RequestPart(name = "img", required = false) MultipartFile img
     ) {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, img));
+    }
+
+    @GetMapping("/popular-by/{type}")
+    @Operation(summary = "Popular recipe", description = "Get popular recipe")
+    public ResponseEntity<?> getPopularRecipe(
+            @PathVariable String type
+    ) {
+        return ResponseUtils.handleSuccess(service.getPopular(type));
     }
 
 }

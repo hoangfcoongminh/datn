@@ -5,6 +5,7 @@ import { login } from '../../api/auth';
 import { FaUserAlt, FaLock, FaHome, FaUserPlus } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -116,6 +117,7 @@ const LoginPage = ({ onLogin }) => {
           </div>
         </div>
       </div>
+      <ChatLauncher />
     </div>
   );
 };

@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 
 /**
  * BẢNG CÔNG THỨC
@@ -44,4 +43,6 @@ public class Recipe extends BaseModel {
     private String imgUrl;
 
     private String videoUrl;
+  
+    private Long viewCount = 0L;
 }

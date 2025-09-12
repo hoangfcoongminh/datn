@@ -73,7 +73,7 @@
 }
 
 .hero-content {
-  max-width: 600px;
+  /* max-width: 600px; */
   animation: slideInLeft 1s ease-out;
 }
 
@@ -154,6 +154,7 @@
 }
 
 .cta-button {
+  width: max-content;
   padding: 16px 32px;
   border: none;
   border-radius: 12px;

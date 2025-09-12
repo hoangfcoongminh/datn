@@ -5,7 +5,6 @@ import com.edward.cook_craft.dto.request.SignupRequest;
 import com.edward.cook_craft.security.AuthenticService;
 import com.edward.cook_craft.utils.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class AuthenticController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
-        HttpServletRequest request
+            HttpServletRequest request
     ) {
         return ResponseUtils.handleSuccess(service.logout(request));
     }

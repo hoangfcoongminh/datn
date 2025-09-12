@@ -45,4 +45,18 @@ public class UserController {
     ) {
         return ResponseUtils.handleSuccess(userService.getMyRecipes(request, pageable));
     }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUser(
+            @PathVariable String username
+    ) {
+        return ResponseUtils.handleSuccess(userService.getUser(username));
+    }
+
+    @GetMapping("/popular-by/{type}")
+    public ResponseEntity<?> getPopularByType(
+            @PathVariable String type
+    ) {
+        return ResponseUtils.handleSuccess(userService.getPopular(type));
+    }
 }

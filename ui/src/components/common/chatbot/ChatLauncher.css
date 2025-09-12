@@ -1,0 +1,54 @@
+.chatlauncher-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 10000;
+}
+
+.chatlauncher-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  width: 420px;
+  height: 450px;
+  max-width: calc(100vw - 32px);
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2), 0 6px 18px rgba(0,0,0,0.08);
+  overflow: hidden;
+  z-index: 10000;
+}
+
+.chatlauncher-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, #a50034, #d32f2f);
+  color: #fff;
+}
+
+.chatlauncher-title {
+  font-weight: 600;
+}
+
+.chatlauncher-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.chatlauncher-close:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.chatlauncher-body {
+  padding: 8px;
+} 

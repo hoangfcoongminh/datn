@@ -4,10 +4,10 @@ import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
 import com.edward.cook_craft.dto.request.RecipeStepRequest;
-import com.edward.cook_craft.dto.response.*;
+import com.edward.cook_craft.dto.response.RecipeDetailResponse;
+import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
-import com.edward.cook_craft.mapper.PageMapper;
 import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
 import com.edward.cook_craft.mapper.RecipeStepMapper;
@@ -16,13 +16,16 @@ import com.edward.cook_craft.model.RecipeIngredientDetail;
 import com.edward.cook_craft.model.RecipeStep;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.*;
+import com.edward.cook_craft.service.batch.RecipeViewService;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
+import com.edward.cook_craft.utils.RecipeUtils;
 import com.edward.cook_craft.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,18 +50,18 @@ public class RecipeService {
     private final RecipeStepRepository recipeStepRepository;
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
-    private final PageMapper pageMapper;
     private final MinioService minioService;
     private final RecipeIngredientDetailMapper recipeIngredientDetailMapper;
     private final RecipeStepMapper recipeStepMapper;
-    private final FavoriteRepository favoriteRepository;
+    private final RecipeUtils recipeUtils;
+    private final RecipeViewService recipeViewService;
 
     public List<RecipeResponse> getAll() {
         return repository.findAll().stream()
                 .map(recipeMapper::toResponse).toList();
     }
 
-    public PagedResponse<?> filter(RecipeFilterRequest request, Pageable pageable) {
+    public Page<RecipeResponse> filter(RecipeFilterRequest request, Pageable pageable) {
         String keyword = request.getKeyword() == null || request.getKeyword().isEmpty() ? null : request.getKeyword().toLowerCase();
         List<Long> categoryIds = request.getCategoryIds() == null || request.getCategoryIds().isEmpty() ? null : request.getCategoryIds();
         List<Long> ingredientIds = request.getIngredientIds() == null || request.getIngredientIds().isEmpty() ? null : request.getIngredientIds();
@@ -66,22 +69,19 @@ public class RecipeService {
         Integer status = request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus();
         boolean sortByFavorite = pageable.getSort().stream()
                 .anyMatch(order -> order.getProperty().equalsIgnoreCase("favorite"));
-        List<Recipe> data;
+        Page<Recipe> paged;
         if (sortByFavorite) {
-            data = repository.filterWithFavorite(
+            paged = repository.filterWithFavorite(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
             );
         } else {
-            data = repository.filter(
+            paged = repository.filter(
                     keyword, categoryIds, ingredientIds, authorUsernames, status, pageable);
         }
+        List<Recipe> data = paged.getContent();
+        var response = recipeUtils.mapWithExtraInfo(data);
 
-        List<RecipeResponse> response = data.stream().map(recipeMapper::toResponse).toList();
-        response.forEach(r -> {
-            r.setIsFavorite(checkFavorite(r.getId()));
-        });
-
-        return pageMapper.map(response, pageable, response.size());
+        return new PageImpl<>(response, pageable, paged.getTotalElements());
     }
 
     public RecipeDetailResponse details(Long id) {
@@ -90,8 +90,7 @@ public class RecipeService {
             throw new CustomException("recipe.not.found");
         }
         Recipe recipeData = recipe.get();
-        RecipeDetailResponse response = new RecipeDetailResponse(recipeMapper.toResponse(recipeData));
-        response.setIsFavorite(checkFavorite(id));
+        RecipeDetailResponse response = new RecipeDetailResponse(recipeUtils.mapWithExtraInfo(List.of(recipeData)).get(0));
 
         List<RecipeIngredientDetail> recipeIngredients = recipeIngredientDetailRepository.findByRecipeId(id);
         var recipeIngredientResponses = recipeIngredients.stream()
@@ -102,6 +101,10 @@ public class RecipeService {
 
         response.setRecipeIngredients(recipeIngredientResponses);
         response.setRecipeSteps(recipeStepResponses);
+
+        //Increase view of this recipe
+        recipeViewService.increaseView(id);
+
         return response;
     }
 
@@ -119,6 +122,7 @@ public class RecipeService {
         } else {
             recipe.setImgUrl(defaultRecipe);
         }
+
         Recipe finalRecipe = repository.save(recipe);
 
         var savedIngredients = ingredients.stream().map(i -> {
@@ -148,9 +152,13 @@ public class RecipeService {
 
     @Transactional
     public RecipeResponse update(String jsonRequest, MultipartFile file) {
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            throw new CustomException("not.authenticated");
+        }
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
-        if (!Objects.equals(SecurityUtils.getCurrentUsername(), request.getAuthorUsername())) {
+        if (!Objects.equals(user.getUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();
@@ -297,11 +305,14 @@ public class RecipeService {
         }
     }
 
-    private Boolean checkFavorite(Long recipeId) {
-        User u = SecurityUtils.getCurrentUser();
-        if (u != null) {
-            return favoriteRepository.existsByUserIdAndRecipeId(u.getId(), recipeId);
+    public List<RecipeResponse> getPopular(String type) {
+        List<Recipe> data;
+        if ("favorite".equalsIgnoreCase(type)) {
+            data = repository.findMostFavoriteRecipes();
+        } else {
+            data = repository.findMostViewedRecipes();
         }
-        return null;
+        return recipeUtils.mapWithExtraInfo(data);
     }
+
 }

@@ -11,13 +11,17 @@ import {
 import { filterRecipes } from "../../api/recipe";
 import { fetchAllCategories } from "../../api/category";
 import { fetchIngredients } from "../../api/ingredient";
-import { Select, Pagination, Input } from "antd";
+import { Select, Pagination, Input, Rate } from "antd";
 import "antd/dist/reset.css";
 import "./RecipeList.css";
 import { toast } from "react-toastify";
+import { addFavorite } from "../../api/user";
+import Recommendation from "../common/recommendation/Recommendation";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Option } = Select;
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+const PAGE_SIZE_OPTIONS = [9, 12, 24, 48];
 
 const RecipeList = () => {
   const location = useLocation();
@@ -47,15 +51,14 @@ const RecipeList = () => {
       setPage(0);
     }
     fetchAllCategories()
-      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .then((data) => setCategories(data.data || []))
       .catch(() => setCategories([]));
     fetchIngredients()
-      .then((data) => setIngredients(Array.isArray(data) ? data : []))
+      .then((data) => setIngredients(data.data || []))
       .catch(() => setIngredients([]));
   }, []);
 
   const fetchData = async () => {
-    setLoading(true);
     setError(null);
     try {
       const data = await filterRecipes({
@@ -68,7 +71,7 @@ const RecipeList = () => {
         size: size,
         sort: sortField,
       });
-      setRecipes(data.content || []);
+      setRecipes(data.data || []);
       setTotal(data.total || 1);
     } catch (err) {
       setError(err.message || "Lỗi khi tải công thức");
@@ -78,7 +81,10 @@ const RecipeList = () => {
   };
 
   useEffect(() => {
+    // setLoading(true);
     fetchData();
+    // Scroll lên đầu trang mỗi khi đổi trang
+    // window.scrollTo({ top: 0, behavior: "smooth" });
     // eslint-disable-next-line
   }, [
     keyword,
@@ -96,7 +102,7 @@ const RecipeList = () => {
 
     // Chỉ validate khi cả hai giá trị cùng tồn tại
     console.log(num, " - ", maxTime);
-    
+
     if (num !== null && maxTime !== null && num > Number(maxTime)) {
       toast.error("Khoảng thời gian không hợp lệ!");
       return;
@@ -119,6 +125,20 @@ const RecipeList = () => {
 
     setPage(0);
     setMaxTime(value || null);
+  };
+
+  const [favoriteLoading, setFavoriteLoading] = useState({});
+  const handleAddFavorite = async (id) => {
+    setFavoriteLoading((prev) => ({ ...prev, [id]: true }));
+    try {
+      await addFavorite(id);
+      // Không cập nhật cục bộ isFavorite nữa, fetch lại danh sách để lấy totalFavorite mới nhất
+      await fetchData();
+    } catch (err) {
+      toast.error("Lỗi khi thêm vào yêu thích");
+    } finally {
+      setFavoriteLoading((prev) => ({ ...prev, [id]: false }));
+    }
   };
 
   return (
@@ -187,7 +207,7 @@ const RecipeList = () => {
                   optionFilterProp="children"
                   showSearch
                   style={{ width: 300 }}
-                >
+                > 
                   {categories.map((cat) => (
                     <Option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -230,9 +250,7 @@ const RecipeList = () => {
                 />
               </div>
               <div className="filter-group">
-                <label
-                  style={{ display: "block", fontWeight: 600 }}
-                >
+                <label style={{ display: "block", fontWeight: 600 }}>
                   Thời gian làm
                 </label>
                 <div
@@ -347,9 +365,6 @@ const RecipeList = () => {
                         }
                         alt={recipe.title}
                       />
-                      <button className="like-button">
-                        <FaHeart />
-                      </button>
                       <div className="card-overlay">
                         <Link
                           to={`/recipes/${recipe.id}`}
@@ -360,26 +375,110 @@ const RecipeList = () => {
                       </div>
                     </div>
                     <div className="card-content">
+                      <div className="rec-author" onClick={() => navigate(`/user/${recipe.authorUsername}`)}>
+                        {recipe.authorAvtUrl ? (
+                          <img
+                            src={recipe.authorAvtUrl}
+                            alt="avatar"
+                            className="rec-author-avatar"
+                          />
+                        ) : (
+                          <span
+                            className="rec-author-avatar"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: "#eee",
+                              color: "#a50034",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {recipe.authorFullName.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                        {recipe.authorFullName}
+                      </div>
                       <h3 className="recipe-title">{recipe.title}</h3>
-                      <p className="recipe-description">{recipe.description}</p>
-                      <div className="recipe-meta">
+                      {/* <p className="recipe-description">{recipe.description}</p> */}
+                      <div
+                        className="recipe-meta"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 16,
+                        }}
+                      >
                         <div className="meta-item">
-                          <FaClock />
-                          <span>{recipe.time}</span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 20,
+                              color: "#faad14",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                            }}
+                          >
+                            <Rate
+                              allowHalf
+                              disabled
+                              value={recipe.averageRating || 0}
+                              style={{ fontSize: 22, color: "#faad14" }}
+                            />
+                          </span>
+                          <span
+                            style={{
+                              color: "#000",
+                              fontWeight: 500,
+                              fontSize: 16,
+                            }}
+                          >
+                            {recipe.totalReview} lượt đánh giá
+                          </span>
                         </div>
-                        <div className="meta-item">
-                          <FaStar />
-                          <span>{recipe.rating}</span>
-                        </div>
-                        <div className="meta-item">
-                          <FaUtensils />
-                          <span>{recipe.difficulty}</span>
-                        </div>
+                        <div
+                          className="meta-item"
+                          style={{ marginLeft: "auto" }}
+                        ></div>
                       </div>
                       <div className="card-footer">
-                        <span className="likes-count">
-                          {recipe.likes} lượt thích
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          {/* <button 
+                            className="like-button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              handleAddFavorite(recipe.id);
+                            }}
+                            disabled={favoriteLoading[recipe.id]}
+                            title={
+                              recipe.isFavorite ? "Bỏ yêu thích" : "Yêu thích"
+                            }
+                          >
+                            {recipe.isFavorite ? (
+                              <FaHeart />
+                            ) : (
+                              <FaHeart style={{ opacity: 0.3 }} />
+                            )}
+                          </button> */}
+                          <span className="rec-fav">
+                            <Button
+                              type="text"
+                              shape="circle"
+                              onClick={() => handleAddFavorite(recipe.id)}
+                              disabled={favoriteLoading[recipe.id]}
+                              icon={
+                                <FaHeart
+                                  style={{ color: recipe.isFavorite ? "red" : "gray", fontSize: 18 }}
+                                />
+                              }
+                            />
+                          </span>
+                          <span className="likes-count">
+                            {recipe.totalFavorite} lượt thích
+                          </span>
+                        </div>
                         <Link
                           to={`/recipes/${recipe.id}`}
                           className="cta-button"
@@ -408,13 +507,28 @@ const RecipeList = () => {
                   onChange={(p, ps) => {
                     setPage(p - 1);
                     setSize(ps);
+                    // Scroll to the top of the recipe cards
+                    const recipeGrid = document.querySelector(".content-section");
+                    if (recipeGrid) {
+                      recipeGrid.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
                   }}
                 />
               </div>
             </div>
+            <div style={{ marginTop: 48 }}>
+              <Recommendation
+                type={"user"}
+                // id={}
+                title={"Gợi ý cho bạn"}
+                apiParams
+              />
+            </div>
           </>
         )}
       </div>
+      <ScrollToTopButton />
+      <ChatLauncher />
     </div>
   );
 };

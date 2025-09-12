@@ -2,3 +2,35 @@
 html, body, * {
   font-family: 'Be Vietnam Pro', sans-serif !important;
 }
+
+body {
+  background-color: #f5f5f5;
+}
+
+/* Sao full */
+.ant-rate-star-full .ant-rate-star-first,
+.ant-rate-star-full .ant-rate-star-second {
+  color: #FFC107 !important; /* vàng cam */
+}
+
+/* Sao half */
+.ant-rate-star-half .ant-rate-star-first {
+  color: #FFC107 !important; /* nửa vàng bên trái */
+}
+.ant-rate-star-half .ant-rate-star-second {
+  color: #4A4A4A !important; /* nửa xám bên phải */
+}
+
+/* Sao trống */
+.ant-rate-star-zero .ant-rate-star-first,
+.ant-rate-star-zero .ant-rate-star-second {
+  color: #4A4A4A !important; /* xám đậm */
+}
+
+/* file app.css hoặc index.css */
+.slick-slide {
+  padding: 0 8px; /* tạo khoảng cách 8px giữa các card */
+}
+.slick-list {
+  margin: 0 -8px; /* bù lại padding để không bị lệch */
+}

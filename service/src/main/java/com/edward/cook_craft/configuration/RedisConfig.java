@@ -38,15 +38,18 @@ public class RedisConfig {
         clientBuilder.connectTimeout(Duration.ofMillis(redisProperties.getTimeout()));
         clientBuilder.usePooling().poolConfig(redisProperties.getPool());
 
-        return new  JedisConnectionFactory(redisStandaloneConfiguration, clientBuilder.build());
+        return new JedisConnectionFactory(redisStandaloneConfiguration, clientBuilder.build());
     }
 
     @Bean
     @Primary
     public RedisTemplate<String, Object> redisTemplate(@Qualifier("redis-cook-craft-cache") RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+
         redisTemplate.setKeySerializer(new StringRedisSerializer());
+
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 
         return redisTemplate;
