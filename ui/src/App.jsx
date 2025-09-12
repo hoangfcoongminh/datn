@@ -32,6 +32,7 @@ import RecipeAdmin from "./components/admin/recipes/RecipeAdmin";
 import IngredientAdmin from "./components/admin/ingredients/IngredientAdmin";
 import UserAdmin from "./components/admin/users/UserAdmin";
 import UnitAdmin from "./components/admin/units/UnitAdmin";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -193,6 +194,7 @@ function App() {
   return (
     <>
       <Router>
+        <ScrollToTop />
         <div className="App">
           <AppContent />
         </div>

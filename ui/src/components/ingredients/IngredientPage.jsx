@@ -33,6 +33,7 @@ import "antd/dist/reset.css";
 import { toast } from "react-toastify";
 import ModelStatus from "../../enums/modelStatus";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Option } = Select;
 
@@ -589,7 +590,7 @@ const IngredientPage = () => {
         okText="Ngưng hoạt động"
         cancelText="Huỷ"
       />
-
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

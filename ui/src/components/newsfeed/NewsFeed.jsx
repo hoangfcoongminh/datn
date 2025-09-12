@@ -36,6 +36,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import TopUsersCarousel from "../common/rating/Rating";
 import CountUp from "react-countup";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -407,7 +408,7 @@ export default function NewsFeed() {
                   {r.authorFullName || "Unknown"}
                 </div>
                 <h3 className="recipe-title">{r.title}</h3>
-                <p className="recipe-description">{r.description}</p>
+                {/* <p className="recipe-description">{r.description}</p> */}
                 <div className="recipe-meta">
                   <div className="meta-item">
                     <Rate
@@ -633,7 +634,7 @@ export default function NewsFeed() {
                   </div>
                   <div className="card-content">
                     <h3 className="recipe-title">{r.title}</h3>
-                    <p className="recipe-description">{r.description}</p>
+                    {/* <p className="recipe-description">{r.description}</p> */}
                     <div className="card-footer">
                       <div
                         style={{
@@ -692,7 +693,7 @@ export default function NewsFeed() {
                   </div>
                   <div className="card-content">
                     <h3 className="recipe-title">{r.title}</h3>
-                    <p className="recipe-description">{r.description}</p>
+                    {/* <p className="recipe-description">{r.description}</p> */}
                     <div className="card-footer">
                       <div
                         style={{
@@ -770,7 +771,7 @@ export default function NewsFeed() {
           </Row>
         </Card>
       </div>
-
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

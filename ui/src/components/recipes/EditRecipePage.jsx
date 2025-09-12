@@ -19,6 +19,7 @@ import { getRecipeDetail, updateRecipe } from "../../api/recipe";
 import { toast } from "react-toastify";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import "./AddRecipePage.css";
+import ScrollToTopButton from "../common/ScrollToTopButton";
 
 const { Option } = Select;
 
@@ -127,7 +128,7 @@ const EditRecipePage = () => {
   return (
     <div
       className="edit-recipe-page"
-      style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}
+      style={{ maxWidth: 900, margin: "0 auto", padding: 24, borderRadius: 10 }}
     >
       <Card
         title={
@@ -357,6 +358,7 @@ const EditRecipePage = () => {
           </Form.Item>
         </Form>
       </Card>
+      <ScrollToTopButton />
       <ChatLauncher />
     </div>
   );

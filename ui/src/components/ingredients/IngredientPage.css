@@ -2,9 +2,10 @@
   min-height: 100vh;
   background: white;
   padding: 40px 20px;
-  width: 80%; /* rộng hơn một chút để chứa nhiều card */
+  width: 75%; /* rộng hơn một chút để chứa nhiều card */
   margin: 40px auto;
   border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(165, 0, 52, 0.1), 0 1.5px 6px rgba(0, 0, 0, 0.04);
 }
 
 .ingredient-title {

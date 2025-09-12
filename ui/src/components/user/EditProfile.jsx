@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { updateUserProfile, getUserProfile } from '../../api/user';
 import { toast } from 'react-toastify';
 import './EditProfile.css';
+import ScrollToTopButton from '../common/ScrollToTopButton';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const EditProfile = () => {
   const [form] = Form.useForm();
@@ -152,6 +154,8 @@ const EditProfile = () => {
           </div>
         </Form>
       </div>
+      <ScrollToTopButton />
+      <ChatLauncher />
     </div>
   );
 };

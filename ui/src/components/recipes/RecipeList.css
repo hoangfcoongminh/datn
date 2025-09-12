@@ -2,7 +2,11 @@
 .recipe-list-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  /* font-family: system-ui, -apple-system, sans-serif; */
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px 10px 10px 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(165, 0, 52, 0.1), 0 1.5px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Header Section */
