@@ -188,7 +188,7 @@ const RecipeList = () => {
                 }
               }}
             >
-              + Thêm công thức mới
+              + Thêm công thức
             </Button>
           </div>
           <div className="filter-content border">

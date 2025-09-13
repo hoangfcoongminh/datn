@@ -1,5 +1,6 @@
 package com.edward.cook_craft.service;
 
+import com.edward.cook_craft.constants.Constants;
 import com.edward.cook_craft.dto.request.IngredientRequest;
 import com.edward.cook_craft.dto.response.IngredientResponse;
 import com.edward.cook_craft.enums.EntityStatus;
@@ -63,7 +64,7 @@ public class IngredientService {
         Ingredient i = ingredientMapper.of(request);
         i.setId(null);
         if (file != null && !file.isEmpty()) {
-            i.setImgUrl(minioService.uploadFile(file));
+            i.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         } else {
             i.setImgUrl(defaultIngredient);
         }
@@ -84,7 +85,7 @@ public class IngredientService {
             if (!defaultIngredient.equals(existed.getImgUrl())) {
                 minioService.deleteFile(existed.getImgUrl());
             }
-            existed.setImgUrl(minioService.uploadFile(file));
+            existed.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         }
         return ingredientMapper.toResponse(repository.save(existed));
     }

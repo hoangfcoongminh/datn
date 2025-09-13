@@ -6,8 +6,8 @@ services:
     container_name: mysql-cook-craft
     restart: always
     environment:
-      MYSQL_DATABASE: cook_craft_db         # Tên database khởi tạo
-      MYSQL_ROOT_PASSWORD: root           # Mật khẩu cho user root
+      MYSQL_DATABASE: cook_craft_db
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:
@@ -53,11 +53,13 @@ services:
 
         echo '📁 Creating bucket: images';
         mc mb myminio/images || true;
-
-        echo '🌐 Setting public policy...';
         mc anonymous set download myminio/images;
 
-        echo '✅ Done creating bucket and setting public access';
+        echo '📁 Creating bucket: videos';
+        mc mb myminio/videos || true;
+        mc anonymous set download myminio/videos;
+
+        echo '✅ Done creating buckets and setting public access';
         exit 0;
       "
     restart: "on-failure"

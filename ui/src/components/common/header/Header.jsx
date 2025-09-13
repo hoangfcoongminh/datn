@@ -162,7 +162,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
                   ],
                   onClick: ({ key }) => {
                     if (key === "account") navigate("/profile/edit");
-                    if (key === "myrecipe") onNavigate("myrecipe");
+                    if (key === "myrecipe") navigate("/recipes/my-recipes");
                     if (key === "logout") onLogout();
                   },
                 }}

@@ -5,7 +5,7 @@ import { UpOutlined } from '@ant-design/icons';
 const ScrollToTopButton = () => {
   const handleClick = () => {
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-    document.body.scrollTop = 0;
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

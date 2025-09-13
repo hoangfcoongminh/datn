@@ -182,7 +182,16 @@ const IngredientPage = () => {
       <h1 className="ingredient-title">Danh sách Nguyên liệu</h1>
 
       {/* Search + Filter */}
-      <div className="ingredient-search-form">
+      <div
+        className="ingredient-search-form"
+        style={{
+          display: "flex",
+          flexWrap: "wrap", // Đảm bảo các phần tử không bị tràn
+          gap: "16px", // Khoảng cách giữa các phần tử
+          alignItems: "center", // Căn giữa theo chiều dọc
+          justifyContent: "space-between", // Căn đều các phần tử
+        }}
+      >
         <Button
           type="primary"
           style={{
@@ -295,11 +304,12 @@ const IngredientPage = () => {
                   borderRadius: 18,
                   overflow: "hidden",
                   position: "relative",
-                  minHeight: 120, padding: "16px"
+                  minHeight: 120,
+                  padding: "16px",
                 }}
               >
                 <h2>{ing.name}</h2>
-                <p>{ing.description || 'Chưa có mô tả'}</p>
+                <p>{ing.description || "Chưa có mô tả"}</p>
                 <Tooltip title="Xem chi tiết" className="detail-ingredient">
                   <Button
                     icon={

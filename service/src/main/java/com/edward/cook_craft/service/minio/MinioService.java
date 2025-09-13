@@ -12,6 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 
+import static com.edward.cook_craft.constants.Constants.FILE_TYPE_IMAGE;
+import static com.edward.cook_craft.constants.Constants.FILE_TYPE_VIDEO;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,8 +22,11 @@ public class MinioService {
 
     private final MinioClient minioClient;
 
-    @Value("${minio.bucket}")
-    private String bucketName;
+    @Value("${minio.bucket-images}")
+    private String bucketImage;
+
+    @Value("${minio.bucket-videos}")
+    private String bucketVideo;
 
     @Value("${minio.url}")
     private String url;
@@ -28,31 +34,51 @@ public class MinioService {
     @PostConstruct
     public void initBucket() {
         try {
-            boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-            if (!found) {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            boolean foundImages = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketImage).build());
+            if (!foundImages) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketImage).build());
             }
+
+            boolean foundVideos = minioClient.bucketExists(
+                    BucketExistsArgs.builder().bucket(bucketVideo).build()
+            );
+            if (!foundVideos) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketVideo).build());
+            }
+
         } catch (Exception e) {
             log.error("Error initializing MinIO bucket {}", e.getMessage());
             throw new RuntimeException("Error initializing MinIO bucket", e);
         }
     }
 
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file, String type) {
         try {
-
+            String bucket;
+            String returnName = "";
             String filename = file.getOriginalFilename();
-
+            switch (type) {
+                case FILE_TYPE_IMAGE:
+                    bucket = bucketImage;
+                    returnName = url + "/images/" + filename;
+                    break;
+                case FILE_TYPE_VIDEO:
+                    bucket = bucketVideo;
+                    returnName = url + "/videos/" + filename;
+                    break;
+                default:
+                    bucket = bucketImage;
+            }
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(bucketName)
+                            .bucket(bucket)
                             .object(filename)
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build()
             );
 
-            return url + "/images/" + filename;
+            return returnName;
 
         } catch (Exception e) {
             throw new CustomException("fail.to.upload.file " + e.getMessage());
@@ -66,7 +92,7 @@ public class MinioService {
             }
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(bucketName)
+                            .bucket(bucketImage)
                             .object(fileName)
                             .build()
             );
@@ -83,7 +109,7 @@ public class MinioService {
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
-                            .bucket(bucketName)
+                            .bucket(bucketImage)
                             .object(fileName)
                             .expiry(timeExpiryInSeconds)
                             .build()
@@ -96,7 +122,7 @@ public class MinioService {
     public byte[] getFileAsBytes(String fileName) {
         try (InputStream stream = minioClient.getObject(
                 GetObjectArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(bucketImage)
                         .object(fileName)
                         .build()
         )) {
@@ -120,7 +146,7 @@ public class MinioService {
 //
 //            minioClient.putObject(
 //                    PutObjectArgs.builder()
-//                            .bucket(bucketName)
+//                            .bucket(bucketImage)
 //                            .object(fileName)
 //                            .stream(img.getInputStream(), img.getSize(), -1)
 //                            .contentType(img.getContentType())

@@ -45,7 +45,7 @@ const CategoryPage = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("id,asc");
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(4);
+  const [size, setSize] = useState(6); // Đặt số lượng phần tử mặc định là 6
   const [total, setTotal] = useState(0);
   const [pageLoading, setPageLoading] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -249,7 +249,11 @@ const CategoryPage = () => {
               style={{ margin: "40px 0" }}
             />
           ) : (
-            <div className="category-grid">
+            <div className="category-grid" style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)", // Hiển thị 3 card trên một dòng
+  gap: "16px", // Khoảng cách giữa các card
+}}>
               {categories.map((cat) => (
                 <div key={cat.id} style={{ position: "relative" }}>
                   <Card
@@ -259,7 +263,7 @@ const CategoryPage = () => {
                       <div
                         style={{
                           width: "100%",
-                          height: 180,
+                          height: 140, // Chiều cao của hình ảnh
                           overflow: "hidden",
                         }}
                       >
@@ -276,7 +280,7 @@ const CategoryPage = () => {
                       </div>
                     }
                     style={{
-                      borderRadius: 18,
+                      borderRadius: 12, // Border radius
                       overflow: "hidden",
                       position: "relative",
                     }}
@@ -285,24 +289,17 @@ const CategoryPage = () => {
                       if (e.target.closest(".detail-category")) return;
                       navigate(`/recipes?categoryId=${cat.id}`);
                     }}
-                    styles={{
-                      body: {
-                        position: "relative",
-                        minHeight: 120,
-                        paddingBottom: 48,
-                      },
-                    }}
                   >
                     <div className="category-info">
-                      <h2>{cat.name}</h2>
-                      <p>{cat.description}</p>
+                      <h3 style={{ fontSize: "16px" }}>{cat.name}</h3> {/* Kích thước font */}
+                      <p style={{ fontSize: "12px" }}>{cat.description}</p> {/* Kích thước font */}
                     </div>
 
                     <Tooltip title="Xem chi tiết" className="detail-category">
                       <Button
                         icon={
                           <EyeOutlined
-                            style={{ fontSize: 18, color: "#a50034" }}
+                            style={{ fontSize: 16, color: "#a50034" }} // Kích thước icon
                           />
                         }
                         type="text"
@@ -329,7 +326,7 @@ const CategoryPage = () => {
                 pageSize={size}
                 total={total}
                 showSizeChanger={true}
-                // pageSizeOptions={PAGE_SIZE_OPTIONS.map(String)}
+                pageSizeOptions={["6", "12", "18", "24"]} // Các số chia hết cho 6
                 onChange={(p, ps) => {
                   setPage(p - 1);
                   setSize(ps);
