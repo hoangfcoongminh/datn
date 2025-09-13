@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.edward.cook_craft.constants.Constants;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -51,7 +52,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse create(String jsonRequest, MultipartFile file) {
+    public CategoryResponse create(String jsonRequest, MultipartFile img) {
         CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
         if (request.getName() == null || request.getName().isEmpty()) {
             throw new CustomException("name.cannot.be.blank");
@@ -61,8 +62,8 @@ public class CategoryService {
         }
         Category c = mapper.of(request);
         c.setId(null);
-        if (file != null && !file.isEmpty()) {
-            c.setImgUrl(minioService.uploadFile(file));
+        if (img != null && !img.isEmpty()) {
+            c.setImgUrl(minioService.uploadFile(img, Constants.FILE_TYPE_IMAGE));
         } else {
             c.setImgUrl(defaultCategory);
         }
@@ -72,7 +73,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse update(String jsonRequest, MultipartFile file) {
+    public CategoryResponse update(String jsonRequest, MultipartFile img) {
         CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
         Category existed = repository.findByIdAndActive(request.getId()).orElseThrow(() -> new CustomException("category.not.exist"));
         if (request.getName() == null || request.getName().isEmpty()) {
@@ -83,11 +84,11 @@ public class CategoryService {
         }
         existed.setName(request.getName());
         existed.setDescription(request.getDescription());
-        if (file != null && !file.isEmpty()) {
+        if (img != null && !img.isEmpty()) {
             if (!defaultCategory.equals(existed.getImgUrl())) {
                 minioService.deleteFile(existed.getImgUrl());
             }
-            existed.setImgUrl(minioService.uploadFile(file));
+            existed.setImgUrl(minioService.uploadFile(img, Constants.FILE_TYPE_IMAGE));
         }
         existed.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
         existed = repository.save(existed);

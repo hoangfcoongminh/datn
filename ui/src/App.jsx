@@ -33,6 +33,7 @@ import IngredientAdmin from "./components/admin/ingredients/IngredientAdmin";
 import UserAdmin from "./components/admin/users/UserAdmin";
 import UnitAdmin from "./components/admin/units/UnitAdmin";
 import ScrollToTop from "./components/common/ScrollToTop";
+import MyRecipeList from "./components/recipes/MyRecipeList";
 
 // Wrapper component to use useNavigate hook
 function AppContent() {
@@ -183,6 +184,7 @@ function AppContent() {
         <Route path="/admin/ingredients" element={<IngredientAdmin />} />
         <Route path="/admin/users" element={<UserAdmin />} />
         <Route path="/admin/units" element={<UnitAdmin />} />
+        <Route path="/recipes/my-recipes" element={<MyRecipeList />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />

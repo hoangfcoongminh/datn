@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, message } from 'antd';
+import { Form, Input, Button, Upload, message, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { updateUserProfile, getUserProfile } from '../../api/user';
@@ -97,6 +97,25 @@ const EditProfile = () => {
           onFinish={handleSubmit}
           className="edit-profile-form"
         >
+          <Form.Item label="Ảnh đại diện">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ marginBottom: '10px' }}
+            />
+            {previewImage && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                <Image
+                  src={previewImage}
+                  alt="Preview"
+                  width={200}
+                  height={200}
+                  style={{ borderRadius: '50%' }}
+                />
+              </div>
+            )}
+          </Form.Item>
           <Form.Item
             label="Họ và tên"
             name="fullName"
@@ -120,28 +139,6 @@ const EditProfile = () => {
               rows={4}
               placeholder="Giới thiệu về bản thân"
             />
-          </Form.Item>
-
-          <Form.Item label="Ảnh đại diện">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={{ marginBottom: '10px' }}
-            />
-            {previewImage && (
-              <img
-                src={previewImage}
-                alt="Preview"
-                style={{
-                  width: '200px',
-                  height: '200px',
-                  objectFit: 'cover',
-                  borderRadius: '50%',
-                  marginTop: '10px'
-                }}
-              />
-            )}
           </Form.Item>
 
           <div className="button-group">

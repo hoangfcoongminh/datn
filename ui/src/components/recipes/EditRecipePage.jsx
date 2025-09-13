@@ -36,6 +36,8 @@ const EditRecipePage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [imageFileDetail, setImageFileDetail] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [preVideoFile, setPreVideoFile] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -100,7 +102,6 @@ const EditRecipePage = () => {
         prepTime: values.prepTime,
         cookTime: values.cookTime,
         servings: values.servings,
-        // imgUrl sẽ được backend xử lý từ file upload
         ingredients: (values.ingredients || []).map((ing) => ({
           ingredientId: ing.ingredientId,
           actualUnitId: ing.actualUnitId,
@@ -111,7 +112,10 @@ const EditRecipePage = () => {
           stepInstruction: step.stepInstruction,
         })),
       };
-      await updateRecipe(recipe, imageFile);
+
+      console.log("Video file:", videoFile);
+
+      await updateRecipe(recipe, imageFile, videoFile);
       toast.success("Cập nhật công thức thành công!");
       navigate(`/recipes/${id}`);
     } catch (err) {
@@ -238,6 +242,36 @@ const EditRecipePage = () => {
                 src={imagePreview || imageFileDetail}
                 preview={true}
                 width={"50%"}
+                style={{ width: "80%", borderRadius: 8 }}
+              />
+            </div>
+          )}
+          {/* Video upload field */}
+          <Form.Item label="Video hướng dẫn (tùy chọn)" name="videoFile">
+            <Input
+              type="file"
+              accept="video/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setVideoFile(file);
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setPreVideoFile(ev.target.result);
+                  reader.readAsDataURL(file);
+                } else {
+                  setVideoFile(null);
+                  setPreVideoFile(null);
+                }
+              }}
+              style={{ borderRadius: 8, width: "35%" }}
+            />
+          </Form.Item>
+
+          {videoFile && (
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <video
+                src={preVideoFile}
+                controls
                 style={{ width: "80%", borderRadius: 8 }}
               />
             </div>
