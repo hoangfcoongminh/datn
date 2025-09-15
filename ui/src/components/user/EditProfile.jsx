@@ -149,7 +149,7 @@ const EditProfile = () => {
               Hủy
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Lưu thay đổi
+              Cập nhật
             </Button>
           </div>
         </Form>
