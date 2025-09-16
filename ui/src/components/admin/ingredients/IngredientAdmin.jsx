@@ -2,19 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select, Image } from "antd";
 import { fetchIngredients } from "../../../api/admin";
 import { toast } from "react-toastify";
-import {
-  StopOutlined,
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import { fetchUnits } from "../../../api/unit";
 import PopupDetail from "../common/PopupDetail";
 import { updateIngredient } from "../../../api/ingredient";
 
-const { Search } = Input;
 const { Option } = Select;
 
 const IngredientAdmin = () => {
@@ -28,7 +22,7 @@ const IngredientAdmin = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState("id,asc");
+  const [sort, setSort] = useState("id,desc");
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
   const [img, setImg] = useState(null);
@@ -39,7 +33,6 @@ const IngredientAdmin = () => {
   };
 
   const handleUpdateIngredient = (updatedData, img) => {
-
     updateIngredient({ ingredient: updatedData, imageFile: img })
       .then((response) => {
         toast.success("Cập nhật nguyên liệu thành công");
@@ -81,10 +74,6 @@ const IngredientAdmin = () => {
 
     loadData();
   }, [ingredientsRequest, page, size, sort]);
-
-  const handleSearch = (value) => {
-    setIngredientsRequest({ ...ingredientsRequest, search: value });
-  };
 
   const handleSortChange = (value) => {
     setSort(value);
@@ -167,7 +156,11 @@ const IngredientAdmin = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" icon={<EyeOutlined />} onClick={() => handleOpenPopup(record)}>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => handleOpenPopup(record)}
+          >
             Chi tiết
           </Button>
         </Space>
@@ -200,11 +193,18 @@ const IngredientAdmin = () => {
             alignItems: "center",
           }}
         >
-          <Search
-            placeholder="Tìm kiếm nguyên liệu theo tên"
-            onSearch={handleSearch}
-            style={{ width: 300 }}
-            enterButton
+          <Input
+            allowClear
+            placeholder="Tìm kiếm tên hoặc mô tả..."
+            value={ingredientsRequest.search}
+            onChange={(e) => {
+              setPage(1); // Reset to page 1
+              setIngredientsRequest((prev) => ({
+                ...prev,
+                search: e.target.value,
+              }));
+            }}
+            style={{ width: 240, borderRadius: 8 }}
           />
 
           <Select
@@ -212,8 +212,8 @@ const IngredientAdmin = () => {
             onChange={handleSortChange}
             style={{ width: 200 }}
           >
-            <Option value="id,asc">ID Tăng dần</Option>
-            <Option value="id,desc">ID Giảm dần</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
             {/* <Option value="calories,desc">Calories cao nhất</Option>

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select, Image } from "antd";
 import { fetchCategories } from "../../../api/admin";
-import { updateCategory } from "../../../api/category";
+import { updateCategory, addCategory } from "../../../api/category"; // thêm createCategory
 import { toast } from "react-toastify";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import PopupDetail from "../common/PopupDetail";
 import { EyeOutlined } from "@ant-design/icons";
 
-const { Search } = Input;
 const { Option } = Select;
 
 const CategoryAdmin = () => {
@@ -21,7 +20,7 @@ const CategoryAdmin = () => {
   const [page, setPage] = useState(1); // Start from page 1
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState("id,asc");
+  const [sort, setSort] = useState("id,desc");
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [img, setImg] = useState(null);
@@ -31,10 +30,14 @@ const CategoryAdmin = () => {
     setOpenPopup(true);
   };
 
-  const handleUpdateCategory = (updatedData, img) => {
-    console.log("updatedData, img: ", updatedData, img);
+  const handleOpenCreatePopup = () => {
+    setSelectedCategory(null);
+    setImg(null);
+    setOpenPopup(true);
+  };
 
-    updateCategory({ updatingCategory: updatedData, imageFile: img })
+  const handleUpdateCategory = (updatedData, img) => {
+    return updateCategory({ updatingCategory: updatedData, imageFile: img })
       .then((response) => {
         toast.success("Cập nhật danh mục thành công");
         setCategories((prev) =>
@@ -43,11 +46,19 @@ const CategoryAdmin = () => {
           )
         );
       })
-      .catch(() => {
-        toast.error("Cập nhật danh mục thất bại");
+      .catch((err) => {
+        toast.error("Cập nhật danh mục thất bại! ", err.message);
+      });
+  };
+
+  const handleSaveNewCategory = (newData, img) => {
+    return addCategory({ addingCategory: newData, imageFile: img }) // gọi API thêm mới
+      .then((response) => {
+        toast.success("Thêm danh mục thành công");
+        setCategories((prev) => [response.data, ...prev]);
       })
-      .finally(() => {
-        // setOpenPopup(false);
+      .catch((err) => {
+        toast.error("Thêm danh mục thất bại! ", err.message);
       });
   };
 
@@ -72,10 +83,6 @@ const CategoryAdmin = () => {
 
     loadCategories();
   }, [categoriesRequest, page, size, sort]);
-
-  const handleSearch = (value) => {
-    setCategoriesRequest({ ...categoriesRequest, name: value });
-  };
 
   const handleSortChange = (value) => {
     setSort(value);
@@ -126,13 +133,17 @@ const CategoryAdmin = () => {
           {status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
         </Tag>
       ),
-    },
+    }, 
     {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" icon={<EyeOutlined />} onClick={() => handleOpenPopup(record)}>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => handleOpenPopup(record)}
+          >
             Chi tiết
           </Button>
         </Space>
@@ -165,11 +176,18 @@ const CategoryAdmin = () => {
             alignItems: "center",
           }}
         >
-          <Search
-            placeholder="Tìm kiếm danh mục"
-            onSearch={handleSearch}
-            style={{ width: 300 }}
-            enterButton
+          <Input
+            allowClear
+            placeholder="Tìm kiếm tên hoặc mô tả..."
+            value={categoriesRequest.search}
+            onChange={(e) => {
+              setPage(1); // Reset to page 1
+              setCategoriesRequest((prev) => ({
+                ...prev,
+                search: e.target.value,
+              }));
+            }}
+            style={{ width: 240, borderRadius: 8 }}
           />
 
           <Select
@@ -177,8 +195,8 @@ const CategoryAdmin = () => {
             onChange={handleSortChange}
             style={{ width: 200 }}
           >
-            <Option value="id,asc">ID Tăng dần</Option>
-            <Option value="id,desc">ID Giảm dần</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
           </Select>
@@ -192,6 +210,14 @@ const CategoryAdmin = () => {
             <Option value="1">Hoạt động</Option>
             <Option value="0">Ngưng hoạt động</Option>
           </Select>
+
+          <Button
+            type="primary"
+            onClick={handleOpenCreatePopup}
+            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+          >
+            Thêm mới
+          </Button>
         </div>
 
         <Table
@@ -224,7 +250,13 @@ const CategoryAdmin = () => {
           { name: "imgUrl", label: "Ảnh minh họa", type: "image" },
           { name: "description", label: "Mô tả", type: "textarea" },
         ]}
-        onUpdate={(updatedData, img) => handleUpdateCategory(updatedData, img)}
+        onUpdate={(updatedData, img) => {
+          if (selectedCategory) {
+            handleUpdateCategory(updatedData, img); // sửa
+          } else {
+            handleSaveNewCategory(updatedData, img); // thêm mới
+          }
+        }}
       />
       <ChatLauncher />
     </div>

@@ -2,18 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select } from "antd";
 import { fetchUnits } from "../../../api/admin";
 import { toast } from "react-toastify";
-import {
-  StopOutlined,
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import PopupDetail from "../common/PopupDetail";
 import { updateUnit } from "../../../api/unit";
 
-const { Search } = Input;
 const { Option } = Select;
 
 const UnitAdmin = () => {
@@ -23,7 +17,7 @@ const UnitAdmin = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState("id,asc");
+  const [sort, setSort] = useState("id,desc");
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [img, setImg] = useState(null);
@@ -34,7 +28,6 @@ const UnitAdmin = () => {
   };
 
   const handleUpdateUnit = (updatedData, img) => {
-    console.log("updatedData, img: ", updatedData, img);
 
     updateUnit({ unit: updatedData, imageFile: img })
       .then((response) => {
@@ -74,10 +67,6 @@ const UnitAdmin = () => {
 
     loadUnits();
   }, [unitsRequest, page, size, sort]);
-
-  const handleSearch = (value) => {
-    setUnitsRequest({ ...unitsRequest, search: value });
-  };
 
   const handleSortChange = (value) => {
     setSort(value);
@@ -209,11 +198,18 @@ const UnitAdmin = () => {
             alignItems: "center",
           }}
         >
-          <Search
-            placeholder="Tìm kiếm đơn vị theo tên hoặc ký hiệu"
-            onSearch={handleSearch}
-            style={{ width: 300 }}
-            enterButton
+          <Input
+            allowClear
+            placeholder="Tìm kiếm tên hoặc mô tả..."
+            value={unitsRequest.search}
+            onChange={(e) => {
+              setPage(1); // Reset to page 1
+              setUnitsRequest((prev) => ({
+                ...prev,
+                search: e.target.value,
+              }));
+            }}
+            style={{ width: 240, borderRadius: 8 }}
           />
 
           <Select
@@ -221,8 +217,8 @@ const UnitAdmin = () => {
             onChange={handleSortChange}
             style={{ width: 200 }}
           >
-            <Option value="id,asc">ID Tăng dần</Option>
-            <Option value="id,desc">ID Giảm dần</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
             {/* <Option value="symbol,asc">Ký hiệu A-Z</Option>

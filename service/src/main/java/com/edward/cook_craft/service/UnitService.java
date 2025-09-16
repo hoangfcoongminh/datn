@@ -2,6 +2,7 @@ package com.edward.cook_craft.service;
 
 import com.edward.cook_craft.dto.request.UnitRequest;
 import com.edward.cook_craft.dto.response.UnitResponse;
+import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.UnitMapper;
 import com.edward.cook_craft.model.Unit;
@@ -61,7 +62,7 @@ public class UnitService {
             throw new CustomException("unit.not.found");
         }
         Unit unit = optional.get();
-        if (!unit.getName().equals(request.getName()) && repository.existsByName(request.getName())) {
+        if (!unit.getName().equals(request.getName()) && EntityStatus.ACTIVE.getStatus().equals(request.getStatus()) && repository.existsByName(request.getName())) {
             throw new CustomException("unit.already.exists");
         }
         unit.setName(request.getName());

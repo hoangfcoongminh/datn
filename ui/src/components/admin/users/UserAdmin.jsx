@@ -12,8 +12,8 @@ import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import PopupDetail from "../common/PopupDetail";
 import { updateUserProfile } from "../../../api/user";
+import Role from "../../../enums/role";
 
-const { Search } = Input;
 const { Option } = Select;
 
 const UserAdmin = () => {
@@ -27,35 +27,35 @@ const UserAdmin = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState("id,asc");
+  const [sort, setSort] = useState("id,desc");
   const [openPopup, setOpenPopup] = useState(false);
-const [selectedUser, setSelectedUser] = useState(null);
-const [img, setImg] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [img, setImg] = useState(null);
 
-const handleOpenPopup = (user) => {
-  setSelectedUser(user);
-  setOpenPopup(true);
-};
+  const handleOpenPopup = (user) => {
+    setSelectedUser(user);
+    setOpenPopup(true);
+  };
 
-const handleUpdateUser = (updatedData, img) => {
-  console.log("updatedData, img: ", updatedData, img);
+  const handleUpdateUser = (updatedData, img) => {
+    console.log("updatedData, img: ", updatedData, img);
 
-  updateUserProfile({ user: updatedData, imageFile: img })
-    .then((response) => {
-      toast.success("Cập nhật người dùng thành công");
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === updatedData.id ? { ...user, ...response.data } : user
-        )
-      );
-    })
-    .catch(() => {
-      toast.error("Cập nhật người dùng thất bại");
-    })
-    .finally(() => {
-      // setOpenPopup(false);
-    });
-};
+    updateUserProfile({ user: updatedData, imageFile: img })
+      .then((response) => {
+        toast.success("Cập nhật người dùng thành công");
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.id === updatedData.id ? { ...user, ...response.data } : user
+          )
+        );
+      })
+      .catch(() => {
+        toast.error("Cập nhật người dùng thất bại");
+      })
+      .finally(() => {
+        // setOpenPopup(false);
+      });
+  };
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -79,12 +79,12 @@ const handleUpdateUser = (updatedData, img) => {
     loadUsers();
   }, [userRequest, page, size, sort]);
 
-  const handleSearch = (value) => {
-    setUserRequest({ ...userRequest, search: value });
-  };
-
   const handleSortChange = (value) => {
     setSort(value);
+  };
+
+  const handleRoleFilterChange = (value) => {
+    setUserRequest((prev) => ({ ...prev, role: value }));
   };
 
   const handleStatusFilterChange = (value) => {
@@ -205,22 +205,40 @@ const handleUpdateUser = (updatedData, img) => {
             alignItems: "center",
           }}
         >
-          <Search
-            placeholder="Tìm kiếm người dùng theo tên hoặc email"
-            onSearch={handleSearch}
-            style={{ width: 300 }}
-            enterButton
+          <Input
+            allowClear
+            placeholder="Tìm kiếm tên hoặc mô tả..."
+            value={userRequest.search}
+            onChange={(e) => {
+              setPage(1); // Reset to page 1
+              setUserRequest((prev) => ({
+                ...prev,
+                search: e.target.value,
+              }));
+            }}
+            style={{ width: 240, borderRadius: 8 }}
           />
+
+          <Select
+            placeholder="Lọc theo vai trò"
+            onChange={(value) => handleRoleFilterChange(value)}
+            style={{ width: 200 }}
+            allowClear
+          >
+            <Option value={Role.ADMIN}>Quản trị viên</Option>
+            <Option value={Role.USER}>Khách hàng</Option>
+          </Select>
+      
 
           <Select
             defaultValue={sort}
             onChange={handleSortChange}
             style={{ width: 200 }}
           >
-            <Option value="id,asc">ID Tăng dần</Option>
-            <Option value="id,desc">ID Giảm dần</Option>
-            <Option value="username,asc">Tên A-Z</Option>
-            <Option value="username,desc">Tên Z-A</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
+            <Option value="name,asc">Tên A-Z</Option>
+            <Option value="name,desc">Tên Z-A</Option>
             <Option value="email,asc">Email A-Z</Option>
             <Option value="email,desc">Email Z-A</Option>
           </Select>

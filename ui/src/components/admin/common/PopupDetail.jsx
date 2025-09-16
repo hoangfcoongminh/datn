@@ -13,6 +13,7 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(data || {});
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const statusOptions = [
     { value: 1, label: "Hoạt động" },
@@ -20,18 +21,29 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
   ];
 
   useEffect(() => {
-    setFormData(data || {});
+    if (data) {
+      setFormData(data);
+    } else {
+      const initial = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {});
+      setFormData({ status: 1, ...initial });
+    }
     setSelectedFile(null); // reset file khi mở popup mới
-    setIsEditing(false);
-  }, [data]);
+    setIsEditing(!data); // Nếu không có data, bật chế độ chỉnh sửa
+  }, [data, fields]);
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleUpdate = () => {
-    onUpdate(formData, selectedFile); // truyền cả object và file ra ngoài
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      await onUpdate(formData, selectedFile);
+      setIsEditing(false);
+      onClose && onClose();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -158,14 +170,15 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
           <>
             <Button
               type="primary"
+              loading={loading}
               style={{
                 backgroundColor: "#349f4aff",
                 borderColor: "green",
               }}
-              onClick={handleUpdate}
+              onClick={handleSave}
               icon={<SaveOutlined />}
             >
-              Cập nhật
+              Lưu
             </Button>
             <Button
               type="default"
