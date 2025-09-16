@@ -50,4 +50,12 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     boolean checkDuplicateIngredient(@Param("name") String name,
                                      @Param("unitId") Long unitId,
                                      @Param("id") Long id);
+
+    @Query(value = "SELECT i " +
+            "FROM Ingredient i " +
+            "WHERE (COALESCE(:search, '') = '' OR CONCAT(LOWER(i.name),'#',LOWER(i.description)) LIKE CONCAT('%',LOWER(:search),'%')) " +
+            "AND (:status IS NULL OR i.status = :status)")
+    Page<Ingredient> getAllIngredientsForAdmin(@Param("search") String search,
+                                               @Param("status") Integer status,
+                                               Pageable pageable);
 }

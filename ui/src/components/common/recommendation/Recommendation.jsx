@@ -87,7 +87,7 @@ export default function Recommendation({ type, id, title = "Gợi ý cho bạn" 
 
       <Slider {...settings}>
         {recipes.map((r) => (
-          <div key={r.id} className="rec-card">
+          <div key={r.id} className="rec-card" style={{ height: '420px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Card
               hoverable
               cover={
@@ -95,24 +95,26 @@ export default function Recommendation({ type, id, title = "Gợi ý cho bạn" 
                   src={r.imgUrl || "https://via.placeholder.com/300x180?text=No+Image"}
                   alt={r.title}
                   onClick={() => navigate(`/recipes/${r.id}`)}
+                  style={{ height: '180px', objectFit: 'cover' }}
                 />
               }
               className="recipe-card"
+              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
             >
               <Card.Meta
                 avatar={
                   r.authorAvtUrl ? (
-                    <Avatar src={r.authorAvtUrl} />
+                    <Avatar src={r.authorAvtUrl} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                   ) : (
-                    <Avatar style={{ backgroundColor: "#f56a00" }}>
+                    <Avatar style={{ backgroundColor: "#f56a00", width: '50px', height: '50px', borderRadius: '50%' }}>
                       {r.authorFullName?.charAt(0).toUpperCase()}
                     </Avatar>
                   )
                 }
-                title={r.authorFullName}
-                description={r.title}
+                title={<span style={{ fontSize: '16px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</span>}
+                description={<span style={{ fontSize: '14px', color: '#666', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.authorFullName}</span>}
                 onClick={() => navigate(`/user/${r.authorUsername}`)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               />
 
               <div className="rec-meta">
@@ -141,7 +143,7 @@ export default function Recommendation({ type, id, title = "Gợi ý cho bạn" 
               <Button
                 type="primary"
                 block
-                style={{ borderRadius: 8, fontWeight: 600 }}
+                style={{ borderRadius: 8, fontWeight: 600, marginTop: 'auto' }}
                 onClick={() => navigate(`/recipes/${r.id}`)}
               >
                 Chi tiết

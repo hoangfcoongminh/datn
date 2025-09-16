@@ -2,7 +2,11 @@
 .recipe-list-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  /* font-family: system-ui, -apple-system, sans-serif; */
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px 10px 10px 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(165, 0, 52, 0.1), 0 1.5px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Header Section */
@@ -106,17 +110,13 @@
 }
 
 .filter-content {
-  background: linear-gradient(135deg, #fbe0ea 0%, #fff 100%);
-  border: 2px solid #a50034;
+  /* background: linear-gradient(135deg, #fbe0ea 0%, #fff 100%); */
   border-radius: 18px;
+  border: none;
   padding: 32px 26px 18px 26px;
   margin-bottom: 28px;
   box-shadow: 0 4px 24px rgba(165,0,52,0.07);
   transition: box-shadow 0.2s, border 0.2s;
-}
-.filter-content:focus-within, .filter-content:hover {
-  box-shadow: 0 8px 32px rgba(165,0,52,0.13);
-  border-color: #d32f2f;
 }
 
 .filter-row {

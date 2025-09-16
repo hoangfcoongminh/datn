@@ -46,18 +46,20 @@ public class RecipeController {
     @Operation(summary = "Create a new recipe", description = "Add a new recipe to the system")
     public ResponseEntity<?> create(
             @RequestPart("jsonRequest") String jsonRequest,
-            @RequestPart(name = "img", required = false) MultipartFile img
+            @RequestPart(name = "img", required = false) MultipartFile img,
+            @RequestPart(name = "video", required = false) MultipartFile video
     ) {
-        return ResponseUtils.handleSuccess(service.create(jsonRequest, img));
+        return ResponseUtils.handleSuccess(service.create(jsonRequest, img, video));
     }
 
     @PutMapping
     @Operation(summary = "Update a recipe", description = "Update a recipe to the system")
     public ResponseEntity<?> update(
             @RequestPart String jsonRequest,
-            @RequestPart(name = "img", required = false) MultipartFile img
+            @RequestPart(name = "img", required = false) MultipartFile img,
+            @RequestPart(name = "video", required = false) MultipartFile video
     ) {
-        return ResponseUtils.handleSuccess(service.update(jsonRequest, img));
+        return ResponseUtils.handleSuccess(service.update(jsonRequest, img, video));
     }
 
     @GetMapping("/popular-by/{type}")

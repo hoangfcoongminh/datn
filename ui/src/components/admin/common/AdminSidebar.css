@@ -1,0 +1,77 @@
+.admin-sidebar {
+  background-color: #ffffff !important;
+  border-right: 1px solid #f0f0f0 !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-sidebar .ant-layout-sider-children {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+  color: white;
+  padding: 0;
+  transition: background 0.3s ease;
+
+}
+.sidebar-header:hover {
+  cursor: pointer;
+}
+
+.sidebar-header h2 {
+  /* background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%); */
+  color: white !important;
+  margin: 0 !important;
+  padding: 20px 16px !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  text-align: center;
+}
+
+.admin-sidebar .ant-menu {
+  border-right: 0 !important;
+}
+
+.admin-sidebar .ant-menu-item {
+  margin: 4px 8px !important;
+  border-radius: 6px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+}
+
+.admin-sidebar .ant-menu-item:hover {
+  background-color: #f6f8fa !important;
+  color: #1890ff !important;
+}
+
+.admin-sidebar .ant-menu-item-selected {
+  background-color: #e6f7ff !important;
+  color: #1890ff !important;
+  border-right: 3px solid #1890ff !important;
+}
+
+.admin-sidebar .ant-menu-item .anticon {
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+/* Custom scrollbar */
+.admin-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

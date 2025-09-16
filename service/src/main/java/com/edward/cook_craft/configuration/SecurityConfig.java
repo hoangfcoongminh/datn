@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "/api/ingredients/**",
                                 "/api/recipes/**",
                                 "/api/units/**",
-                                "/api/review/**").hasAuthority("USER")
+                                "/api/review/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

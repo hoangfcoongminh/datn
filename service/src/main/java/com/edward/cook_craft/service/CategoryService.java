@@ -116,6 +116,9 @@ public class CategoryService {
         LocalDateTime endOfLastMonth = currentMonth.atDay(1).atStartOfDay();
 
         List<Category> data = repository.findTop4CategoriesByRecipeCount(startOfMonth, endOfMonth);
+        if (data.isEmpty()) {
+            data = repository.findTop4CategoriesByRecipeCount(startOfLastMonth, endOfLastMonth);
+        }
         var categoryIds = data.stream().map(Category::getId).toList();
 
         var totalOfCatLastMonth = recipeRepository.findTotalRecipeInMonthByCategory(startOfLastMonth, endOfLastMonth, categoryIds)

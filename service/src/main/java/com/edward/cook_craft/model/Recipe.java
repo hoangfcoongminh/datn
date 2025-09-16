@@ -43,6 +43,6 @@ public class Recipe extends BaseModel {
     private String imgUrl;
 
     private String videoUrl;
-
+  
     private Long viewCount = 0L;
 }

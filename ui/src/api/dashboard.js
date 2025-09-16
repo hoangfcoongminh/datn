@@ -1,27 +1,13 @@
-export async function fetchRecipeStats(type = "year", params = {}) {
+export async function fetchRecipeStats({ groupBy = "YEAR", startDate, endDate }) {
   const token = localStorage.getItem("token");
   const queryParams = new URLSearchParams();
-  let path = "";
-  switch (type) {
-    case "year":
-      path = "/year";
-      if (params.year) queryParams.append("year", params.year);
-      break;
-    case "month":
-      path = "/month";
-      if (params.year) queryParams.append("year", params.year);
-      if (params.month) queryParams.append("month", params.month);
-      break;
-    case "day":
-      path = "/date-range";
-      if (params.startDate) queryParams.append("startDate", params.startDate);
-      if (params.endDate) queryParams.append("endDate", params.endDate);
-      break;
-    default:
-      throw new Error("Invalid type parameter");
-  }
 
-  const url = `http://localhost:8080/api/admin/dashboard/recipes${path}?${queryParams.toString()}`;
+  queryParams.append("groupBy", groupBy.toUpperCase());
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+
+  const url = `http://localhost:8080/api/admin/dashboard/recipes?${queryParams.toString()}`;
+
   try {
     const res = await fetch(url, {
       method: "GET",
@@ -32,60 +18,19 @@ export async function fetchRecipeStats(type = "year", params = {}) {
     });
 
     if (!res.ok) {
-      if (res.status === 401) {
-        throw new Error("Unauthorized: Token invalid or expired");
-      } else if (res.status === 403) {
-        throw new Error("Forbidden: You do not have permission to access this resource");
-      }
+      if (res.status === 401) throw new Error("Unauthorized: Token invalid or expired");
+      if (res.status === 403) throw new Error("Forbidden: You do not have permission");
       throw new Error(`Server error: ${res.status} ${res.statusText}`);
     }
 
     const data = await res.json();
+    if (!data.success) throw new Error(data.message || "Failed to fetch stats");
 
-    if (!data.success) {
-      throw new Error(data.message || "Failed to fetch dashboard data");
-    }
-
-    return data.data;
+    return data.data; // mảng StaticResponse { timeUnit, count }
   } catch (error) {
-    console.error("Error fetching recipe stats:", error);
     throw new Error(error.message || "An unexpected error occurred");
   }
 }
-
-// export async function fetchUserStats(type, params) {
-//   const queryParams = new URLSearchParams({ groupBy: type.toUpperCase() });
-//   if (params.year) queryParams.append("year", params.year);
-//   if (params.month) queryParams.append("month", params.month);
-//   if (params.startDate) queryParams.append("startDate", params.startDate);
-//   if (params.endDate) queryParams.append("endDate", params.endDate);
-
-//   const url = `http://localhost:8080/api/admin/dashboard/users?${queryParams.toString()}`;
-//   const token = localStorage.getItem("token");
-
-//   try {
-//     const res = await fetch(url, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-//       },
-//     });
-
-//     if (!res.ok) {
-//       if (res.status === 401) throw new Error("Unauthorized: Token invalid or expired");
-//       if (res.status === 403) throw new Error("Forbidden: You do not have permission");
-//       throw new Error(`Server error: ${res.status} ${res.statusText}`);
-//     }
-
-//     const data = await res.json();
-//     if (!data.success) throw new Error(data.message || "Failed to fetch user stats");
-//     return data.data;
-//   } catch (error) {
-//     console.error("Error fetching user stats:", error);
-//     throw new Error(error.message || "An unexpected error occurred");
-//   }
-// }
 
 export function getChartData(stats, label) {
   if (!stats || stats.length === 0) {
@@ -103,4 +48,72 @@ export function getChartData(stats, label) {
       },
     ],
   };
+}
+
+export async function fetchUserStats({ groupBy = "YEAR", startDate, endDate }) {
+  const token = localStorage.getItem("token");
+  const queryParams = new URLSearchParams();
+
+  queryParams.append("groupBy", groupBy.toUpperCase());
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+
+  const url = `http://localhost:8080/api/admin/dashboard/users?${queryParams.toString()}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) throw new Error("Unauthorized: Token invalid or expired");
+      if (res.status === 403) throw new Error("Forbidden: You do not have permission");
+      throw new Error(`Server error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || "Failed to fetch stats");
+
+    return data.data; // mảng StaticResponse { timeUnit, count }
+  } catch (error) {
+    throw new Error(error.message || "An unexpected error occurred");
+  }
+}
+
+export async function fetchUserActivityStats({ groupBy = "YEAR", startDate, endDate }) {
+  const token = localStorage.getItem("token");
+  const queryParams = new URLSearchParams();
+
+  queryParams.append("groupBy", groupBy.toUpperCase());
+  if (startDate) queryParams.append("startDate", startDate);
+  if (endDate) queryParams.append("endDate", endDate);
+
+  const url = `http://localhost:8080/api/admin/dashboard/activity?${queryParams.toString()}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) throw new Error("Unauthorized: Token invalid or expired");
+      if (res.status === 403) throw new Error("Forbidden: You do not have permission");
+      throw new Error(`Server error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || "Failed to fetch stats");
+
+    return data.data; // mảng StaticResponse { timeUnit, count }
+  } catch (error) {
+    throw new Error(error.message || "An unexpected error occurred");
+  }
 }

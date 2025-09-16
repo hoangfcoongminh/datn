@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { updateUserProfile, getUserProfile } from '../../api/user';
 import { toast } from 'react-toastify';
 import './EditProfile.css';
+import ScrollToTopButton from '../common/ScrollToTopButton';
+import ChatLauncher from '../common/chatbot/ChatLauncher';
 
 const EditProfile = () => {
   const [form] = Form.useForm();
@@ -57,15 +59,16 @@ const EditProfile = () => {
 
       const response = await updateUserProfile(updatedUser, imageFile);
       
-      if (response && response.data) {
+      if (response.success && response.code === 200) {
         toast.success('Cập nhật thông tin thành công!');
         // Cập nhật lại thông tin user trong localStorage
         const user = JSON.parse(localStorage.getItem('user'));
         user.user = { ...user.user, ...response.data };
         localStorage.setItem('user', JSON.stringify(user));
-        navigate(-1);
+        window.dispatchEvent(new Event("storage"));
+        // navigate(-1);
       } else {
-        throw new Error(response?.message || 'Có lỗi xảy ra khi cập nhật thông tin');
+        toast.error(response?.message || 'Có lỗi xảy ra khi cập nhật thông tin');
       }
     } catch (error) {
       toast.error(error.message || 'Có lỗi xảy ra khi cập nhật thông tin');
@@ -146,11 +149,13 @@ const EditProfile = () => {
               Hủy
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Lưu thay đổi
+              Cập nhật
             </Button>
           </div>
         </Form>
       </div>
+      <ScrollToTopButton />
+      <ChatLauncher />
     </div>
   );
 };
