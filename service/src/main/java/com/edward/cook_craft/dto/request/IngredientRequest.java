@@ -1,5 +1,6 @@
 package com.edward.cook_craft.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Valid
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IngredientRequest {
 
     private Long id;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select } from "antd";
 import { fetchCategories } from "../../../api/admin";
+import { updateCategory } from "../../../api/category";
 import { toast } from "react-toastify";
-import { StopOutlined } from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
+import PopupDetail from "../common/PopupDetail";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -17,6 +18,32 @@ const CategoryAdmin = () => {
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sort, setSort] = useState("id,asc");
+  const [openPopup, setOpenPopup] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [img, setImg] = useState(null);
+
+  const handleOpenPopup = (category) => {
+    setSelectedCategory(category);
+    setOpenPopup(true);
+  };
+
+  const handleUpdateCategory = (updatedData, img) => {
+    console.log('updatedData, img: ', updatedData, img);
+    
+    updateCategory({ updatingCategory: updatedData, imageFile: img })
+      .then(() => {
+        toast.success("Cập nhật danh mục thành công");
+        setCategories((prev) =>
+          prev.map((cat) => (cat.id === updatedData.id ? { ...cat, ...updatedData } : cat))
+        );
+      })
+      .catch(() => {
+        toast.error("Cập nhật danh mục thất bại");
+      })
+      .finally(() => {
+        // setOpenPopup(false);
+      });
+  };
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -82,10 +109,8 @@ const CategoryAdmin = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => console.log("View", record.id)}>
+          <Button type="primary" onClick={() => handleOpenPopup(record)}>
             Xem
-          </Button>
-          <Button type="danger" icon={<StopOutlined />} onClick={() => console.log("Deactivate", record.id)}>
           </Button>
         </Space>
       ),
@@ -159,6 +184,18 @@ const CategoryAdmin = () => {
           }}
         />
       </div>
+      <PopupDetail
+        open={openPopup}
+        onClose={() => setOpenPopup(false)}
+        data={selectedCategory}
+        file={img}
+        fields={[
+          { name: "name", label: "Tên danh mục", type: "text" },
+          { name: "imgUrl", label: "Ảnh minh họa", type: "image" },
+          { name: "description", label: "Mô tả", type: "textarea" },
+        ]}
+        onUpdate={(updatedData, img) => handleUpdateCategory(updatedData, img)}
+      />
       <ChatLauncher />
     </div>
   );
