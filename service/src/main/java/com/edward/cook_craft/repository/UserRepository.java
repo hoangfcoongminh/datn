@@ -20,11 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.status = 1")
     List<User> findAllAndActive();
 
-    @Query(value = "SELECT u " +
-            "FROM User u " +
-            "WHERE u.id = :id " +
-            "AND u.status = 1")
-    Optional<User> findByIdAndActive(@Param("id") Long id);
+    Optional<User> findByUsername(String username);
 
     @Query(value = "SELECT u " +
             "FROM User u " +
@@ -36,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u " +
             "WHERE u.username = :username " +
             "AND u.status = 1")
-    Optional<User> findByUsername(@Param("username") String username);
+    Optional<User> findByUsernameAndActive(@Param("username") String username);
 
     List<User> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 

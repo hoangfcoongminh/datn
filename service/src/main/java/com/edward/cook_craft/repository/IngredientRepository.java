@@ -19,13 +19,6 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
             "WHERE i.status = 1 ")
     List<Ingredient> findAll();
 
-    @NotNull
-    @Query(value = "SELECT i " +
-            "FROM Ingredient i " +
-            "WHERE i.id = :id " +
-            "AND i.status = 1 ")
-    Optional<Ingredient> findById(@NotNull @Param("id") Long id);
-
     @Query(value = "SELECT i " +
             "FROM Ingredient i " +
             "WHERE (:search IS NULL OR LOWER(CONCAT(i.name, '#', i.description)) LIKE CONCAT('%', :search, '%')) " +
