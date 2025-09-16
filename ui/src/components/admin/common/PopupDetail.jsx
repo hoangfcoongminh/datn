@@ -65,14 +65,22 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
             <Select
               style={{ width: 150 }}
               value={
-                statusOptions.find((option) => option.value === formData.status).value
+                statusOptions.find((option) => option.value === formData.status)
+                  ?.value
               }
               disabled={!isEditing}
               onChange={(value) => handleChange("status", value)}
             >
               {statusOptions.map((option) => (
                 <Option key={option.value} value={option.value}>
-                  {option.label}
+                  <span
+                    style={{
+                      color: option.value === 1 ? "green" : "red",
+                    //   fontWeight: 400,
+                    }}
+                  >
+                    {option.label}
+                  </span>
                 </Option>
               ))}
             </Select>

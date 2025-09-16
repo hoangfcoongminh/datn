@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Space, Tag, Input, Select } from "antd";
 import { fetchUnits } from "../../../api/admin";
 import { toast } from "react-toastify";
-import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  StopOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
+import PopupDetail from "../common/PopupDetail";
+import { updateUnit } from "../../../api/unit";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -17,6 +24,34 @@ const UnitAdmin = () => {
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sort, setSort] = useState("id,asc");
+  const [openPopup, setOpenPopup] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [img, setImg] = useState(null);
+
+  const handleOpenPopup = (unit) => {
+    setSelectedUnit(unit);
+    setOpenPopup(true);
+  };
+
+  const handleUpdateUnit = (updatedData, img) => {
+    console.log("updatedData, img: ", updatedData, img);
+
+    updateUnit({ unit: updatedData, imageFile: img })
+      .then((response) => {
+        toast.success("Cập nhật đơn vị thành công");
+        setUnits((prev) =>
+          prev.map((unit) =>
+            unit.id === updatedData.id ? { ...unit, ...response.data } : unit
+          )
+        );
+      })
+      .catch(() => {
+        toast.error("Cập nhật đơn vị thất bại");
+      })
+      .finally(() => {
+        // setOpenPopup(false);
+      });
+  };
 
   useEffect(() => {
     const loadUnits = async () => {
@@ -65,9 +100,7 @@ const UnitAdmin = () => {
       dataIndex: "name",
       key: "name",
       render: (name) => (
-        <div style={{ fontWeight: 600, color: '#1890ff' }}>
-          {name}
-        </div>
+        <div style={{ fontWeight: 600, color: "#1890ff" }}>{name}</div>
       ),
     },
     // {
@@ -85,13 +118,15 @@ const UnitAdmin = () => {
       dataIndex: "description",
       key: "description",
       render: (description) => (
-        <div style={{ 
-          maxWidth: 250, 
-          overflow: 'hidden', 
-          textOverflow: 'ellipsis', 
-          whiteSpace: 'nowrap',
-          color: '#666'
-        }}>
+        <div
+          style={{
+            maxWidth: 250,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            color: "#666",
+          }}
+        >
           {description || "Không có mô tả"}
         </div>
       ),
@@ -136,34 +171,16 @@ const UnitAdmin = () => {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
-        <Space size="small">
-          <Button 
-            type="primary" 
-            size="small"
+        <Space size="middle">
+          <Button
+            type="primary"
             icon={<EyeOutlined />}
-            onClick={() => console.log("View", record.id)}
+            onClick={() => handleOpenPopup(record)}
           >
-            Xem
-          </Button>
-          <Button 
-            type="default" 
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => console.log("Edit", record.id)}
-          >
-            Sửa
-          </Button>
-          <Button 
-            type="danger" 
-            size="small"
-            icon={<StopOutlined />} 
-            onClick={() => console.log("Deactivate", record.id)}
-          >
-            Khóa
+            Chi tiết
           </Button>
         </Space>
       ),
-      width: 180,
     },
   ];
 
@@ -182,14 +199,16 @@ const UnitAdmin = () => {
           Quản lý Đơn vị
         </h2>
 
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          marginBottom: 16,
-          gap: 16,
-          flexWrap: 'wrap',
-          alignItems: 'center'
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 16,
+            gap: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
           <Search
             placeholder="Tìm kiếm đơn vị theo tên hoặc ký hiệu"
             onSearch={handleSearch}
@@ -197,13 +216,17 @@ const UnitAdmin = () => {
             enterButton
           />
 
-          <Select defaultValue={sort} onChange={handleSortChange} style={{ width: 200 }}>
+          <Select
+            defaultValue={sort}
+            onChange={handleSortChange}
+            style={{ width: 200 }}
+          >
             <Option value="id,asc">ID Tăng dần</Option>
             <Option value="id,desc">ID Giảm dần</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
-            <Option value="symbol,asc">Ký hiệu A-Z</Option>
-            <Option value="symbol,desc">Ký hiệu Z-A</Option>
+            {/* <Option value="symbol,asc">Ký hiệu A-Z</Option>
+            <Option value="symbol,desc">Ký hiệu Z-A</Option> */}
           </Select>
 
           <Select
@@ -228,7 +251,8 @@ const UnitAdmin = () => {
             total: total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} đơn vị`,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} của ${total} đơn vị`,
             onChange: (page, pageSize) => {
               setPage(page);
               setSize(pageSize);
@@ -237,9 +261,20 @@ const UnitAdmin = () => {
           scroll={{ x: 1000 }}
         />
       </div>
+      <PopupDetail
+        open={openPopup}
+        onClose={() => setOpenPopup(false)}
+        data={selectedUnit}
+        file={img}
+        fields={[
+          { name: "name", label: "Tên đơn vị", type: "text" },
+          { name: "description", label: "Mô tả", type: "textarea" },
+        ]}
+        onUpdate={(updatedData, img) => handleUpdateUnit(updatedData, img)}
+      />
       <ChatLauncher />
     </div>
   );
 };
 
-export default UnitAdmin; 
+export default UnitAdmin;

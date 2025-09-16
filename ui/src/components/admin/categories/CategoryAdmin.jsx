@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Space, Tag, Input, Select } from "antd";
+import { Table, Button, Space, Tag, Input, Select, Image } from "antd";
 import { fetchCategories } from "../../../api/admin";
 import { updateCategory } from "../../../api/category";
 import { toast } from "react-toastify";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import PopupDetail from "../common/PopupDetail";
+import { EyeOutlined } from "@ant-design/icons";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -13,7 +14,10 @@ const { Option } = Select;
 const CategoryAdmin = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [categoriesRequest, setCategoriesRequest] = useState({ search: "", status: "" });
+  const [categoriesRequest, setCategoriesRequest] = useState({
+    search: "",
+    status: "",
+  });
   const [page, setPage] = useState(1); // Start from page 1
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
@@ -28,13 +32,15 @@ const CategoryAdmin = () => {
   };
 
   const handleUpdateCategory = (updatedData, img) => {
-    console.log('updatedData, img: ', updatedData, img);
-    
+    console.log("updatedData, img: ", updatedData, img);
+
     updateCategory({ updatingCategory: updatedData, imageFile: img })
-      .then(() => {
+      .then((response) => {
         toast.success("Cập nhật danh mục thành công");
         setCategories((prev) =>
-          prev.map((cat) => (cat.id === updatedData.id ? { ...cat, ...updatedData } : cat))
+          prev.map((cat) =>
+            cat.id === updatedData.id ? { ...cat, ...response.data } : cat
+          )
         );
       })
       .catch(() => {
@@ -84,7 +90,22 @@ const CategoryAdmin = () => {
       title: "STT",
       dataIndex: "index",
       key: "index",
-      render: (_, __, index) => (page - 1)  * size + index + 1, // Calculate serial number based on pagination
+      render: (_, __, index) => (page - 1) * size + index + 1, // Calculate serial number based on pagination
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "imgUrl",
+      key: "imgUrl",
+      render: (image) => (
+        <Image
+          width={50}
+          height={50}
+          src={image}
+          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+          style={{ objectFit: "cover", borderRadius: "6px" }}
+        />
+      ),
+      width: 80,
     },
     {
       title: "Tên danh mục",
@@ -101,7 +122,9 @@ const CategoryAdmin = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === 1 ? "green" : "red"}>{status === 1 ? "Hoạt động" : "Ngưng hoạt động"}</Tag>
+        <Tag color={status === 1 ? "green" : "red"}>
+          {status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
+        </Tag>
       ),
     },
     {
@@ -109,8 +132,8 @@ const CategoryAdmin = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => handleOpenPopup(record)}>
-            Xem
+          <Button type="primary" icon={<EyeOutlined />} onClick={() => handleOpenPopup(record)}>
+            Chi tiết
           </Button>
         </Space>
       ),
@@ -132,14 +155,16 @@ const CategoryAdmin = () => {
           Quản lý Danh mục
         </h2>
 
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          marginBottom: 16, 
-          gap: 16, 
-          flexWrap: 'wrap',
-          alignItems: 'center'
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 16,
+            gap: 16,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
           <Search
             placeholder="Tìm kiếm danh mục"
             onSearch={handleSearch}
@@ -147,7 +172,11 @@ const CategoryAdmin = () => {
             enterButton
           />
 
-          <Select defaultValue={sort} onChange={handleSortChange} style={{ width: 200 }}>
+          <Select
+            defaultValue={sort}
+            onChange={handleSortChange}
+            style={{ width: 200 }}
+          >
             <Option value="id,asc">ID Tăng dần</Option>
             <Option value="id,desc">ID Giảm dần</Option>
             <Option value="name,asc">Tên A-Z</Option>
@@ -176,7 +205,8 @@ const CategoryAdmin = () => {
             total: total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} danh mục`,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} của ${total} danh mục`,
             onChange: (page, pageSize) => {
               setPage(page);
               setSize(pageSize);
