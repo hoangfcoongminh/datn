@@ -80,13 +80,13 @@ public class AuthenticService {
             throw new CustomException("confirm.password.invalid");
         }
 
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.findByUsernameAndActive(request.getUsername()).isPresent()) {
             throw new CustomException("user.name.exists");
         }
     }
 
     private void validateLogin(LoginRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isEmpty()) {
+        if (userRepository.findByUsernameAndActive(request.getUsername()).isEmpty()) {
             throw new CustomException("user.not.found");
         }
         try {

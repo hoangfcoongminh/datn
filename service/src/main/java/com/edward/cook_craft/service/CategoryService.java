@@ -75,11 +75,11 @@ public class CategoryService {
     @Transactional
     public CategoryResponse update(String jsonRequest, MultipartFile img) {
         CategoryRequest request = JsonUtils.jsonMapper(jsonRequest, CategoryRequest.class);
-        Category existed = repository.findByIdAndActive(request.getId()).orElseThrow(() -> new CustomException("category.not.exist"));
+        Category existed = repository.findById(request.getId()).orElseThrow(() -> new CustomException("category.not.exist"));
         if (request.getName() == null || request.getName().isEmpty()) {
             throw new CustomException("name.cannot.be.blank");
         }
-        if (!request.getName().equals(existed.getName()) && repository.existsByName(request.getName())) {
+        if (!request.getName().equals(existed.getName()) && EntityStatus.ACTIVE.getStatus().equals(request.getStatus()) && repository.existsByName(request.getName())) {
             throw new CustomException("name.already.exists");
         }
         existed.setName(request.getName());

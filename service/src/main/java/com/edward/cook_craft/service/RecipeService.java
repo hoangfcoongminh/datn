@@ -8,6 +8,7 @@ import com.edward.cook_craft.dto.request.RecipeStepRequest;
 import com.edward.cook_craft.dto.response.RecipeDetailResponse;
 import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.enums.EntityStatus;
+import com.edward.cook_craft.enums.Role;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.RecipeIngredientDetailMapper;
 import com.edward.cook_craft.mapper.RecipeMapper;
@@ -161,7 +162,7 @@ public class RecipeService {
         }
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
-        if (!Objects.equals(user.getUsername(), request.getAuthorUsername())) {
+        if (!Role.ADMIN.equals(user.getRole()) || !Objects.equals(user.getUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();
@@ -171,7 +172,7 @@ public class RecipeService {
     }
 
     private void validateRecipeRequest(RecipeRequest request) {
-        if (request.getId() != null && repository.getByIdAndActive(request.getId()).isEmpty()) {
+        if (request.getId() != null && repository.findById(request.getId()).isEmpty()) {
             throw new CustomException("recipe.not.found");
         }
 
@@ -179,7 +180,7 @@ public class RecipeService {
             throw new CustomException("category.cannot.null.or.not.found");
         }
 
-        if (request.getAuthorUsername() == null || userRepository.findByUsername(request.getAuthorUsername()).isEmpty()) {
+        if (request.getAuthorUsername() == null || userRepository.findByUsernameAndActive(request.getAuthorUsername()).isEmpty()) {
             throw new CustomException("user.not.found");
         }
 

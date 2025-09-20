@@ -1,6 +1,5 @@
 package com.edward.cook_craft.repository;
 
-import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.enums.Role;
 import com.edward.cook_craft.model.User;
 import org.springframework.data.domain.Page;
@@ -20,11 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.status = 1")
     List<User> findAllAndActive();
 
-    @Query(value = "SELECT u " +
-            "FROM User u " +
-            "WHERE u.id = :id " +
-            "AND u.status = 1")
-    Optional<User> findByIdAndActive(@Param("id") Long id);
+    Optional<User> findByUsername(String username);
 
     @Query(value = "SELECT u " +
             "FROM User u " +
@@ -36,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u " +
             "WHERE u.username = :username " +
             "AND u.status = 1")
-    Optional<User> findByUsername(@Param("username") String username);
+    Optional<User> findByUsernameAndActive(@Param("username") String username);
 
     List<User> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
@@ -46,7 +41,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND (:status IS NULL OR u.status = :status) " +
             "AND (:role IS NULL OR u.role = :role)")
     Page<User> getUserForAdmin(@Param("search") String search,
-                               @Param("status") EntityStatus status,
+                               @Param("status") Integer status,
                                @Param("role") Role role,
                                Pageable pageable);
 }
