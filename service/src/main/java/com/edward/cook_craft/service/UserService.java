@@ -7,6 +7,7 @@ import com.edward.cook_craft.dto.response.RecipeResponse;
 import com.edward.cook_craft.dto.response.UserFavoritesResponse;
 import com.edward.cook_craft.dto.response.UserResponse;
 import com.edward.cook_craft.enums.EntityStatus;
+import com.edward.cook_craft.enums.Role;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.UserMapper;
 import com.edward.cook_craft.model.Favorite;
@@ -56,8 +57,17 @@ public class UserService {
     public UserResponse update(String jsonRequest, MultipartFile file) {
         UpdateUserRequest request = JsonUtils.jsonMapper(jsonRequest, UpdateUserRequest.class);
         validate(request);
+        User u = SecurityUtils.getCurrentUser();
+        if (u == null) {
+            throw new CustomException("not.authenticated");
+        }
+        User user;
+        if (u.getRole().equals(Role.ADMIN)) {
+            user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new CustomException("user.not.found"));
+        } else {
+            user = userRepository.findByUsernameAndActive(request.getUsername()).orElseThrow(() -> new CustomException("user.not.found"));
+        }
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new CustomException("user.not.found"));
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
         if (file != null && !file.isEmpty()) {
@@ -66,6 +76,8 @@ public class UserService {
             user.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         }
         user.setDescription(request.getDescription());
+        user.setRole(request.getRole());
+        user.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
 
         user = userRepository.save(user);
 
@@ -129,7 +141,7 @@ public class UserService {
     }
 
     public UserResponse getUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameAndActive(username);
         if (user.isEmpty()) {
             throw new CustomException("user.not.found");
         }
