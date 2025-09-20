@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, message, Image } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Form, Input, Button, message, Image } from 'antd';
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate, Link } from 'react-router-dom';
 import { updateUserProfile, getUserProfile } from '../../api/user';
 import { toast } from 'react-toastify';
 import './EditProfile.css';
@@ -91,6 +91,10 @@ const EditProfile = () => {
     <div className="edit-profile-container">
       <div className="edit-profile-card">
         <h1>Sửa thông tin cá nhân</h1>
+        <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
+          <FaArrowLeft />
+          Quay lại
+        </Link>
         <Form
           form={form}
           layout="vertical"
