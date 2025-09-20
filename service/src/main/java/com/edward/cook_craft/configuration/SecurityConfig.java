@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/api/recipes/**",
                                 "/api/units/**",
                                 "/api/review/**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/api/chatbot").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
