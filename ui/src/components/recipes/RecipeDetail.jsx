@@ -100,27 +100,20 @@ const RecipeDetail = () => {
         <div className="recipe-header">
           <div className="recipe-image-section">
             {showVideo && recipe.videoUrl ? (
-              <iframe
+              <video
                 style={{
                   borderRadius: 8,
-                  // marginLeft: 32,
                   width: "100%",
                   maxWidth: 480,
                 }}
                 controls
                 autoPlay
-                poster={
-                  `https://www.youtube-nocookie.com/embed/Xw7v-w6kc_0?rel=0&modestbranding=1` ||
-                  "https://via.placeholder.com/400x250?text=No+Image"
-                }
-                src={"https://www.youtube.com/embed/Xw7v-w6kc_0"}
-                className="recipe-main-image"
+                src={recipe.videoUrl}
+                className="recipe-main-video"
                 title="Recipe Video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
               >
                 Trình duyệt của bạn không hỗ trợ video.
-              </iframe>
+              </video>
             ) : (
               <Image
                 style={{ borderRadius: 8 }}

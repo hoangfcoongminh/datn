@@ -32,13 +32,16 @@ export async function filterRecipes({ keyword, categoryIds, ingredientIds, autho
   return data;
 }
 
-export async function createRecipe(recipe, imageFile) {
+export async function createRecipe(recipe, imageFile, videoFile) {
   const token = localStorage.getItem('token');
   const formData = new FormData();
   formData.append('jsonRequest', JSON.stringify(recipe));
   if (imageFile) {
     formData.append('img', imageFile);
   }  
+  if (videoFile) {
+    formData.append('video', videoFile);
+  }
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'POST',
       headers: {
@@ -89,12 +92,15 @@ export async function getRecipeDetail(id) {
   return data;
 }
 
-export async function updateRecipe(recipe, imageFile) {
+export async function updateRecipe(recipe, imageFile, videoFile) {
   const token = localStorage.getItem('token');
   const formData = new FormData();
   formData.append('jsonRequest', JSON.stringify(recipe));
   if (imageFile) {
     formData.append('img', imageFile);
+  }
+  if (videoFile) {
+    formData.append('video', videoFile);
   }
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'PUT',

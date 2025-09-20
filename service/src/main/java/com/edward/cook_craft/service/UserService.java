@@ -1,5 +1,6 @@
 package com.edward.cook_craft.service;
 
+import com.edward.cook_craft.constants.Constants;
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.UpdateUserRequest;
 import com.edward.cook_craft.dto.response.RecipeResponse;
@@ -62,7 +63,7 @@ public class UserService {
         if (file != null && !file.isEmpty()) {
             String existsAvtUrl = user.getImgUrl();
             minioService.deleteFile(existsAvtUrl);
-            user.setImgUrl(minioService.uploadFile(file));
+            user.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         }
         user.setDescription(request.getDescription());
 

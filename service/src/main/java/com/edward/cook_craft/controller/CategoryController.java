@@ -38,8 +38,7 @@ public class CategoryController {
     @Operation(summary = "Create a new category", description = "Create a new category with the provided details")
     public ResponseEntity<?> create(
             @RequestPart(name = "jsonRequest") String jsonRequest,
-            @RequestPart(name = "img", required = false) MultipartFile file,
-            @RequestPart(name = "video", required = false) MultipartFile video
+            @RequestPart(name = "img", required = false) MultipartFile file
     ) {
         return ResponseUtils.handleSuccess(service.create(jsonRequest, file));
     }
@@ -48,8 +47,7 @@ public class CategoryController {
     @Operation(summary = "Update an category", description = "Update an existed category")
     public ResponseEntity<?> update(
             @RequestPart(name = "jsonRequest") String jsonRequest,
-            @RequestPart(name = "img", required = false) MultipartFile file,
-            @RequestPart(name = "video", required = false) MultipartFile video
+            @RequestPart(name = "img", required = false) MultipartFile file
     ) {
         return ResponseUtils.handleSuccess(service.update(jsonRequest, file));
     }

@@ -1,5 +1,6 @@
 package com.edward.cook_craft.service;
 
+import com.edward.cook_craft.constants.Constants;
 import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.dto.request.RecipeIngredientDetailRequest;
 import com.edward.cook_craft.dto.request.RecipeRequest;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
 public class RecipeService {
 
     @Value("${image.default.recipe}")
-    private String defaultRecipe;
+    private String defaultRecipeImage;
 
     private final RecipeRepository repository;
     private final CategoryRepository categoryRepository;
@@ -118,12 +119,12 @@ public class RecipeService {
         Recipe recipe = recipeMapper.of(request);
         recipe.setId(null);
         if (img != null && !img.isEmpty()) {
-            recipe.setImgUrl(minioService.uploadFile(img));
+            recipe.setImgUrl(minioService.uploadFile(img, Constants.FILE_TYPE_IMAGE));
         } else {
-            recipe.setImgUrl(defaultRecipe);
+            recipe.setImgUrl(defaultRecipeImage);
         }
         if (video != null && !video.isEmpty()) {
-            recipe.setVideoUrl(minioService.uploadFile(video));
+            recipe.setVideoUrl(minioService.uploadFile(video, Constants.FILE_TYPE_VIDEO));
         }
         Recipe finalRecipe = repository.save(recipe);
 
@@ -164,7 +165,7 @@ public class RecipeService {
             throw new CustomException("you.are.not.authorized");
         }
         Recipe recipe = repository.getByIdAndActive(request.getId()).get();
-        updateRecipeData(recipe, request, img);
+        updateRecipeData(recipe, request, img, video);
 
         return details(recipe.getId());
     }
@@ -200,7 +201,7 @@ public class RecipeService {
 
     }
 
-    private void updateRecipeData(Recipe r, RecipeRequest request, MultipartFile file) {
+    private void updateRecipeData(Recipe r, RecipeRequest request, MultipartFile img, MultipartFile video) {
         r.setCategoryId(request.getCategoryId());
         r.setTitle(request.getTitle());
         r.setDescription(request.getDescription());
@@ -208,11 +209,15 @@ public class RecipeService {
         r.setCookTime(request.getCookTime());
         r.setServings(request.getServings());
         r.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
-        if (file != null && !file.isEmpty()) {
-            if (!defaultRecipe.equals(r.getImgUrl())) {
+        if (img != null && !img.isEmpty()) {
+            if (!defaultRecipeImage.equals(r.getImgUrl())) {
                 minioService.deleteFile(r.getImgUrl());
             }
-            r.setImgUrl(minioService.uploadFile(file));
+            r.setImgUrl(minioService.uploadFile(img, Constants.FILE_TYPE_IMAGE));
+        }
+        if (video != null && !video.isEmpty()) {
+            minioService.deleteFile(r.getVideoUrl());
+            r.setVideoUrl(minioService.uploadFile(video, Constants.FILE_TYPE_VIDEO));
         }
         updateRecipeIngredient(r.getId(), request.getIngredients());
         updateRecipeStep(r.getId(), request.getSteps());
