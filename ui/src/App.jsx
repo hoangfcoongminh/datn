@@ -50,15 +50,15 @@ function AppContent() {
         try {
           setUser(JSON.parse(savedUser));
         } catch (error) {
+          console.error("Error parsing user data:", error);
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setUser(null);
-        } finally {
-          setLoading(false);
         }
       } else {
         setUser(null);
       }
+      setLoading(false); // Ensure loading is set to false outside of try-finally
     };
 
     // Gọi ngay lần đầu khi component mount
