@@ -154,34 +154,12 @@ const RecipeAdmin = () => {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
-        <Space size="small">
-          <Button 
-            type="primary" 
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => console.log("View", record.id)}
-          >
-            Xem
-          </Button>
-          <Button 
-            type="default" 
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => console.log("Edit", record.id)}
-          >
-            Sửa
-          </Button>
-          <Button 
-            type="danger" 
-            size="small"
-            icon={<StopOutlined />} 
-            onClick={() => console.log("Deactivate", record.id)}
-          >
-            Khóa
+        <Space size="middle">
+          <Button type="primary" icon={<EyeOutlined />} onClick={() => handleOpenPopup(record)}>
+            Chi tiết
           </Button>
         </Space>
       ),
-      width: 200,
     },
   ];
 
@@ -220,8 +198,8 @@ const RecipeAdmin = () => {
             <Option value="id,desc">ID Giảm dần</Option>
             <Option value="title,asc">Tên A-Z</Option>
             <Option value="title,desc">Tên Z-A</Option>
-            <Option value="rating,desc">Đánh giá cao nhất</Option>
-            <Option value="rating,asc">Đánh giá thấp nhất</Option>
+            {/* <Option value="rating,desc">Đánh giá cao nhất</Option>
+            <Option value="rating,asc">Đánh giá thấp nhất</Option> */}
             <Option value="cookingTime,asc">Thời gian nấu ngắn nhất</Option>
             <Option value="cookingTime,desc">Thời gian nấu dài nhất</Option>
           </Select>

@@ -31,13 +31,6 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
             "AND u.status = 1")
     Page<Unit> filter(@Param("name") String name, Pageable pageable);
 
-    @NotNull
-    @Query(value = "SELECT u " +
-            "FROM Unit u " +
-            "WHERE u.id = :id " +
-            "AND u.status = 1")
-    Optional<Unit> findById(@NotNull @Param("id") Long id);
-
     @Query(value = "SELECT u " +
             "FROM Unit u " +
             "WHERE (COALESCE(:search, '') = '' OR LOWER(u.name) LIKE CONCAT('%',LOWER(:search),'%')) " +
