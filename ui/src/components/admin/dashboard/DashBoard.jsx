@@ -132,15 +132,16 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Dashboard Quản trị
@@ -154,6 +155,7 @@ const Dashboard = () => {
             alignItems: "center",
             gap: 16,
             flexWrap: "wrap",
+            justifyContent: "center",
           }}
         >
           <span style={{ fontWeight: 600 }}>Thống kê theo:</span>
@@ -199,11 +201,12 @@ const Dashboard = () => {
                 display: "flex",
                 gap: 32,
                 flexWrap: "wrap",
+                justifyContent: "center",
                 marginBottom: 32,
               }}
             >
               {/* Users bên trái */}
-              <Card title="Người dùng mới" style={{ flex: 1, minWidth: 350 }}>
+              <Card title="Người dùng mới" style={{ flex: 1, minWidth: 300 }}>
                 <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16 }}>
                   Tổng người dùng:{" "}
                   {userStats.length
@@ -244,7 +247,7 @@ const Dashboard = () => {
               </Card>
 
               {/* Recipes bên phải */}
-              <Card title="Công thức mới" style={{ flex: 1, minWidth: 350 }}>
+              <Card title="Công thức mới" style={{ flex: 1, minWidth: 300 }}>
                 <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16 }}>
                   Tổng công thức:{" "}
                   {recipeStats.length

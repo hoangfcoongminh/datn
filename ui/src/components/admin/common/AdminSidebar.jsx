@@ -52,7 +52,7 @@ const AdminSidebar = () => {
 
   return (
     <Sider
-      width={250}
+      width={"15vw"}
       className="admin-sidebar"
       theme="light"
     >

@@ -2,9 +2,6 @@ import React, { use, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button, Spin } from "antd";
 import {
-  FaUtensils,
-  FaClock,
-  FaStar,
   FaHeart,
   FaArrowLeft,
 } from "react-icons/fa";
@@ -143,10 +140,14 @@ const RecipeList = () => {
 
   return (
     <div className="recipe-list-page">
+      <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
+        <FaArrowLeft />
+        Quay lại
+      </Link>
       {/* Header Section */}
       <div
         className="recipe-list-header"
-        style={{ textAlign: "center", margin: "32px 0 0 0" }}
+        style={{ textAlign: "center" }}
       >
         <p
           style={{
@@ -207,7 +208,7 @@ const RecipeList = () => {
                   optionFilterProp="children"
                   showSearch
                   style={{ width: 300 }}
-                > 
+                >
                   {categories.map((cat) => (
                     <Option key={cat.id} value={cat.id}>
                       {cat.name}

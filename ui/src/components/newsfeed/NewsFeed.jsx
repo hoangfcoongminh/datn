@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { List, Spin, Avatar, Button, Card, Pagination, Rate, Input, Select, Badge, Progress, Statistic, Row, Col } from "antd";
-import { SearchOutlined, TrophyOutlined, FireOutlined, HeartOutlined, EyeOutlined, ClockCircleOutlined, UserOutlined, BookOutlined, StarOutlined } from "@ant-design/icons";
+import { Button, Card, Pagination, Rate, Input, Select, Badge, Progress, Statistic, Row, Col } from "antd";
+import { TrophyOutlined, FireOutlined, HeartOutlined, EyeOutlined, UserOutlined, BookOutlined } from "@ant-design/icons";
 import Slider from "react-slick";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import "./NewsFeed.css";
@@ -8,12 +8,11 @@ import { filterRecipes, getPopularRecipe } from "../../api/recipe";
 import { fetchPopularCategories } from "../../api/category";
 import { getPopularUsers } from "../../api/user";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import TopUsersCarousel from "../common/rating/Rating";
 import CountUp from 'react-countup';
 import ScrollToTopButton from "../common/ScrollToTopButton";
 
-const { Search } = Input;
 const { Option } = Select;
 
 export default function NewsFeed() {
@@ -22,13 +21,12 @@ export default function NewsFeed() {
   const [loading, setLoading] = useState(true);
   const [popularByView, setPopularByView] = useState([]);
   const [popularByFavorite, setPopularByFavorite] = useState([]);
-  const [favorite, setFavorite] = useState([]);
   const [topFavUsers, setTopFavUsers] = useState([]);
   const [topRatingUsers, setTopRatingUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(10);
-  const [sortField, setSortField] = useState("id,asc");
+  const [sortField, setSortField] = useState("id,desc");
   const [keyword, setKeyword] = useState("");
   const [minTime, setMinTime] = useState("");
   const [maxTime, setMaxTime] = useState("");
@@ -45,13 +43,6 @@ export default function NewsFeed() {
   });
 
   const [trendingCategories, setTrendingCategories] = useState([]);
-
-  const [recentActivities] = useState([
-    { user: "Minh Anh", action: "đã thêm công thức", recipe: "Bánh flan caramel", time: "2 phút trước", avatar: "/api/placeholder/32/32" },
-    { user: "Thanh Hoa", action: "đã đánh giá", recipe: "Phở bò Hà Nội", time: "15 phút trước", avatar: "/api/placeholder/32/32", rating: 5 },
-    { user: "Quang Minh", action: "đã yêu thích", recipe: "Bánh mì thịt nướng", time: "1 giờ trước", avatar: "/api/placeholder/32/32" },
-    { user: "Thu Hà", action: "đã bình luận về", recipe: "Cơm tấm sườn nướng", time: "2 giờ trước", avatar: "/api/placeholder/32/32" }
-  ]);
 
   const fetchRecipeList = async () => {
     try {
@@ -115,7 +106,7 @@ export default function NewsFeed() {
       const data = await fetchPopularCategories();
       setTrendingCategories(data.data)
       console.log('popular categories', trendingCategories);
-      
+
     } catch (err) {
       toast.error(err.message || 'Đã có lỗi xảy ra');
     } finally {
@@ -154,7 +145,7 @@ export default function NewsFeed() {
   // Effect riêng cho recipe list, chạy khi page, size hoặc các filter thay đổi
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadRecipes = async () => {
       try {
         setLoading(true);
@@ -218,19 +209,6 @@ export default function NewsFeed() {
           <h1 className="hero-title">Chào mừng đến với Cộng đồng Ẩm thực</h1>
           <p className="hero-subtitle">Khám phá hàng ngàn công thức từ những người đầu bếp tài năng</p>
         </div>
-        <div className="hero-search-section">
-          <Input
-          allowClear
-            placeholder="Tìm kiếm công thức yêu thích..."
-            value={keyword}
-                  onChange={(e) => {
-                    setPage(0);
-                    setKeyword(e.target.value);
-                  }}
-                  style={{ maxWidth: 320, borderRadius: 8 }}
-            className="hero-search"
-          />
-        </div>
         <div className="hero-stats">
           <Row gutter={16} justify="center">
             <Col span={6}>
@@ -259,12 +237,43 @@ export default function NewsFeed() {
             onChange={(value) => setSortField(value)}
             value={sortField}
           >
-            <Option value="createdAt,desc">Mới nhất</Option>
-            <Option value="title,asc">Tên</Option>
-            <Option value="averageRating,desc">Đánh giá cao nhất</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
+            <Option value="title,asc">Tên A-Z</Option>
+            <Option value="title,desc">Tên Z-A</Option>
           </Select>
+          <Input
+            allowClear
+            placeholder="Tìm kiếm công thức yêu thích..."
+            value={keyword}
+            onChange={(e) => {
+              setPage(0);
+              setKeyword(e.target.value);
+            }}
+            style={{ maxWidth: 320, borderRadius: 8 }}
+            className="hero-search"
+          />
+          <Link
+            to="/recipes"
+            style={{
+              float: "right",
+              color: "#1890ff",
+              // fontWeight: "bold",
+              textDecoration: "none",
+              marginTop: "8px",
+              transition: "color 0.3s",
+            }}
+            onMouseEnter={(e) => (e.target.style.color = "#2823b5ff")}
+            onMouseLeave={(e) => (e.target.style.color = "#1890ff")}
+          >
+            Tìm kiếm nhiều hơn ?
+          </Link>
         </div>
-        <div className="recipes-grid">
+        <div className="recipes-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '20px'
+        }}>
           {recipeList.map((r) => (
             <div key={r.id} className="recipe-card">
               <div className="card-image">
@@ -307,7 +316,7 @@ export default function NewsFeed() {
                   {r.authorFullName || 'Unknown'}
                 </div>
                 <h3 className="recipe-title">{r.title}</h3>
-                <p className="recipe-description">{r.description}</p>
+                {/* <p className="recipe-description">{r.description}</p> */}
                 <div className="recipe-meta">
                   <div className="meta-item">
                     <Rate
@@ -364,8 +373,8 @@ export default function NewsFeed() {
         <h3 className="section-title">
           <TrophyOutlined /> Thể loại thịnh hành
         </h3>
-        <div className="trending-categories" style={{ 
-          display: 'grid', 
+        <div className="trending-categories" style={{
+          display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '20px',
           padding: '20px'
@@ -375,8 +384,8 @@ export default function NewsFeed() {
               key={index}
               hoverable
               cover={
-                <div style={{ 
-                  height: '160px', 
+                <div style={{
+                  height: '160px',
                   overflow: 'hidden',
                   position: 'relative'
                 }}>
@@ -404,7 +413,7 @@ export default function NewsFeed() {
               style={{ position: 'relative' }}
             >
               <div className="category-info" style={{ position: 'relative' }}>
-                <h4 style={{ 
+                <h4 style={{
                   fontSize: '18px',
                   fontWeight: 600,
                   marginBottom: '8px',
@@ -443,35 +452,6 @@ export default function NewsFeed() {
           ))}
         </div>
       </div>
-
-      {/* Recent Activities */}
-      {/* <div className="newsfeed-section">
-        <h3 className="newsfeed-section-title">
-          <ClockCircleOutlined /> Hoạt động gần đây
-        </h3>
-        <Card className="activity-card">
-          <List
-            itemLayout="horizontal"
-            dataSource={recentActivities}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={<Avatar src={item.avatar} />}
-                  title={
-                    <span>
-                      <strong>{item.user}</strong> {item.action} <em>{item.recipe}</em>
-                      {item.rating && (
-                        <Rate disabled defaultValue={item.rating} style={{ marginLeft: 8, fontSize: 12 }} />
-                      )}
-                    </span>
-                  }
-                  description={item.time}
-                />
-              </List.Item>
-            )}
-          />
-        </Card>
-      </div> */}
 
       {/* Section: Công thức phổ biến (slide) */}
       <div className="newsfeed-section">

@@ -28,7 +28,6 @@ const UnitAdmin = () => {
   };
 
   const handleUpdateUnit = (updatedData, img) => {
-
     updateUnit({ unit: updatedData, imageFile: img })
       .then((response) => {
         toast.success("Cập nhật đơn vị thành công");
@@ -174,15 +173,16 @@ const UnitAdmin = () => {
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Quản lý Đơn vị
@@ -209,31 +209,42 @@ const UnitAdmin = () => {
                 search: e.target.value,
               }));
             }}
-            style={{ width: 240, borderRadius: 8 }}
+            style={{ width: "100%", maxWidth: 240, borderRadius: 8 }}
           />
 
           <Select
             defaultValue={sort}
             onChange={handleSortChange}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
           >
             <Option value="id,desc">Mới nhất</Option>
             <Option value="id,asc">Cũ nhất</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
-            {/* <Option value="symbol,asc">Ký hiệu A-Z</Option>
-            <Option value="symbol,desc">Ký hiệu Z-A</Option> */}
           </Select>
 
           <Select
             placeholder="Lọc theo trạng thái"
             onChange={(value) => handleStatusFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value="1">Hoạt động</Option>
             <Option value="0">Ngưng hoạt động</Option>
           </Select>
+
+          <Button
+            type="primary"
+            // onClick={handleOpenCreatePopup}
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              // width: "100%",
+              maxWidth: 200,
+            }}
+          >
+            Thêm mới
+          </Button>
         </div>
 
         <Table
@@ -254,7 +265,8 @@ const UnitAdmin = () => {
               setSize(pageSize);
             },
           }}
-          scroll={{ x: 1000 }}
+          scroll={{ x: "75vw" }}
+          tableLayout="fixed"
         />
       </div>
       <PopupDetail

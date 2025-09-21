@@ -70,8 +70,8 @@ const RecipeAdmin = () => {
       key: "imgUrl",
       render: (imgUrl) => (
         <Image
-          width={60}
-          height={60}
+          width={80}
+          height={80}
           src={imgUrl}
           fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
           style={{ objectFit: 'cover', borderRadius: '8px' }}
@@ -118,10 +118,11 @@ const RecipeAdmin = () => {
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* hiển thị sao trung bình */}
-          <Rate 
-            disabled 
-            value={record.averageRating.toFixed(1) || 0} 
+          <Rate
+            disabled
+            value={record.averageRating.toFixed(1) || 0}
             style={{ fontSize: 12 }}
+            allowHalf
           />
           {/* hiển thị số điểm & tổng lượt */}
           <span style={{ fontSize: 12, color: '#666' }}>
@@ -129,17 +130,18 @@ const RecipeAdmin = () => {
           </span>
         </div>
       ),
-    },    
-    {
-      title: "Thời gian nấu",
-      dataIndex: "cookTime",
-      key: "cookTime",
-      render: (time) => (
-        <div style={{ color: '#52c41a', fontWeight: 500 }}>
-          {time ? `${time} giờ` : "Chưa cập nhật"}
-        </div>
-      ),
+      width: 200,
     },
+    // {
+    //   title: "Thời gian nấu",
+    //   dataIndex: "cookTime",
+    //   key: "cookTime",
+    //   render: (time) => (
+    //     <div style={{ color: '#52c41a', fontWeight: 500 }}>
+    //       {time ? `${time} giờ` : "Chưa cập nhật"}
+    //     </div>
+    //   ),
+    // },
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -164,23 +166,24 @@ const RecipeAdmin = () => {
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Quản lý Công thức
         </h2>
 
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
           marginBottom: 16,
           gap: 16,
           flexWrap: 'wrap',
@@ -189,17 +192,15 @@ const RecipeAdmin = () => {
           <Search
             placeholder="Tìm kiếm công thức theo tên"
             onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: 300 }}
+            style={{ width: "100%", maxWidth: 300 }}
             enterButton
           />
 
-          <Select defaultValue={sort} onChange={handleSortChange} style={{ width: 200 }}>
+          <Select defaultValue={sort} onChange={handleSortChange} style={{ width: "100%", maxWidth: 200 }}>
             <Option value="id,asc">ID Tăng dần</Option>
             <Option value="id,desc">ID Giảm dần</Option>
             <Option value="title,asc">Tên A-Z</Option>
             <Option value="title,desc">Tên Z-A</Option>
-            {/* <Option value="rating,desc">Đánh giá cao nhất</Option>
-            <Option value="rating,asc">Đánh giá thấp nhất</Option> */}
             <Option value="cookingTime,asc">Thời gian nấu ngắn nhất</Option>
             <Option value="cookingTime,desc">Thời gian nấu dài nhất</Option>
           </Select>
@@ -207,12 +208,25 @@ const RecipeAdmin = () => {
           <Select
             placeholder="Lọc theo trạng thái"
             onChange={(value) => handleStatusFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value="1">Hoạt động</Option>
             <Option value="0">Ngưng hoạt động</Option>
           </Select>
+
+          <Button
+            type="primary"
+            // onClick={handleOpenCreatePopup}
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              // width: "100%",
+              maxWidth: 200,
+            }}
+          >
+            Thêm mới
+          </Button>
         </div>
 
         <Table
@@ -232,7 +246,8 @@ const RecipeAdmin = () => {
               setSize(pageSize);
             },
           }}
-          scroll={{ x: 1400 }}
+          scroll={{ x: "75vw" }}
+          tableLayout="fixed"
         />
       </div>
       <ChatLauncher />
