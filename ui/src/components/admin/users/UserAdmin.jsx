@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Space, Tag, Input, Select, Avatar } from "antd";
+import { Table, Button, Space, Tag, Input, Select, Image } from "antd";
 import { fetchUsers } from "../../../api/admin";
 import { toast } from "react-toastify";
 import {
@@ -104,14 +104,15 @@ const UserAdmin = () => {
       dataIndex: "imgUrl",
       key: "imgUrl",
       render: (imgUrl) => (
-        <Avatar
-          size={40}
+        <Image
+          width={70}
+          height={70}
           src={imgUrl}
           icon={<UserOutlined />}
-          style={{ backgroundColor: "#1890ff" }}
+          style={{ backgroundColor: "#1890ff", borderRadius: "50%" }}
         />
       ),
-      width: 80,
+      width: 120,
     },
     {
       title: "Tên người dùng",
@@ -131,18 +132,19 @@ const UserAdmin = () => {
           {email || "Chưa cập nhật"}
         </div>
       ),
+      width: 250,
     },
-    {
-      title: "Số điện thoại",
-      dataIndex: "phone",
-      key: "phone",
-      render: (phone) => (
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <PhoneOutlined style={{ color: "#fa8c16" }} />
-          {phone || "Chưa cập nhật"}
-        </div>
-      ),
-    },
+    // {
+    //   title: "Số điện thoại",
+    //   dataIndex: "phone",
+    //   key: "phone",
+    //   render: (phone) => (
+    //     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    //       <PhoneOutlined style={{ color: "#fa8c16" }} />
+    //       {phone || "Chưa cập nhật"}
+    //     </div>
+    //   ),
+    // },
     {
       title: "Vai trò",
       dataIndex: "role",
@@ -181,15 +183,16 @@ const UserAdmin = () => {
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Quản lý Người dùng
@@ -216,24 +219,23 @@ const UserAdmin = () => {
                 search: e.target.value,
               }));
             }}
-            style={{ width: 240, borderRadius: 8 }}
+            style={{ width: "100%", maxWidth: 240, borderRadius: 8 }}
           />
 
           <Select
             placeholder="Lọc theo vai trò"
             onChange={(value) => handleRoleFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value={Role.ADMIN}>Quản trị viên</Option>
             <Option value={Role.USER}>Khách hàng</Option>
           </Select>
-      
 
           <Select
             defaultValue={sort}
             onChange={handleSortChange}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
           >
             <Option value="id,desc">Mới nhất</Option>
             <Option value="id,asc">Cũ nhất</Option>
@@ -246,12 +248,25 @@ const UserAdmin = () => {
           <Select
             placeholder="Lọc theo trạng thái"
             onChange={(value) => handleStatusFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value="1">Hoạt động</Option>
             <Option value="0">Ngưng hoạt động</Option>
           </Select>
+
+          <Button
+            type="primary"
+            // onClick={handleOpenCreatePopup}
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              // width: "100%",
+              maxWidth: 200,
+            }}
+          >
+            Thêm mới
+          </Button>
         </div>
 
         <Table
@@ -272,7 +287,8 @@ const UserAdmin = () => {
               setSize(pageSize);
             },
           }}
-          scroll={{ x: 1200 }}
+          scroll={{ x: "75vw" }}
+          tableLayout="fixed"
         />
       </div>
       <PopupDetail

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useReducer, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getUserPublicProfile } from "../../api/user";
+import { FaArrowLeft } from "react-icons/fa";
 import { filterRecipes } from "../../api/recipe";
 import { Button, Spin, Rate, Pagination } from "antd";
 import { HeartOutlined, EditOutlined } from "@ant-design/icons";
@@ -76,6 +77,10 @@ export default function UserProfile() {
 
   return (
     <div className="user-profile-page">
+      <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
+        <FaArrowLeft />
+        Quay lại
+      </Link>
       {/* Hero Section */}
       <div
         className="user-hero"

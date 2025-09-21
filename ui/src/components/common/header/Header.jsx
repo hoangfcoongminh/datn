@@ -156,11 +156,13 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
               <Dropdown
                 menu={{
                   items: [
+                    { key: "myprofile", label: "Trang cá nhân" },
                     { key: "account", label: "Quản lý tài khoản" },
                     { key: "myrecipe", label: "Công thức của tôi" },
                     { key: "logout", label: "Đăng xuất" },
                   ],
                   onClick: ({ key }) => {
+                    if (key === "myprofile") navigate("/user/" + user.user.username);
                     if (key === "account") navigate("/profile/edit");
                     if (key === "myrecipe") navigate("/recipes/my-recipes");
                     if (key === "logout") onLogout();

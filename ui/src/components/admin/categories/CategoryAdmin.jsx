@@ -97,7 +97,8 @@ const CategoryAdmin = () => {
       title: "STT",
       dataIndex: "index",
       key: "index",
-      render: (_, __, index) => (page - 1) * size + index + 1, // Calculate serial number based on pagination
+      render: (_, __, index) => (page - 1) * size + index + 1,
+      width: 50, // Adjusted for better visibility
     },
     {
       title: "Hình ảnh",
@@ -105,24 +106,26 @@ const CategoryAdmin = () => {
       key: "imgUrl",
       render: (image) => (
         <Image
-          width={50}
-          height={50}
+          width={80}
+          height={80}
           src={image}
           fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
           style={{ objectFit: "cover", borderRadius: "6px" }}
         />
       ),
-      width: 80,
+      width: 120, // Adjusted for better alignment
     },
     {
       title: "Tên danh mục",
       dataIndex: "name",
       key: "name",
+      width: 250, // Increased for better readability
     },
     {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
+      width: 250, // Increased for better readability
     },
     {
       title: "Trạng thái",
@@ -133,7 +136,8 @@ const CategoryAdmin = () => {
           {status === 1 ? "Hoạt động" : "Ngưng hoạt động"}
         </Tag>
       ),
-    }, 
+      width: 150, // Adjusted for better alignment
+    },
     {
       title: "Hành động",
       key: "action",
@@ -148,19 +152,21 @@ const CategoryAdmin = () => {
           </Button>
         </Space>
       ),
+      width: 180, // Adjusted for better alignment
     },
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Quản lý Danh mục
@@ -187,13 +193,13 @@ const CategoryAdmin = () => {
                 search: e.target.value,
               }));
             }}
-            style={{ width: 240, borderRadius: 8 }}
+            style={{ maxWidth: 240, borderRadius: 8 }}
           />
 
           <Select
             defaultValue={sort}
             onChange={handleSortChange}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
           >
             <Option value="id,desc">Mới nhất</Option>
             <Option value="id,asc">Cũ nhất</Option>
@@ -204,7 +210,7 @@ const CategoryAdmin = () => {
           <Select
             placeholder="Lọc theo trạng thái"
             onChange={(value) => handleStatusFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value="1">Hoạt động</Option>
@@ -214,7 +220,12 @@ const CategoryAdmin = () => {
           <Button
             type="primary"
             onClick={handleOpenCreatePopup}
-            style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              // width: "100%",
+              maxWidth: 200,
+            }}
           >
             Thêm mới
           </Button>
@@ -238,6 +249,8 @@ const CategoryAdmin = () => {
               setSize(pageSize);
             },
           }}
+          scroll={{ x: "75vw" }}
+          tableLayout="fixed"
         />
       </div>
       <PopupDetail

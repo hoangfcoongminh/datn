@@ -97,14 +97,14 @@ const IngredientAdmin = () => {
       key: "imgUrl",
       render: (image) => (
         <Image
-          width={50}
-          height={50}
+          width={80}
+          height={80}
           src={image}
           fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
           style={{ objectFit: "cover", borderRadius: "6px" }}
         />
       ),
-      width: 80,
+      width: 120,
     },
     {
       title: "Tên nguyên liệu",
@@ -169,15 +169,16 @@ const IngredientAdmin = () => {
   ];
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
       <AdminSidebar />
-      <div style={{ flex: 1, padding: 32 }}>
+      <div style={{ flex: 1, padding: 32, minWidth: "300px" }}>
         <h2
           style={{
             color: "#a50034",
             fontWeight: 700,
-            fontSize: 32,
+            fontSize: "2rem",
             marginBottom: 24,
+            textAlign: "center",
           }}
         >
           Quản lý Nguyên liệu
@@ -204,33 +205,42 @@ const IngredientAdmin = () => {
                 search: e.target.value,
               }));
             }}
-            style={{ width: 240, borderRadius: 8 }}
+            style={{ width: "100%", maxWidth: 240, borderRadius: 8 }}
           />
 
           <Select
             defaultValue={sort}
             onChange={handleSortChange}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
           >
             <Option value="id,desc">Mới nhất</Option>
             <Option value="id,asc">Cũ nhất</Option>
             <Option value="name,asc">Tên A-Z</Option>
             <Option value="name,desc">Tên Z-A</Option>
-            {/* <Option value="calories,desc">Calories cao nhất</Option>
-            <Option value="calories,asc">Calories thấp nhất</Option>
-            <Option value="protein,desc">Protein cao nhất</Option>
-            <Option value="protein,asc">Protein thấp nhất</Option> */}
           </Select>
 
           <Select
             placeholder="Lọc theo trạng thái"
             onChange={(value) => handleStatusFilterChange(value)}
-            style={{ width: 200 }}
+            style={{ width: "100%", maxWidth: 200 }}
             allowClear
           >
             <Option value="1">Hoạt động</Option>
             <Option value="0">Ngưng hoạt động</Option>
           </Select>
+
+          <Button
+            type="primary"
+            // onClick={handleOpenCreatePopup}
+            style={{
+              backgroundColor: "#52c41a",
+              borderColor: "#52c41a",
+              // width: "100%",
+              maxWidth: 200,
+            }}
+          >
+            Thêm mới
+          </Button>
         </div>
 
         <Table
@@ -251,7 +261,8 @@ const IngredientAdmin = () => {
               setSize(pageSize);
             },
           }}
-          scroll={{ x: 1300 }}
+          scroll={{ x: "75vw" }}
+          tableLayout="fixed"
         />
       </div>
       <PopupDetail

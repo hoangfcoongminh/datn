@@ -10,7 +10,7 @@
   right: 24px;
   bottom: 92px;
   width: 420px;
-  height: 450px;
+  /* height: 450px; */
   max-width: calc(100vw - 32px);
   background: #ffffff;
   border-radius: 18px;
