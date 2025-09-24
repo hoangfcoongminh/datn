@@ -7,6 +7,7 @@ import {
   FaHeart,
   FaRegHeart,
   FaArrowLeft,
+  FaEye
 } from "react-icons/fa";
 import { MdOutlineFavorite } from "react-icons/md";
 import { getRecipeDetail } from "../../api/recipe";
@@ -211,6 +212,10 @@ const RecipeDetail = () => {
               <div className="stat-item">
                 <MdOutlineFavorite />
                 <span>Số lượt thích: {recipe.totalFavorite}</span>
+              </div>
+              <div className="stat-item">
+                <FaEye />
+                <span>Số lượt xem: {recipe.viewCount}</span>
               </div>
             </div>
             {(recipe.videoUrl || isAuthor) && (

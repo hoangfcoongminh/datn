@@ -76,7 +76,7 @@ public class UserService {
             user.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         }
         user.setDescription(request.getDescription());
-        user.setRole(request.getRole());
+        user.setRole(request.getRole() == null ? Role.USER : request.getRole());
         user.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
 
         user = userRepository.save(user);
@@ -184,5 +184,9 @@ public class UserService {
             response = favoriteRepository.findTopUsersByFavorite(PageRequest.of(0, 3));
         }
         return response;
+    }
+
+    public List<UserResponse> getAllUser() {
+        return userRepository.findAllAndActive().stream().map(userMapper::toResponse).toList();
     }
 }

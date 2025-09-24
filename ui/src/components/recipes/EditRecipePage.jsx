@@ -50,7 +50,7 @@ const EditRecipePage = () => {
           fetchIngredients(),
           fetchUnits(),
         ]);
-        
+
         const user = JSON.parse(localStorage.getItem("user"));
         setImageFileDetail(recipe.imgUrl);
         if (!user || recipe.authorId !== user.id) {
@@ -75,9 +75,10 @@ const EditRecipePage = () => {
             });
           }
         }
-        setCategories(cats.data || []);
-        setIngredients(ings.data || []);
-        setUnits(uns.data || []);
+        setCategories(cats || []);
+        setIngredients(ings || []);
+        setUnits(uns || []);
+
       } catch (err) {
         setError(err.message || "Lỗi khi tải dữ liệu.");
       } finally {
@@ -102,6 +103,7 @@ const EditRecipePage = () => {
         prepTime: values.prepTime,
         cookTime: values.cookTime,
         servings: values.servings,
+        status: values.status,
         ingredients: (values.ingredients || []).map((ing) => ({
           ingredientId: ing.ingredientId,
           actualUnitId: ing.actualUnitId,
@@ -113,11 +115,24 @@ const EditRecipePage = () => {
         })),
       };
 
-      console.log("Video file:", videoFile);
+      if (recipe.ingredients.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một nguyên liệu.");
+        setLoading(false);
+        return;
+      }
+      if (recipe.steps.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một bước nấu.");
+        setLoading(false);
+        return;
+      }
 
       await updateRecipe(recipe, imageFile, videoFile);
       toast.success("Cập nhật công thức thành công!");
-      navigate(`/recipes/${id}`);
+      if (values.status === 1) {
+        navigate(-1);
+      } else if (values.status === 0) {
+        navigate('/recipes/my-recipes'); // Lui về trước đó 2 màn hình nếu ngưng hoạt động
+      }
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
       toast.error(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
@@ -171,6 +186,16 @@ const EditRecipePage = () => {
         }
       >
         <Form layout="vertical" form={form} onFinish={handleFinish}>
+          <Form.Item name="status" required>
+            <Select
+              placeholder="Chọn trạng thái"
+              style={{ width: 160, float: "right" }}
+              dropdownStyle={{ textAlign: "left" }}
+            >
+              <Option value={1} style={{ color: "green" }}>Hoạt động</Option>
+              <Option value={0} style={{ color: "red" }}>Ngưng hoạt động</Option>
+            </Select>
+          </Form.Item>
           <Form.Item label="Tên công thức" name="title" required>
             <Input placeholder="Nhập tên công thức" />
           </Form.Item>
@@ -382,9 +407,6 @@ const EditRecipePage = () => {
               </div>
             )}
           </Form.List>
-          {error && (
-            <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
-          )}
           <Form.Item style={{ marginTop: 32 }}>
             <Button type="primary" htmlType="submit" loading={loading}>
               Lưu thay đổi

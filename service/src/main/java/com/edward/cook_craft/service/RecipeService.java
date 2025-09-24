@@ -162,10 +162,10 @@ public class RecipeService {
         }
         RecipeRequest request = JsonUtils.jsonMapper(jsonRequest, RecipeRequest.class);
         validateRecipeRequest(request);
-        if (!Role.ADMIN.equals(user.getRole()) || !Objects.equals(user.getUsername(), request.getAuthorUsername())) {
+        if (!Role.ADMIN.equals(user.getRole()) && !Objects.equals(user.getUsername(), request.getAuthorUsername())) {
             throw new CustomException("you.are.not.authorized");
         }
-        Recipe recipe = repository.getByIdAndActive(request.getId()).get();
+        Recipe recipe = repository.findById(request.getId()).get();
         updateRecipeData(recipe, request, img, video);
 
         return details(recipe.getId());

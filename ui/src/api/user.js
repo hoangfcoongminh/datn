@@ -110,3 +110,22 @@ export async function updateUserProfile(user, imageFile) {
     toast.error(err.message);
   }
 }
+
+export async function getAllUser() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`http://localhost:8080/api/user`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    let data = await res.json();
+    if (!data.success) {
+      toast.error(data.message);
+    }
+    return data;
+  } catch (err) {
+    toast.error(err.message);
+  }
+}
