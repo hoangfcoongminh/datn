@@ -59,4 +59,10 @@ public class UserController {
     ) {
         return ResponseUtils.handleSuccess(userService.getPopular(type));
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getUsers() {
+        return ResponseUtils.handleSuccess(userService.getAllUser());
+    }
+
 }

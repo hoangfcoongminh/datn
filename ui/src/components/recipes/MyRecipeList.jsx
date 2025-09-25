@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Image, Tag, Rate, Space } from 'antd';
-import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HeartOutlined, EyeFilled } from "@ant-design/icons";
 import { filterRecipes } from '../../api/recipe';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,7 +15,7 @@ const MyRecipeList = () => {
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
     const [total, setTotal] = useState(0);
-    const [sort, setSort] = useState("id,asc");
+    const [sort, setSort] = useState("id,desc");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,6 +33,7 @@ const MyRecipeList = () => {
                     categoryIds: [],
                     ingredientIds: [],
                     authorUsernames: [currentUser.username],
+                    status: -1,
                     page: 0,
                     size: 10,
                     sort: 'createdAt,desc',
@@ -87,16 +88,6 @@ const MyRecipeList = () => {
             ),
         },
         {
-            title: "Tác giả",
-            dataIndex: "authorUsername",
-            key: "authorUsername",
-            render: (authorUsername) => (
-                <div style={{ color: '#666' }}>
-                    {authorUsername || "Không xác định"}
-                </div>
-            ),
-        },
-        {
             title: "Danh mục",
             dataIndex: "categoryId",
             key: "categoryId",
@@ -128,12 +119,24 @@ const MyRecipeList = () => {
             ),
         },
         {
-            title: "Thời gian nấu",
-            dataIndex: "cookTime",
-            key: "cookTime",
-            render: (time) => (
-                <div style={{ color: '#52c41a', fontWeight: 500 }}>
-                    {time ? `${time} giờ` : "Chưa cập nhật"}
+            title: "Lượt thích",
+            dataIndex: "totalFavorite",
+            key: "totalFavorite",
+            render: (count) => (
+                <div style={{ color: '#a50034', fontWeight: 500 }}>
+                    <HeartOutlined /> {' '}
+                    {count ? `${count} lượt thích` : "Chưa có lượt thích"}
+                </div>
+            ),
+        },
+        {
+            title: "Lượt xem",
+            dataIndex: "viewCount",
+            key: "viewCount",
+            render: (count) => (
+                <div style={{ fontWeight: 500 }}>
+                    <EyeOutlined /> {' '}
+                    {count ? `${count} lượt xem` : "Chưa có lượt xem"}
                 </div>
             ),
         },
@@ -155,8 +158,8 @@ const MyRecipeList = () => {
                     <Button
                         type="primary"
                         size="small"
-                        icon={<EyeOutlined />}
-                        onClick={() => console.log("View", record.id)}
+                        icon={<EyeFilled />}
+                        onClick={() => navigate(`/recipes/${record.id}`)}
                     >
                         Xem
                     </Button>
@@ -164,17 +167,9 @@ const MyRecipeList = () => {
                         type="default"
                         size="small"
                         icon={<EditOutlined />}
-                        onClick={() => console.log("Edit", record.id)}
+                        onClick={() => navigate(`/recipes/edit/${record.id}`)}
                     >
                         Sửa
-                    </Button>
-                    <Button
-                        type="danger"
-                        size="small"
-                        icon={<StopOutlined />}
-                        onClick={() => console.log("Deactivate", record.id)}
-                    >
-                        Khóa
                     </Button>
                 </Space>
             ),
@@ -184,7 +179,7 @@ const MyRecipeList = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Danh sách công thức của tôi</h1>
+            <h1 style={{ textAlign: 'center' }}>Danh sách công thức của tôi</h1>
             <Table
                 columns={columns}
                 dataSource={recipes}

@@ -6,6 +6,7 @@ import { FaUserAlt, FaLock, FaHome, FaUserPlus } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import ChatLauncher from '../common/chatbot/ChatLauncher';
+import cookingImg from '../../assets/cooking.png';
 
 const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -46,7 +47,7 @@ const LoginPage = ({ onLogin }) => {
       <div className="auth-form-wrapper">
         <div className="auth-header">
           <div className="auth-logo-circle">
-            <img src="/vite.svg" alt="CookCraft" />
+            <img src={cookingImg} alt="CookCraft" />
           </div>
           <h2>Đăng nhập</h2>
           <p className="auth-sub">Chào mừng bạn trở lại với CookCraft!</p>

@@ -17,23 +17,16 @@ export async function fetchUnits() {
   return data;
 }
 
-export async function addUnit({ addingUnit, imageFile }) {
+export async function addUnit({ addingUnit }) {
   const token = localStorage.getItem('token');
-  const formData = new FormData();
-
-  // Properly serialize the JSON request
-  formData.append('jsonRequest', JSON.stringify(addingUnit));
-
-  if (imageFile) {
-    formData.append('img', imageFile);
-  }
 
   const res = await fetch('http://localhost:8080/api/units', {
     method: 'POST',
     headers: {
+      'Content-Type': 'application/json', // Đảm bảo định dạng JSON
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     },
-    body: formData,
+    body: JSON.stringify(addingUnit), // Chuyển đổi thành chuỗi JSON
   });
 
   let data;
@@ -50,23 +43,16 @@ export async function addUnit({ addingUnit, imageFile }) {
   return data;
 }
 
-export async function updateUnit({ unit, imageFile }) {
+export async function updateUnit({ unit }) {
   const token = localStorage.getItem('token');
-  const formData = new FormData();
-
-  // Properly serialize the JSON request
-  formData.append('jsonRequest', JSON.stringify(unit));
-
-  if (imageFile) {
-    formData.append('img', imageFile);
-  }
 
   const res = await fetch('http://localhost:8080/api/units', {
     method: 'PUT',
     headers: {
+      'Content-Type': 'application/json', // Đảm bảo định dạng JSON
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     },
-    body: formData,
+    body: JSON.stringify(unit), // Chuyển đổi thành chuỗi JSON
   });
 
   let data;

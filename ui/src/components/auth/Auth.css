@@ -70,7 +70,7 @@ html, body {
 .auth-logo-circle {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #a50034 0%, #d32f2f 100%);
+  /* background: linear-gradient(135deg, #a50034 0%, #d32f2f 100%); */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -99,7 +99,7 @@ html, body {
   left: -3px;
   right: -3px;
   bottom: -3px;
-  background: linear-gradient(135deg, #a50034, #d32f2f);
+  /* background: linear-gradient(135deg, #a50034, #d32f2f); */
   border-radius: 50%;
   z-index: -1;
   opacity: 0.2;
@@ -108,7 +108,7 @@ html, body {
 .auth-logo-circle img {
   width: 45px;
   height: 45px;
-  filter: brightness(0) invert(1);
+  /* filter: brightness(0) invert(1); */
 }
 
 .auth-header h2 {

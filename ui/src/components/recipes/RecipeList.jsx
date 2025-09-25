@@ -12,7 +12,7 @@ import { Select, Pagination, Input, Rate } from "antd";
 import "antd/dist/reset.css";
 import "./RecipeList.css";
 import { toast } from "react-toastify";
-import { addFavorite } from "../../api/user";
+import { addFavorite, getAllUser } from "../../api/user";
 import Recommendation from "../common/recommendation/Recommendation";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import ScrollToTopButton from "../common/ScrollToTopButton";
@@ -31,16 +31,15 @@ const RecipeList = () => {
   const [size, setSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(10);
   const [keyword, setKeyword] = useState("");
-  const [minTime, setMinTime] = useState("");
-  const [maxTime, setMaxTime] = useState("");
   const [categoryIds, setCategoryIds] = useState([]);
   const [ingredientIds, setIngredientIds] = useState([]);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const params = new URLSearchParams(location.search);
   const categoryIdFromUrl = params.get("categoryId");
-  const [sortField, setSortField] = useState("id,asc");
-  const [typeTime, setTypeTime] = useState("hour");
+  const [sortField, setSortField] = useState("id,desc");
+  const [authorUsernames, setAuthorUsernames] = useState([]);
+  const [listUser, setListUser] = useState([]);
 
   useEffect(() => {
     if (categoryIdFromUrl) {
@@ -53,6 +52,10 @@ const RecipeList = () => {
     fetchIngredients()
       .then((data) => setIngredients(data.data || []))
       .catch(() => setIngredients([]));
+    getAllUser()
+      .then((data) => setListUser(data.data || []))
+      .catch(() => setListUser([]));
+      
   }, []);
 
   const fetchData = async () => {
@@ -62,8 +65,8 @@ const RecipeList = () => {
         keyword,
         categoryIds,
         ingredientIds,
-        minTime: minTime || undefined,
-        maxTime: maxTime || undefined,
+        authorUsernames: authorUsernames,
+        status: 1,
         page,
         size: size,
         sort: sortField,
@@ -87,42 +90,13 @@ const RecipeList = () => {
     keyword,
     categoryIds,
     ingredientIds,
+    authorUsernames,
     // minTime,
     // maxTime,
     page,
     size,
     sortField,
   ]);
-
-  const handleMinTimeChange = (value) => {
-    const num = value ? Number(value) : null;
-
-    // Chỉ validate khi cả hai giá trị cùng tồn tại
-    console.log(num, " - ", maxTime);
-
-    if (num !== null && maxTime !== null && num > Number(maxTime)) {
-      toast.error("Khoảng thời gian không hợp lệ!");
-      return;
-    }
-
-    setPage(0);
-    setMinTime(value || null);
-  };
-
-  const handleMaxTimeChange = (value) => {
-    const num = value ? Number(value) : null;
-
-    // Chỉ validate khi cả hai giá trị cùng tồn tại
-    console.log(minTime, " - ", num);
-
-    if (num !== null && minTime !== null && num < Number(minTime)) {
-      toast.error("Khoảng thời gian không hợp lệ!");
-      return;
-    }
-
-    setPage(0);
-    setMaxTime(value || null);
-  };
 
   const [favoriteLoading, setFavoriteLoading] = useState({});
   const handleAddFavorite = async (id) => {
@@ -252,65 +226,26 @@ const RecipeList = () => {
               </div>
               <div className="filter-group">
                 <label style={{ display: "block", fontWeight: 600 }}>
-                  Thời gian làm
+                  Người dùng
                 </label>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    // background: "#fafafa",
-                    padding: "0px 16px",
-                    borderRadius: 8,
-                    // border: "1px solid #ddd",
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Chọn người dùng"
+                  value={authorUsernames}
+                  onChange={(vals) => {
+                    setAuthorUsernames(vals); // Chỉ gửi username thay vì cả user
+                    setPage(0);
                   }}
+                  optionFilterProp="children"
+                  showSearch
                 >
-                  <label style={{ fontSize: 14 }}>Từ:</label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="Từ..."
-                    value={minTime ?? ""}
-                    onChange={(e) => {
-                      setPage(0);
-                      setMinTime(e.target.value);
-                      handleMinTimeChange(e.target.value);
-                    }}
-                    style={{
-                      width: 100,
-                      borderRadius: 6,
-                    }}
-                  />
-                  <span style={{ fontWeight: 500, color: "#888" }}>-</span>
-                  <label style={{ fontSize: 14 }}>Đến:</label>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="Đến..."
-                    value={maxTime ?? ""}
-                    onChange={(e) => {
-                      setPage(0);
-                      setMaxTime(e.target.value);
-                      handleMaxTimeChange(e.target.value);
-                    }}
-                    style={{
-                      width: 100,
-                      borderRadius: 6,
-                    }}
-                  />
-                  <Select
-                    value={typeTime}
-                    onChange={(value) => {
-                      setTypeTime(value);
-                      setPage(0);
-                    }}
-                    style={{ minWidth: 100 }}
-                    options={[
-                      { value: "minute", label: "Phút" },
-                      { value: "hour", label: "Giờ" },
-                    ]}
-                  />
-                </div>
+                  {listUser.map((user) => (
+                    <Option key={user.username} value={user.username}>
+                      {user.username} - {user.fullName}
+                    </Option>
+                  ))}
+                </Select>
               </div>
 
               <div className="filter-group">

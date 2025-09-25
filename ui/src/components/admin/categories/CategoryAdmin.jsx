@@ -25,6 +25,8 @@ const CategoryAdmin = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [img, setImg] = useState(null);
 
+  const DEFAULT_IMAGE = "http://localhost:9000/images/default-category.jpg";
+
   const handleOpenPopup = (category) => {
     setSelectedCategory(category);
     setOpenPopup(true);
@@ -260,7 +262,7 @@ const CategoryAdmin = () => {
         file={img}
         fields={[
           { name: "name", label: "Tên danh mục", type: "text" },
-          { name: "imgUrl", label: "Ảnh minh họa", type: "image" },
+          { name: "imgUrl", label: "Ảnh minh họa", type: "image", defaultImage: DEFAULT_IMAGE },
           { name: "description", label: "Mô tả", type: "textarea" },
         ]}
         onUpdate={(updatedData, img) => {

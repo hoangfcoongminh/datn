@@ -54,7 +54,8 @@ const EditProfile = () => {
         username: currentUser.username,
         email: values.email || currentUser.email,
         fullName: values.fullName,
-        description: values.description
+        description: values.description,
+        role: currentUser.role,
       };
 
       const response = await updateUserProfile(updatedUser, imageFile);

@@ -30,23 +30,37 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
     <AntHeader className="main-header">
       <div
         className="header-left"
-        style={{ display: "flex", alignItems: "center", gap: 18 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 18,
+          cursor: "pointer",
+        }}
       >
-        <img
-          src={logo}
-          alt="logo"
-          className="header-logo"
-          onClick={() => onNavigate("home")}
+        <div onClick={() => onNavigate("home")}>
+          <img
+            src={logo}
+            alt="logo"
+            className="header-logo"
+            style={{
+              marginLeft: 40,
+              height: 60,
+              width: "auto",
+              borderRadius: 5,
+              border: "none",
+              backgroundColor: "white",
+            }}
+          />
+        </div>
+        <span
           style={{
-            cursor: "pointer",
-            marginLeft: 40,
-            height: 60,
-            width: "auto",
-            borderRadius: 5,
-            border: "none",
-            backgroundColor: "white",
+            color: "#a50034",
+            fontWeight: 600,
+            textTransform: "uppercase",
           }}
-        />
+        >
+          Cooking-craft
+        </span>
         <Menu
           mode="horizontal"
           selectedKeys={[]}
@@ -162,7 +176,8 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
                     { key: "logout", label: "Đăng xuất" },
                   ],
                   onClick: ({ key }) => {
-                    if (key === "myprofile") navigate("/user/" + user.user.username);
+                    if (key === "myprofile")
+                      navigate("/user/" + user.user.username);
                     if (key === "account") navigate("/profile/edit");
                     if (key === "myrecipe") navigate("/recipes/my-recipes");
                     if (key === "logout") onLogout();

@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signup } from '../../api/auth';
 import { toast } from 'react-toastify';
 import ChatLauncher from '../common/chatbot/ChatLauncher';
+import cookingImg from '../../assets/cooking.png';
 
 const SignupPage = ({ onSignup }) => {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ const SignupPage = ({ onSignup }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password || !confirmPassword || !fullName) {
+    if (!username || !password || !confirmPassword) {
       setError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
@@ -50,7 +51,7 @@ const SignupPage = ({ onSignup }) => {
       <div className="auth-form-wrapper">
         <div className="auth-header">
           <div className="auth-logo-circle">
-            <img src="/vite.svg" alt="CookCraft" />
+            <img src={cookingImg} alt="CookCraft" />
           </div>
           <h2>Đăng ký</h2>
           <p className="auth-sub">Tạo tài khoản CookCraft để bắt đầu hành trình nấu ăn!</p>
@@ -66,6 +67,7 @@ const SignupPage = ({ onSignup }) => {
               onChange={e => setUsername(e.target.value)}
               autoComplete="username"
               disabled={loading}
+              required
             />
           </div>
           
@@ -102,6 +104,7 @@ const SignupPage = ({ onSignup }) => {
               onChange={e => setPassword(e.target.value)}
               autoComplete="new-password"
               disabled={loading}
+              required
             />
             <span
               className="password-toggle"
@@ -121,6 +124,7 @@ const SignupPage = ({ onSignup }) => {
               onChange={e => setConfirmPassword(e.target.value)}
               autoComplete="new-password"
               disabled={loading}
+              required
             />
             <span
               className="password-toggle"

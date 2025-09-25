@@ -7,6 +7,7 @@ import {
   FaHeart,
   FaRegHeart,
   FaArrowLeft,
+  FaEye
 } from "react-icons/fa";
 import { MdOutlineFavorite } from "react-icons/md";
 import { getRecipeDetail } from "../../api/recipe";
@@ -19,6 +20,7 @@ import { addFavorite } from "../../api/user";
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import moment from 'moment';
 import ScrollToTopButton from "../common/ScrollToTopButton";
+import Role from "../../enums/role";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -212,8 +214,12 @@ const RecipeDetail = () => {
                 <MdOutlineFavorite />
                 <span>Số lượt thích: {recipe.totalFavorite}</span>
               </div>
+              <div className="stat-item">
+                <FaEye />
+                <span>Số lượt xem: {recipe.viewCount}</span>
+              </div>
             </div>
-            {(recipe.videoUrl || isAuthor) && (
+            {/* {(recipe.videoUrl || isAuthor) && ( */}
               <div
                 style={{
                   display: "flex",
@@ -237,7 +243,7 @@ const RecipeDetail = () => {
                     {showVideo ? "Ẩn video hướng dẫn" : "Xem video hướng dẫn"}
                   </Button>
                 )}
-                {isAuthor && (
+                {(isAuthor || user.user.role === Role.ADMIN) && (
                   <Button
                     type="primary"
                     style={{
@@ -253,7 +259,7 @@ const RecipeDetail = () => {
                   </Button>
                 )}
               </div>
-            )}
+            {/* )} */}
           </div>
         </div>
 

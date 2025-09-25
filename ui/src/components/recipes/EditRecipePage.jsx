@@ -39,6 +39,8 @@ const EditRecipePage = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [preVideoFile, setPreVideoFile] = useState(null);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -50,8 +52,7 @@ const EditRecipePage = () => {
           fetchIngredients(),
           fetchUnits(),
         ]);
-        
-        const user = JSON.parse(localStorage.getItem("user"));
+
         setImageFileDetail(recipe.imgUrl);
         if (!user || recipe.authorId !== user.id) {
           setCanEdit(false);
@@ -75,9 +76,10 @@ const EditRecipePage = () => {
             });
           }
         }
-        setCategories(cats.data || []);
-        setIngredients(ings.data || []);
-        setUnits(uns.data || []);
+        setCategories(cats || []);
+        setIngredients(ings || []);
+        setUnits(uns || []);
+
       } catch (err) {
         setError(err.message || "Lỗi khi tải dữ liệu.");
       } finally {
@@ -102,6 +104,7 @@ const EditRecipePage = () => {
         prepTime: values.prepTime,
         cookTime: values.cookTime,
         servings: values.servings,
+        status: values.status,
         ingredients: (values.ingredients || []).map((ing) => ({
           ingredientId: ing.ingredientId,
           actualUnitId: ing.actualUnitId,
@@ -113,11 +116,24 @@ const EditRecipePage = () => {
         })),
       };
 
-      console.log("Video file:", videoFile);
+      if (recipe.ingredients.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một nguyên liệu.");
+        setLoading(false);
+        return;
+      }
+      if (recipe.steps.length === 0) {
+        toast.error("Vui lòng thêm ít nhất một bước nấu.");
+        setLoading(false);
+        return;
+      }
 
       await updateRecipe(recipe, imageFile, videoFile);
       toast.success("Cập nhật công thức thành công!");
-      navigate(`/recipes/${id}`);
+      if (values.status === 1) {
+        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate(-1);
+      } else if (values.status === 0) {
+        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate('/my-recipes');
+      }
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
       toast.error(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
@@ -171,6 +187,16 @@ const EditRecipePage = () => {
         }
       >
         <Form layout="vertical" form={form} onFinish={handleFinish}>
+          <Form.Item name="status" required>
+            <Select
+              placeholder="Chọn trạng thái"
+              style={{ width: 160, float: "right" }}
+              dropdownStyle={{ textAlign: "left" }}
+            >
+              <Option value={1} style={{ color: "green" }}>Hoạt động</Option>
+              <Option value={0} style={{ color: "red" }}>Ngưng hoạt động</Option>
+            </Select>
+          </Form.Item>
           <Form.Item label="Tên công thức" name="title" required>
             <Input placeholder="Nhập tên công thức" />
           </Form.Item>
@@ -330,7 +356,7 @@ const EditRecipePage = () => {
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%' }} onClick={() => add()} block>
                   + Thêm nguyên liệu
                 </Button>
               </div>
@@ -376,15 +402,12 @@ const EditRecipePage = () => {
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%' }} onClick={() => add()} block>
                   + Thêm bước nấu
                 </Button>
               </div>
             )}
           </Form.List>
-          {error && (
-            <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
-          )}
           <Form.Item style={{ marginTop: 32 }}>
             <Button type="primary" htmlType="submit" loading={loading}>
               Lưu thay đổi

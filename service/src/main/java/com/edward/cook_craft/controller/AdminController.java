@@ -1,9 +1,9 @@
 package com.edward.cook_craft.controller;
 
 import com.edward.cook_craft.dto.request.DashBoardRequest;
-import com.edward.cook_craft.dto.request.RecipeFilterRequest;
 import com.edward.cook_craft.service.admin.AdminService;
 import com.edward.cook_craft.service.admin.DashboardService;
+import com.edward.cook_craft.service.admin.User_AdminService;
 import com.edward.cook_craft.service.admin.dto.request.*;
 import com.edward.cook_craft.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -21,6 +22,15 @@ public class AdminController {
 
     private final DashboardService dashboardService;
     private final AdminService adminService;
+    private final User_AdminService userAdminService;
+
+    @PostMapping("/user/add")
+    public ResponseEntity<?> addUser(
+            @RequestPart(name = "jsonRequest") String jsonRequest,
+            @RequestPart(name = "img", required = false ) MultipartFile file
+    ) {
+        return ResponseUtils.handleSuccess(userAdminService.addUser(jsonRequest, file));
+    }
 
     @GetMapping("/dashboard/recipes")
     public ResponseEntity<?> getRecipeStats(
