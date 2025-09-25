@@ -39,6 +39,8 @@ const EditRecipePage = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [preVideoFile, setPreVideoFile] = useState(null);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -51,7 +53,6 @@ const EditRecipePage = () => {
           fetchUnits(),
         ]);
 
-        const user = JSON.parse(localStorage.getItem("user"));
         setImageFileDetail(recipe.imgUrl);
         if (!user || recipe.authorId !== user.id) {
           setCanEdit(false);
@@ -129,9 +130,9 @@ const EditRecipePage = () => {
       await updateRecipe(recipe, imageFile, videoFile);
       toast.success("Cập nhật công thức thành công!");
       if (values.status === 1) {
-        navigate(-1);
+        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate(-1);
       } else if (values.status === 0) {
-        navigate('/recipes/my-recipes'); // Lui về trước đó 2 màn hình nếu ngưng hoạt động
+        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate('/my-recipes');
       }
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
@@ -355,7 +356,7 @@ const EditRecipePage = () => {
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%' }} onClick={() => add()} block>
                   + Thêm nguyên liệu
                 </Button>
               </div>
@@ -401,7 +402,7 @@ const EditRecipePage = () => {
                     </Button>
                   </Space>
                 ))}
-                <Button type="dashed" style={{ width: '20%'}} onClick={() => add()} block>
+                <Button type="dashed" style={{ width: '20%' }} onClick={() => add()} block>
                   + Thêm bước nấu
                 </Button>
               </div>

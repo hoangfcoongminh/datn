@@ -6,6 +6,7 @@ import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-de
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import { fetchAllCategories } from "../../../api/category";
+import { useNavigate } from "react-router-dom";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -19,6 +20,7 @@ const RecipeAdmin = () => {
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [sort, setSort] = useState("id,asc");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
@@ -157,7 +159,7 @@ const RecipeAdmin = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" icon={<EyeOutlined />} onClick={() => handleOpenPopup(record)}>
+          <Button type="primary" icon={<EyeOutlined />} onClick={() => navigate(`/recipes/${record.id}`)}>
             Chi tiết
           </Button>
         </Space>
@@ -217,7 +219,7 @@ const RecipeAdmin = () => {
 
           <Button
             type="primary"
-            // onClick={handleOpenCreatePopup}
+            onClick={() => navigate('/recipes/add')}
             style={{
               backgroundColor: "#52c41a",
               borderColor: "#52c41a",

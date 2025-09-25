@@ -9,7 +9,7 @@ import {
 
 const { Option } = Select;
 
-const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
+const PopupDetail = ({ open, onClose, data, onUpdate, fields = [] }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(data || {});
   const [selectedFile, setSelectedFile] = useState(null);
@@ -21,10 +21,14 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
   ];
 
   useEffect(() => {
+    // đảm bảo formData luôn là object (không null)
     if (data) {
       setFormData(data);
     } else {
-      const initial = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {});
+      const initial = (fields || []).reduce(
+        (acc, field) => ({ ...acc, [field.name]: "" }),
+        {}
+      );
       setFormData({ status: 1, ...initial });
     }
     setSelectedFile(null); // reset file khi mở popup mới
@@ -44,12 +48,6 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setFormData(data);
-    setSelectedFile(null);
   };
 
   const handleChange = (field, value) => {
@@ -76,10 +74,7 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
             <span>Trạng thái: </span>
             <Select
               style={{ width: 150 }}
-              value={
-                statusOptions.find((option) => option.value === formData.status)
-                  ?.value
-              }
+              value={formData?.status ?? 1}
               disabled={!isEditing}
               onChange={(value) => handleChange("status", value)}
             >
@@ -88,7 +83,6 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
                   <span
                     style={{
                       color: option.value === 1 ? "green" : "red",
-                    //   fontWeight: 400,
                     }}
                   >
                     {option.label}
@@ -102,59 +96,129 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Render dynamic fields */}
-        {fields.map((field) => {
-          if (field.type === "text") {
-            return (
-              <Input
-                key={field.name}
-                placeholder={field.label}
-                value={formData[field.name] || ""}
-                disabled={!isEditing}
-                onChange={(e) => handleChange(field.name, e.target.value)}
-              />
-            );
+        {(fields || []).map((field) => {
+  if (!field || !field.name) return null;
+
+  // text input
+  if (field.type === "text") {
+    return (
+      <div key={field.name} style={{ marginBottom: 16 }}>
+        <label
+          style={{ display: "block", marginBottom: 8, fontWeight: 600 }}
+        >
+          {field.label}
+        </label>
+        <Input
+          placeholder={field.label}
+          value={formData[field.name] || ""}
+          disabled={!isEditing}
+          onChange={(e) => handleChange(field.name, e.target.value)}
+        />
+      </div>
+    );
+  }
+
+  // textarea
+  if (field.type === "textarea") {
+    return (
+      <div key={field.name} style={{ marginBottom: 16 }}>
+        <label
+          style={{ display: "block", marginBottom: 8, fontWeight: 600 }}
+        >
+          {field.label}
+        </label>
+        <Input.TextArea
+          placeholder={field.label}
+          value={formData[field.name] || ""}
+          disabled={!isEditing}
+          onChange={(e) => handleChange(field.name, e.target.value)}
+        />
+      </div>
+    );
+  }
+
+  // image
+  if (field.type === "image") {
+    return (
+      <div key={field.name} style={{ marginBottom: 16, textAlign: "center" }}>
+        <label
+          style={{ display: "block", marginBottom: 8, fontWeight: 600 }}
+        >
+          {field.label}
+        </label>
+        <Image
+          src={
+            selectedFile
+              ? URL.createObjectURL(selectedFile)
+              : formData[field.name] || field.defaultImage
           }
-          if (field.type === "textarea") {
-            return (
-              <Input.TextArea
-                key={field.name}
-                placeholder={field.label}
-                value={formData[field.name] || ""}
-                disabled={!isEditing}
-                onChange={(e) => handleChange(field.name, e.target.value)}
-              />
-            );
-          }
-          if (field.type === "image") {
-            return (
-              <div key={field.name} style={{ textAlign: "center" }}>
-                <Image
-                  src={
-                    selectedFile
-                      ? URL.createObjectURL(selectedFile)
-                      : formData[field.name] || ""
-                  }
-                  alt={field.label}
-                  style={{ maxWidth: "100%", maxHeight: 200 }}
-                />
-                {isEditing && (
-                  <Upload
-                    showUploadList={false}
-                    beforeUpload={(file) => {
-                      setSelectedFile(file);
-                      return false; // không upload tự động
-                    }}
-                  >
-                    <Button icon={<UploadOutlined />} style={{ marginTop: 8 }}>
-                      Chọn ảnh mới
-                    </Button>
-                  </Upload>
-                )}
-              </div>
-            );
-          }
-          return null;
-        })}
+          alt={field.label}
+          style={{ maxWidth: "100%", maxHeight: 200 }}
+        />
+        {isEditing && (
+          <Upload
+            showUploadList={false}
+            beforeUpload={(file) => {
+              setSelectedFile(file);
+              return false;
+            }}
+          >
+            <Button icon={<UploadOutlined />} style={{ marginTop: 8 }}>
+              Chọn ảnh mới
+            </Button>
+          </Upload>
+        )}
+      </div>
+    );
+  }
+
+  // select
+  if (field.type === "select" && Array.isArray(field.options)) {
+    return (
+      <div key={field.name} style={{ marginBottom: 16 }}>
+        <label
+          style={{ display: "block", marginBottom: 8, fontWeight: 600 }}
+        >
+          {field.label}
+        </label>
+        <Select
+          placeholder={field.label}
+          value={formData[field.name] || undefined}
+          disabled={!isEditing}
+          onChange={(value) => handleChange(field.name, value)}
+        >
+          {field.options.map((option) => (
+            <Option key={option.value} value={option.value}>
+              {option.label}
+            </Option>
+          ))}
+        </Select>
+      </div>
+    );
+  }
+
+  // password (chỉ hiện khi thêm mới, tức là data = null)
+  if (field.type === "password" && !data) {
+    return (
+      <div key={field.name} style={{ marginBottom: 16 }}>
+        <label
+          style={{ display: "block", marginBottom: 8, fontWeight: 600 }}
+        >
+          {field.label}
+        </label>
+        <Input.Password
+          placeholder={field.label}
+          value={formData[field.name] || ""}
+          onChange={(e) => handleChange(field.name, e.target.value)}
+          style={{ borderRadius: 8 }}
+        />
+      </div>
+    );
+  }
+
+  return null;
+})}
+
       </div>
 
       {/* Footer buttons */}
@@ -182,7 +246,7 @@ const PopupDetail = ({ open, onClose, data, onUpdate, fields }) => {
             </Button>
             <Button
               type="default"
-              onClick={handleCancelEdit}
+              onClick={onClose} // Đóng modal ngay lập tức
               icon={<CloseOutlined />}
             >
               Đóng

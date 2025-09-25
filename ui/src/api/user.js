@@ -129,3 +129,39 @@ export async function getAllUser() {
     toast.error(err.message);
   }
 }
+
+export async function addUser({ userData, imageFile }) {
+  try {
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    console.log('data', userData);
+    
+    // Chỉ lấy các trường cần thiết từ userData
+    const user = {
+      username: userData.username,
+      password: userData.password,
+      fullName: userData.fullName,
+      role: userData.role, // role là enums
+    };
+
+    formData.append("jsonRequest", JSON.stringify(user));
+    if (imageFile) {
+      formData.append("img", imageFile);
+    }
+
+    const res = await fetch(`http://localhost:8080/api/admin/user/add`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    let data = await res.json();
+    if (!data.success) {
+      toast.error(data.message);
+    }
+    return data;
+  } catch (err) {
+    toast.error(err.message);
+  }
+}
