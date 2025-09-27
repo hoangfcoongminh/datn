@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Image, Tag, Rate, Space } from 'antd';
 import { StopOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HeartOutlined, EyeFilled } from "@ant-design/icons";
 import { filterRecipes } from '../../api/recipe';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ChatLauncher from '../common/chatbot/ChatLauncher';
 import ScrollToTopButton from '../common/ScrollToTopButton';
 import { fetchAllCategories } from "../../api/category";
+import { FaArrowLeft } from 'react-icons/fa';
 
 const MyRecipeList = () => {
     const [recipes, setRecipes] = useState([]);
@@ -179,7 +180,11 @@ const MyRecipeList = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1 style={{ textAlign: 'center' }}>Danh sách công thức của tôi</h1>
+            <h1 style={{ textAlign: 'center', fontWeight: 600, color: "#a50034" }}>Danh sách công thức của tôi</h1>
+            <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
+                <FaArrowLeft />
+                Quay lại
+            </Link>
             <Table
                 columns={columns}
                 dataSource={recipes}

@@ -262,7 +262,7 @@ const RecipeList = () => {
                     { value: "title,desc", label: "Tên giảm dần" },
                     { value: "id,asc", label: "Cũ nhất" },
                     { value: "id,desc", label: "Mới nhất" },
-                    // { value: "favorites,desc", label: "Yêu thích nhất" },
+                    { value: "favorite,desc", label: "Yêu thích nhất" },
                   ]}
                 />
               </div>
@@ -380,24 +380,6 @@ const RecipeList = () => {
                       </div>
                       <div className="card-footer">
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          {/* <button 
-                            className="like-button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              handleAddFavorite(recipe.id);
-                            }}
-                            disabled={favoriteLoading[recipe.id]}
-                            title={
-                              recipe.isFavorite ? "Bỏ yêu thích" : "Yêu thích"
-                            }
-                          >
-                            {recipe.isFavorite ? (
-                              <FaHeart />
-                            ) : (
-                              <FaHeart style={{ opacity: 0.3 }} />
-                            )}
-                          </button> */}
                           <span className="rec-fav">
                             <Button
                               type="text"

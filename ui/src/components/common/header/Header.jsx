@@ -173,6 +173,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
                     { key: "myprofile", label: "Trang cá nhân" },
                     { key: "account", label: "Quản lý tài khoản" },
                     { key: "myrecipe", label: "Công thức của tôi" },
+                    { key: "favorite", label: "Công thức yêu thích" },
                     { key: "logout", label: "Đăng xuất" },
                   ],
                   onClick: ({ key }) => {
@@ -180,6 +181,7 @@ const Header = ({ user, onLogout, onAccount, onNavigate }) => {
                       navigate("/user/" + user.user.username);
                     if (key === "account") navigate("/profile/edit");
                     if (key === "myrecipe") navigate("/recipes/my-recipes");
+                    if (key === 'favorite') navigate('/recipes/favorites');
                     if (key === "logout") onLogout();
                   },
                 }}

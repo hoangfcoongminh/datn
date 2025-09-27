@@ -43,7 +43,7 @@ const IngredientPage = () => {
   const [units, setUnits] = useState([]);
 
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState("id,asc");
+  const [sortField, setSortField] = useState("id,desc");
   const [unitIds, setUnitIds] = useState([]);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);

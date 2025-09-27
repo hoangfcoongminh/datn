@@ -15,6 +15,7 @@ public class UserMapper {
                 .description(request.getDescription())
                 .imgUrl(request.getImgUrl())
                 .role(request.getRole())
+                .status(request.getStatus())
                 .build();
     }
 }

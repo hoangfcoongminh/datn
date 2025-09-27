@@ -138,4 +138,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
                                        @Param("authorUsernames") List<String> authorUsernames,
                                        @Param("status") Integer status,
                                        Pageable pageable);
+
+    List<Recipe> findAllByCreatedAtAfter(LocalDateTime createdAtAfter);
+
+    @Query(value = "SELECT r " +
+            "FROM Favorite f " +
+            "INNER JOIN Recipe r " +
+            "ON r.id = f.recipeId " +
+            "INNER JOIN User u " +
+            "ON f.userId = u.id " +
+            "WHERE u.username = :username " +
+            "AND f.status = 1 " +
+            "AND r.status = 1")
+    Page<Recipe> getFavoritesByUsername(@Param("username") String username, Pageable pageable);
 }

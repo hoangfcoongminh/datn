@@ -6,7 +6,7 @@ import { EyeOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
 import AdminSidebar from "../common/AdminSidebar";
 import ChatLauncher from "../../common/chatbot/ChatLauncher";
 import PopupDetail from "../common/PopupDetail";
-import { updateUserProfile, addUser } from "../../../api/user"; 
+import { updateUserProfile, addUser } from "../../../api/user";
 import Role from "../../../enums/role";
 
 const UserAdmin = () => {
@@ -43,11 +43,17 @@ const UserAdmin = () => {
 
   const handleUpdateUser = async (updatedData, img) => {
     try {
-      const response = await updateUserProfile({ user: updatedData, imageFile: img });
-      toast.success("Cập nhật người dùng thành công");
-      setUsers((prev) => prev.map((u) => u.id === updatedData.id ? { ...u, ...response.data } : u
-      )
-      );
+      console.log("data", updatedData);
+      
+      const response = await updateUserProfile({ userData: updatedData, imageFile: img });
+      if (response.success) {
+        toast.success("Cập nhật người dùng thành công");
+        setUsers((prev) => prev.map((u) => u.username === updatedData.username ? { ...u, ...response.data } : u
+        )
+        );
+      } else {
+        toast.error(response.message || "Cập nhật người dùng thất bại");
+      }
     } catch {
       toast.error("Cập nhật người dùng thất bại");
     }
@@ -56,8 +62,13 @@ const UserAdmin = () => {
   const handleAddUser = async (newData, img) => {
     try {      
       const response = await addUser({ userData: newData, imageFile: img });
-      toast.success("Thêm người dùng thành công");
-      setUsers((prev) => [response.data, ...prev]);
+      if (response.success) {
+        toast.success("Thêm người dùng thành công");
+        setUsers((prev) => [response.data, ...prev]);
+      }
+      else {
+        toast.error(response.message || "Thêm người dùng thất bại");
+      }
     } catch {
       toast.error("Thêm người dùng thất bại");
     }

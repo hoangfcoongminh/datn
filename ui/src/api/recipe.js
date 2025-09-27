@@ -38,14 +38,14 @@ export async function createRecipe(recipe, imageFile, videoFile) {
   formData.append('jsonRequest', JSON.stringify(recipe));
   if (imageFile) {
     formData.append('img', imageFile);
-  }  
+  }
   if (videoFile) {
     formData.append('video', videoFile);
   }
   const res = await fetch('http://localhost:8080/api/recipes', {
     method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    headers: {
+      'Authorization': `Bearer ${token}`
       // KHÔNG set Content-Type, để browser tự set boundary cho multipart
     },
     body: formData
@@ -150,3 +150,28 @@ export async function getPopularRecipe(type) {
   }
   return data;
 }
+
+export async function getFavoriteRecipes({ page, size, sort }) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(
+    `http://localhost:8080/api/recipes/favorites?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`,
+    {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    }
+  );
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    toast.error('Lỗi không xác định từ máy chủ.');
+  }
+  if (!data.success) {
+    let err = data.message;
+    throw new Error(err.message || "Lỗi khi tải công thức");
+  }
+  return data;
+};

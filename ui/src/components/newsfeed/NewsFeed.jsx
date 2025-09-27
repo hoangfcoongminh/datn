@@ -12,6 +12,7 @@ import { useNavigate, Link } from "react-router-dom";
 import TopUsersCarousel from "../common/rating/Rating";
 import CountUp from 'react-countup';
 import ScrollToTopButton from "../common/ScrollToTopButton";
+import { fetchNewsFeed } from "../../api/newsfeed";
 
 const { Option } = Select;
 
@@ -36,10 +37,10 @@ export default function NewsFeed() {
 
   // Mock data for new sections
   const [weeklyStats, setWeeklyStats] = useState({
-    totalRecipes: 1250,
-    newRecipes: 45,
-    totalUsers: 8924,
-    activeUsers: 1847
+    totalUser: 0,
+    activeUser: 0,
+    totalRecipe: 0,
+    newRecipeOfWeek: 0
   });
 
   const [trendingCategories, setTrendingCategories] = useState([]);
@@ -114,6 +115,20 @@ export default function NewsFeed() {
     }
   }
 
+  const fetchWeeklyStats = async () => {
+    try {
+      const data = await fetchNewsFeed();
+      console.log('weekly stats', data);
+      
+      if (data.success) {
+        setWeeklyStats(data.data);
+      } else {
+        toast.error("Lỗi khi tải thống kê cho newsfeed");
+      }
+    } catch (err) {
+      toast.error(err.message || "Lỗi khi tải thống kê tuần");
+    }
+  };
 
   // Effect cho việc fetch dữ liệu ban đầu
   useEffect(() => {
@@ -127,6 +142,7 @@ export default function NewsFeed() {
           fetchPopularByView(),
           fetchPopularUsers(),
           getPopularCategories(),
+          fetchWeeklyStats(), // Fetch weekly stats
         ]);
       } catch (err) {
         if (isMounted) toast.error(err?.message || "Có lỗi xảy ra");
@@ -212,16 +228,16 @@ export default function NewsFeed() {
         <div className="hero-stats">
           <Row gutter={16} justify="center">
             <Col span={6}>
-              <Statistic title="Tổng công thức" valueRender={() => <CountUp end={weeklyStats.totalRecipes} duration={1.5} />} prefix={<BookOutlined />} />
+              <Statistic title="Tổng công thức" valueRender={() => <CountUp end={weeklyStats.totalRecipe} duration={1.5} />} prefix={<BookOutlined />} />
             </Col>
             <Col span={6}>
-              <Statistic title="Công thức mới" valueRender={() => <CountUp end={weeklyStats.newRecipes} duration={1.5} />} prefix={<FireOutlined />} />
+              <Statistic title="Công thức mới trong tuần" valueRender={() => <CountUp end={weeklyStats.newRecipeOfWeek} duration={1.5} />} prefix={<FireOutlined />} />
             </Col>
             <Col span={6}>
-              <Statistic title="Người dùng" valueRender={() => <CountUp end={weeklyStats.totalUsers} duration={1.5} />} prefix={<UserOutlined />} />
+              <Statistic title="Người dùng" valueRender={() => <CountUp end={weeklyStats.totalUser} duration={1.5} />} prefix={<UserOutlined />} />
             </Col>
             <Col span={6}>
-              <Statistic title="Đang hoạt động" valueRender={() => <CountUp end={weeklyStats.activeUsers} duration={1.5} />} prefix={<EyeOutlined />} />
+              <Statistic title="Đang hoạt động" valueRender={() => <CountUp end={weeklyStats.activeUser} duration={1.5} />} prefix={<EyeOutlined />} />
             </Col>
           </Row>
         </div>

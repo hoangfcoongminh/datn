@@ -323,4 +323,16 @@ public class RecipeService {
         return recipeUtils.mapWithExtraInfo(data);
     }
 
+    public Page<RecipeResponse> getFavorites(Pageable pageable) {
+        User u = SecurityUtils.getCurrentUser();
+        if (u == null) {
+            throw new CustomException("not.authenticated");
+        }
+        Page<Recipe> paged = repository.getFavoritesByUsername(u.getUsername(), pageable);
+        List<Recipe> data = paged.getContent();
+        List<RecipeResponse> response = recipeUtils.mapWithExtraInfo(data);
+
+        return new PageImpl<>(response, pageable, paged.getTotalElements());
+    }
+
 }

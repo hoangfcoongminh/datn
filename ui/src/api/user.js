@@ -85,9 +85,19 @@ export async function getUserProfile() {
   }
 }
 
-export async function updateUserProfile(user, imageFile) {
+export async function updateUserProfile({ userData, imageFile }) {
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");   
+
+    // Chỉ giữ lại các trường cần thiết
+    const user = {
+      username: userData.username,
+      email: userData.email,
+      fullName: userData.fullName,
+      description: userData.description,
+      role: userData.role,
+      status: userData.status,
+    };
     const formData = new FormData();
     formData.append("jsonRequest", JSON.stringify(user));
     if (imageFile) {

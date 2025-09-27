@@ -70,4 +70,10 @@ public class RecipeController {
         return ResponseUtils.handleSuccess(service.getPopular(type));
     }
 
+    @GetMapping("/favorites")
+    public ResponseEntity<?> getFavoriteRecipe(
+            Pageable pageable
+    ) {
+        return ResponseUtils.handleSuccess(service.getFavorites(pageable));
+    }
 }

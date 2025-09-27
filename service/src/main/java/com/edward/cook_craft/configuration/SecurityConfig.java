@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/api/units/filter",
                                 "/api/recommendation/**",
                                 "/api/categories/popular",
-                                "/api/user/popular-by/**").permitAll()
+                                "/api/user/popular-by/**",
+                                "/api/newsfeed").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ingredients").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ingredients/**").permitAll()
@@ -55,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/units/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/recipes/filter/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user").permitAll()
                         .requestMatchers(
                                 "/api/categories/**",
                                 "/api/ingredients/**",

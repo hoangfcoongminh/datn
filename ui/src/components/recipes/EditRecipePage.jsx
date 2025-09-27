@@ -132,7 +132,7 @@ const EditRecipePage = () => {
       if (values.status === 1) {
         user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate(-1);
       } else if (values.status === 0) {
-        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate('/my-recipes');
+        user.user.role === 'ADMIN' ? navigate('/admin/recipes') : navigate('/recipes/my-recipes');
       }
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra khi cập nhật công thức.");
