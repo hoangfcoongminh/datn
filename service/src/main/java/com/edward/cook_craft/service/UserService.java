@@ -11,6 +11,7 @@ import com.edward.cook_craft.enums.Role;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.UserMapper;
 import com.edward.cook_craft.model.Favorite;
+import com.edward.cook_craft.model.Recipe;
 import com.edward.cook_craft.model.Review;
 import com.edward.cook_craft.model.User;
 import com.edward.cook_craft.repository.FavoriteRepository;
@@ -77,6 +78,13 @@ public class UserService {
         }
         user.setDescription(request.getDescription());
         user.setRole(request.getRole() == null ? Role.USER : request.getRole());
+
+        if (request.getStatus() != null &&  !request.getStatus().equals(user.getStatus())) {
+            List<Recipe> recipeOfUser = recipeRepository.findAllByAuthorUsername(user.getUsername());
+            recipeOfUser.forEach(r -> r.setStatus(request.getStatus()));
+            recipeRepository.saveAll(recipeOfUser);
+        }
+
         user.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus());
 
         user = userRepository.save(user);

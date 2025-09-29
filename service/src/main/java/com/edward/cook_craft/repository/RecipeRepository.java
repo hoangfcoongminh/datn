@@ -151,4 +151,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             "AND f.status = 1 " +
             "AND r.status = 1")
     Page<Recipe> getFavoritesByUsername(@Param("username") String username, Pageable pageable);
+
+    @Query(value = "SELECT r " +
+            "FROM Recipe r " +
+            "WHERE r.authorUsername = :authorUsername " +
+            "AND r.status = 1")
+    List<Recipe> findAllByAuthorUsername(@Param("authorUsername") String authorUsername);
 }
