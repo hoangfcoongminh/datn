@@ -149,37 +149,26 @@ public class UserService {
     }
 
     public UserResponse getUser(String username) {
-        Optional<User> user = userRepository.findByUsernameAndActive(username);
-        if (user.isEmpty()) {
-            throw new CustomException("user.not.found");
-        }
-        UserResponse response = userMapper.toResponse(user.get());
-        response.setTotalReviewForUser(getTotalReviewForUser(username));
-        response.setAverageRating(getAverageRatingForUser(username));
-        response.setTotalFavoriteForUser(getTotalFavoriteForUser(username));
+        User user = userRepository.findByUsernameAndActive(username)
+                .orElseThrow(() -> new CustomException("user.not.found"));
+
+        UserResponse response = userMapper.toResponse(user);
+
+        List<Review> reviews = reviewRepository.findAllReviewForUser(username);
+
+        response.setTotalReviewForUser(reviews.size());
+        response.setAverageRating(calcAverageRating(reviews));
+        response.setTotalFavoriteForUser(favoriteRepository.countTotalFavoriteForUser(username));
+
         return response;
     }
 
-    private List<Review> getAllReviewForUser(String username) {
-        return reviewRepository.findAllReviewForUser(username);
-    }
-
-    private int getTotalReviewForUser(String username) {
-        return getAllReviewForUser(username).size();
-    }
-
-    private float getAverageRatingForUser(String username) {
-        float total = getAllReviewForUser(username)
-                .stream()
+    private float calcAverageRating(List<Review> reviews) {
+        if (reviews.isEmpty()) return 0f;
+        float total = reviews.stream()
                 .map(Review::getRating)
                 .reduce(0f, Float::sum);
-        if (getTotalReviewForUser(username) == 0)
-            return 0f;
-        return total / getTotalReviewForUser(username);
-    }
-
-    private int getTotalFavoriteForUser(String username) {
-        return favoriteRepository.findTotalFavoriteForUser(username).size();
+        return total / reviews.size();
     }
 
     public List<UserResponse> getPopular(String type) {

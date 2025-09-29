@@ -290,7 +290,7 @@ const Dashboard = () => {
 
             {/* Pie chart tổng hợp */}
             <Card
-              title="Tỷ lệ Người dùng vs Công thức"
+              title="Tỷ lệ hoạt động của người dùng"
               style={{ maxWidth: 700, margin: "0 auto" }}
             >
               <Pie

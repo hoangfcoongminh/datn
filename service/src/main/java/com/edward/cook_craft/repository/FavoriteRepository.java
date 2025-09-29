@@ -55,14 +55,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "AND f.status = 1")
     List<Favorite> findByRecipeId(@Param("recipeId") Long recipeId);
 
-    @Query(value = "SELECT f " +
-            "FROM Favorite f " +
-            "INNER JOIN Recipe r " +
-            "ON f.recipeId = r.id " +
-            "WHERE r.authorUsername = :username " +
-            "AND r.status = 1 " +
-            "AND f.status = 1 ")
-    List<Favorite> findTotalFavoriteForUser(@Param("username") String username);
+    @Query("SELECT COUNT(f) FROM Favorite f " +
+            "JOIN Recipe rc ON rc.id = f.recipeId " +
+            "WHERE rc.authorUsername = :username " +
+            "AND rc.status = 1 " +
+            "AND f.status = 1")
+    int countTotalFavoriteForUser(@Param("username") String username);
+
 
     @Query("""
         SELECT new com.edward.cook_craft.dto.response.UserResponse(

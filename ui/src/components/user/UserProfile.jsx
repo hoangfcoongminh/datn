@@ -123,7 +123,7 @@ export default function UserProfile() {
               <div className="user-info-card">
                 <div className="user-stats">
                   <div className="stat-item">
-                    <strong>{recipes.length || 0}</strong>
+                    <strong>{total || 0}</strong>
                     <span>Công thức</span>
                   </div>
                   <div className="stat-item">

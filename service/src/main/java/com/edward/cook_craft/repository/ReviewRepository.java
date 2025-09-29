@@ -56,14 +56,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND r.status = 1")
     List<Review> findByUsername(@Param("username") String username);
 
-    @Query(value = "SELECT rv " +
-            "FROM Recipe rc " +
-            "LEFT JOIN Review rv " +
-            "ON rc.id = rv.recipeId " +
+    @Query("SELECT rv FROM Review rv " +
+            "JOIN Recipe rc ON rc.id = rv.recipeId " +
             "WHERE rc.authorUsername = :username " +
             "AND rc.status = 1 " +
-            "AND rv.status = 1 ")
+            "AND rv.status = 1")
     List<Review> findAllReviewForUser(@Param("username") String username);
+
 
     @Query("""
     SELECT new com.edward.cook_craft.dto.response.UserResponse(

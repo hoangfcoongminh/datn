@@ -32,45 +32,49 @@ public class PersonalRecommendationService {
     private final RecipeUtils recipeUtils;
 
     public List<RecipeResponse> getRecommendationsForUser() {
-        User user = SecurityUtils.getCurrentUser();
-        if (user == null) {
-            List<Recipe> recipes = recipeRepository.findTop10ViewRecipes();
-            return recipeUtils.mapWithExtraInfo(recipes);
+        try {
+            User user = SecurityUtils.getCurrentUser();
+            if (user == null) {
+                List<Recipe> recipes = recipeRepository.findTop10ViewRecipes();
+                return recipeUtils.mapWithExtraInfo(recipes);
+            }
+            Long userId = user.getId();
+
+            List<Review> myReviews = reviewRepository.findByUserId(userId);
+            List<Favorite> myFavorites = favoriteRepository.findAllFavoriteByUserId(userId);
+
+            Set<Long> interactedRecipeIds = Stream.concat(
+                    myReviews.stream().map(Review::getRecipeId),
+                    myFavorites.stream().map(Favorite::getRecipeId)
+            ).collect(Collectors.toSet());
+
+            Set<Long> similarUsers = findSimilarUsers(userId, myReviews, myFavorites);
+            List<Review> reviews = reviewRepository.findAllActive();
+            List<Long> cfRecipeIds = reviews.stream()
+                    .filter(r -> similarUsers.contains(r.getUserId()))
+                    .filter(r -> r.getRating() >= 4)
+                    .map(Review::getRecipeId)
+                    .filter(id -> !interactedRecipeIds.contains(id))
+                    .distinct()
+                    .toList();
+
+            List<Recipe> suggestions = recipeRepository.findAllByIdActive(cfRecipeIds);
+
+            if (suggestions.size() < 5) {
+                List<Recipe> cbResults = contentBasedSuggestion(myReviews, myFavorites, interactedRecipeIds);
+                suggestions.addAll(cbResults);
+            }
+            if (suggestions.size() < 10) {
+                List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
+                        suggestions.stream().map(Recipe::getId).toList());
+                suggestions.addAll(topView);
+            }
+            var response = recipeUtils.mapWithExtraInfo(suggestions);
+
+            return response.stream().distinct().limit(10).toList();
+        } catch (Exception e) {
+            return null;
         }
-        Long userId = user.getId();
-
-        List<Review> myReviews = reviewRepository.findByUserId(userId);
-        List<Favorite> myFavorites = favoriteRepository.findAllFavoriteByUserId(userId);
-
-        Set<Long> interactedRecipeIds = Stream.concat(
-                myReviews.stream().map(Review::getRecipeId),
-                myFavorites.stream().map(Favorite::getRecipeId)
-        ).collect(Collectors.toSet());
-
-        Set<Long> similarUsers = findSimilarUsers(userId, myReviews, myFavorites);
-        List<Review> reviews = reviewRepository.findAllActive();
-        List<Long> cfRecipeIds = reviews.stream()
-                .filter(r -> similarUsers.contains(r.getUserId()))
-                .filter(r -> r.getRating() >= 4)
-                .map(Review::getRecipeId)
-                .filter(id -> !interactedRecipeIds.contains(id))
-                .distinct()
-                .toList();
-
-        List<Recipe> suggestions = recipeRepository.findAllByIdActive(cfRecipeIds);
-
-        if (suggestions.size() < 5) {
-            List<Recipe> cbResults = contentBasedSuggestion(myReviews, myFavorites, interactedRecipeIds);
-            suggestions.addAll(cbResults);
-        }
-        if (suggestions.size() < 10) {
-            List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
-                    suggestions.stream().map(Recipe::getId).toList());
-            suggestions.addAll(topView);
-        }
-        var response = recipeUtils.mapWithExtraInfo(suggestions);
-
-        return response.stream().distinct().limit(10).toList();
     }
 
     private Set<Long> findSimilarUsers(Long userId, List<Review> myReviews, List<Favorite> myFavorites) {

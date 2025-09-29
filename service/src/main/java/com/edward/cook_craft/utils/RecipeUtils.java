@@ -37,9 +37,10 @@ public class RecipeUtils {
 
         List<RecipeResponse> response = recipes.stream().map(recipeMapper::toResponse).toList();
         response.forEach(r -> {
-            r.setAverageRating(ratingMap.get(r.getId()).getFirst());
+            var rating = ratingMap.getOrDefault(r.getId(), Pair.of(0.0f, 0));
+            r.setAverageRating(rating.getFirst());
             r.setTotalReview(ratingMap.get(r.getId()).getSecond());
-            r.setTotalFavorite(totalFavoriteMap.get(r.getId()));
+            r.setTotalFavorite(totalFavoriteMap.getOrDefault(r.getId(), 0));
             r.setAuthorFullName(authorInforMap.get(r.getAuthorUsername()).getFirst());
             r.setAuthorAvtUrl(authorInforMap.get(r.getAuthorUsername()).getSecond());
         });

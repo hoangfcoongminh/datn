@@ -28,42 +28,46 @@ public class RelatedRecommendationService {
     private final RecipeUtils recipeUtils;
 
     public List<RecipeResponse> getRelatedRecipes(Long recipeId) {
-        Recipe current = recipeRepository.getByIdAndActive(recipeId).orElse(null);
-        if (current == null) return List.of();
+        try {
+            Recipe current = recipeRepository.getByIdAndActive(recipeId).orElse(null);
+            if (current == null) return List.of();
 
-        List<Recipe> contentBased = recipeRepository.findByCategoryId(current.getCategoryId()).stream()
-                .filter(r -> !r.getId().equals(recipeId))
-                .limit(5)
-                .toList();
+            List<Recipe> contentBased = recipeRepository.findByCategoryId(current.getCategoryId()).stream()
+                    .filter(r -> !r.getId().equals(recipeId))
+                    .limit(5)
+                    .toList();
 
-        Set<Long> userIds = Stream.concat(
-                reviewRepository.findByRecipeIdAndActive(recipeId).stream().map(Review::getUserId),
-                favoriteRepository.findByRecipeId(recipeId).stream().map(Favorite::getUserId)
-        ).collect(Collectors.toSet());
+            Set<Long> userIds = Stream.concat(
+                    reviewRepository.findByRecipeIdAndActive(recipeId).stream().map(Review::getUserId),
+                    favoriteRepository.findByRecipeId(recipeId).stream().map(Favorite::getUserId)
+            ).collect(Collectors.toSet());
 
-        Set<Long> relatedRecipeIds = new HashSet<>();
-        for (Long userId : userIds) {
-            reviewRepository.findByUserId(userId).stream()
-                    .filter(r -> r.getRating() >= 4 && !r.getRecipeId().equals(recipeId))
-                    .forEach(r -> relatedRecipeIds.add(r.getRecipeId()));
+            Set<Long> relatedRecipeIds = new HashSet<>();
+            for (Long userId : userIds) {
+                reviewRepository.findByUserId(userId).stream()
+                        .filter(r -> r.getRating() >= 4 && !r.getRecipeId().equals(recipeId))
+                        .forEach(r -> relatedRecipeIds.add(r.getRecipeId()));
 
-            favoriteRepository.findAllFavoriteByUserId(userId).stream()
-                    .filter(f -> !f.getRecipeId().equals(recipeId))
-                    .forEach(f -> relatedRecipeIds.add(f.getRecipeId()));
+                favoriteRepository.findAllFavoriteByUserId(userId).stream()
+                        .filter(f -> !f.getRecipeId().equals(recipeId))
+                        .forEach(f -> relatedRecipeIds.add(f.getRecipeId()));
+            }
+
+            List<Recipe> communityBased = recipeRepository.findAllById(relatedRecipeIds);
+
+            List<Recipe> suggestions = new ArrayList<>(Stream.concat(contentBased.stream(), communityBased.stream())
+                    .distinct()
+                    .limit(10)
+                    .toList());
+            if (suggestions.size() < 10) {
+                List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
+                        suggestions.stream().map(Recipe::getId).toList());
+                suggestions.addAll(topView);
+            }
+
+            return recipeUtils.mapWithExtraInfo(suggestions);
+        } catch (Exception e) {
+            return null;
         }
-
-        List<Recipe> communityBased = recipeRepository.findAllById(relatedRecipeIds);
-
-        List<Recipe> suggestions = new ArrayList<>(Stream.concat(contentBased.stream(), communityBased.stream())
-                .distinct()
-                .limit(10)
-                .toList());
-        if (suggestions.size() < 10) {
-            List<Recipe> topView = recipeRepository.findTopViewExcludeIds(
-                    suggestions.stream().map(Recipe::getId).toList());
-            suggestions.addAll(topView);
-        }
-
-        return recipeUtils.mapWithExtraInfo(suggestions);
     }
 }
