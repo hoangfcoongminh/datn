@@ -320,7 +320,7 @@
 .stat-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #a50034 0%, #d32f2f 100%);
+  /* background: linear-gradient(135deg, #f194b1 0%, #fae1e1 100%); */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -328,7 +328,7 @@
   margin: 0 auto 20px auto;
   color: white;
   font-size: 1.8rem;
-  box-shadow: 0 8px 24px rgba(165, 0, 52, 0.3);
+  box-shadow: 0 8px 24px rgba(138, 77, 96, 0.3);
 }
 
 .stat-number {

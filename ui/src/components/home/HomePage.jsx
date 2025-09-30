@@ -13,8 +13,10 @@ import {
   FaClock,
   FaFire,
   FaThumbsUp,
+  FaRobot,
 } from "react-icons/fa";
 import { Navigate, useNavigate } from "react-router-dom";
+import { fetchNewsFeed } from "../../api/newsfeed";
 
 import ChatLauncher from "../common/chatbot/ChatLauncher";
 import ScrollToTopButton from "../common/ScrollToTopButton";
@@ -22,14 +24,37 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
+  const [weeklyStats, setWeeklyStats] = useState({
+    totalUser: 0,
+    activeUser: 0,
+    totalRecipe: 0,
+    newRecipeOfWeek: 0,
+  });
 
   useEffect(() => {
     setIsVisible(true);
+    fetchWeeklyStats();
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+    const fetchWeeklyStats = async () => {
+      try {
+        const data = await fetchNewsFeed();
+        console.log('weekly stats', data);
+        
+        if (data.success) {
+          setWeeklyStats(data.data);
+        } else {
+          toast.error("Lỗi khi tải thống kê cho newsfeed");
+        }
+      } catch (err) {
+        toast.error(err.message || "Lỗi khi tải thống kê tuần");
+      }
+    };
+
   const heroSlides = [
     {
       title: "Chia sẻ đam mê",
@@ -102,19 +127,19 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
       color: "#388e3c",
     },
     {
-      icon: <FaFire />,
-      title: "Độ khó phù hợp",
+      icon: <FaRobot />,
+      title: "Tích hợp AI",
       description:
-        "Từ người mới bắt đầu đến chuyên gia, có công thức phù hợp với mọi cấp độ.",
+        "Hỏi đáp về nấu ăn, công thức và mẹo vặt với trợ lý ảo thông minh.",
       color: "#7b1fa2",
     },
   ];
 
   const stats = [
-    { number: "10,000+", label: "Công thức", icon: <FaUtensils /> },
-    { number: "50,000+", label: "Thành viên", icon: <FaUsers /> },
-    { number: "100,000+", label: "Đánh giá", icon: <FaStar /> },
-    { number: "1,000+", label: "Đầu bếp", icon: <FaThumbsUp /> },
+    { number: weeklyStats.totalRecipe, label: "Công thức", icon: <FaUtensils /> },
+    { number: weeklyStats.totalUser, label: "Thành viên", icon: <FaUsers /> },
+    { number: weeklyStats.totalRating || 0, label: "Đánh giá", icon: <FaStar /> },
+    { number: weeklyStats.newRecipeOfWeek, label: "Công thức mới", icon: <FaThumbsUp /> },
   ];
 
   const nextSlide = () => {

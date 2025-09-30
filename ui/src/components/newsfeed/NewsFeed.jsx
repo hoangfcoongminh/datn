@@ -524,61 +524,73 @@ export default function NewsFeed() {
         <h3 className="newsfeed-section-title">
           <HeartOutlined /> Công thức được yêu thích nhất
         </h3>
-        <div className="recipes-grid-slider">
-          <Slider {...sliderSettings}>
-            {popularByFavorite.map((r) => (
-              <div key={r.id}>
-                <div className="recipe-card slider-card">
-                  <div className="card-image">
-                    <img
-                      src={r.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
-                      alt={r.title}
-                    />
-                    <div className="card-overlay">
-                      <div
-                        onClick={() => handleCardClick(r.id)}
-                        className="view-button"
-                      >
-                        Xem chi tiết
+        {popularByFavorite.length > 0 ? (
+          <div className="recipes-grid-slider">
+            <Slider {...sliderSettings}>
+              {popularByFavorite.map((r) => (
+                <div key={r.id}>
+                  <div className="recipe-card slider-card">
+                    <div className="card-image">
+                      <img
+                        src={r.imgUrl || "https://via.placeholder.com/400x250?text=No+Image"}
+                        alt={r.title}
+                      />
+                      <div className="card-overlay">
+                        <div
+                          onClick={() => handleCardClick(r.id)}
+                          className="view-button"
+                        >
+                          Xem chi tiết
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="card-content">
-                    <h3 className="recipe-title">{r.title}</h3>
-                    <p className="recipe-description">{r.description}</p>
-                    <div className="card-footer">
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <HeartOutlined style={{ color: '#f43f5e' }} />
-                        <span className="likes-count">
-                          {r.totalFavorite} lượt thích
-                        </span>
-                      </div>
-                      <div
-                        onClick={() => handleCardClick(r.id)}
-                        className="cta-button"
-                        style={{ cursor: 'pointer' }}
-                      >
-                        Xem
+                    <div className="card-content">
+                      <h3 className="recipe-title">{r.title}</h3>
+                      <p className="recipe-description">{r.description}</p>
+                      <div className="card-footer">
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <HeartOutlined style={{ color: '#f43f5e' }} />
+                          <span className="likes-count">
+                            {r.totalFavorite} lượt thích
+                          </span>
+                        </div>
+                        <div
+                          onClick={() => handleCardClick(r.id)}
+                          className="cta-button"
+                          style={{ cursor: 'pointer' }}
+                        >
+                          Xem
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </Slider>
-        </div>
+              ))}
+            </Slider>
+          </div>
+        ) : (
+          <p>Chưa có công thức nào được yêu thích.</p>
+        )}
       </div>
 
       {/* Người dùng có lượt đánh giá cao nhất */}
       <div className="newsfeed-section">
         <h3 className="newsfeed-section-title">Người dùng được đánh giá cao</h3>
-        <TopUsersCarousel users={topRatingUsers} type="rating" />
+        {topRatingUsers.length > 0 ? (
+          <TopUsersCarousel users={topRatingUsers} type="rating" />
+        ) : (
+          <p>Chưa có người dùng nào được đánh giá cao.</p>
+        )}
       </div>
 
       {/* Người dùng có nhiều lượt thích nhất */}
       <div className="newsfeed-section">
         <h3 className="newsfeed-section-title">Người dùng được yêu thích nhất</h3>
-        <TopUsersCarousel users={topFavUsers} type="favorite" />
+        {topFavUsers.length > 0 ? (
+          <TopUsersCarousel users={topFavUsers} type="favorite" />
+        ) : (
+          <p>Chưa có người dùng nào được yêu thích.</p>
+        )}
       </div>
 
       {/* Weekly Challenge */}
