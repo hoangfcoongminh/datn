@@ -21,3 +21,5 @@ VIDEO FOR RECIPE
 #### features/review + base-code
 
 Function: follow other user
+
+Slide for presentation: shttps://gamma.app/vi
