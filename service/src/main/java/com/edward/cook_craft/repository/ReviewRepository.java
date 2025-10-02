@@ -63,26 +63,31 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND rv.status = 1")
     List<Review> findAllReviewForUser(@Param("username") String username);
 
-
     @Query("""
-    SELECT new com.edward.cook_craft.dto.response.UserResponse(
-        u.username,
-        u.email,
-        u.fullName,
-        u.description,
-        u.imgUrl,
-        u.role,
-        COUNT(r.id),
-        COALESCE(AVG(r.rating), 0),
-        (SELECT COUNT(f.id) FROM Favorite f WHERE f.userId = u.id AND f.status = 1)
-    )
-    FROM User u
-    LEFT JOIN Review r ON u.id = r.userId
-    WHERE u.status = 1 AND r.status = 1
-    GROUP BY u.id, u.username, u.email, u.fullName, u.description, u.imgUrl, u.role
-    ORDER BY AVG(r.rating) DESC
-    """)
+            SELECT new com.edward.cook_craft.dto.response.UserResponse(
+                u.username,
+                u.email,
+                u.fullName,
+                u.description,
+                u.imgUrl,
+                u.role,
+                COUNT(rw.id),
+                COALESCE(AVG(rw.rating), 0),
+                (SELECT COUNT(f.id)
+                 FROM Favorite f
+                 JOIN Recipe r2 ON f.recipeId = r2.id
+                 WHERE r2.authorUsername = u.username AND f.status = 1)
+            )
+            FROM User u
+            JOIN Recipe rc ON rc.authorUsername = u.username AND rc.status = 1
+            LEFT JOIN Review rw ON rw.recipeId = rc.id AND rw.status = 1
+            WHERE u.status = 1
+            GROUP BY u.id, u.username, u.email, u.fullName, u.description, u.imgUrl, u.role
+            ORDER BY COALESCE(AVG(rw.rating), 0) DESC
+            """)
     List<UserResponse> findTopUsersByRating(Pageable pageable);
+
+
 
     List<Review> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

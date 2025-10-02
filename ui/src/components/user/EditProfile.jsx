@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Image } from 'antd';
+import React, { useState, useEffect } from "react";
+import { Form, Input, Button, message, Image } from "antd";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate, Link } from 'react-router-dom';
-import { updateUserProfile, getUserProfile } from '../../api/user';
-import { toast } from 'react-toastify';
-import './EditProfile.css';
-import ScrollToTopButton from '../common/ScrollToTopButton';
-import ChatLauncher from '../common/chatbot/ChatLauncher';
+import { useNavigate, Link } from "react-router-dom";
+import { updateUserProfile, getUserProfile } from "../../api/user";
+import { toast } from "react-toastify";
+import "./EditProfile.css";
+import ScrollToTopButton from "../common/ScrollToTopButton";
+import ChatLauncher from "../common/chatbot/ChatLauncher";
 
 const EditProfile = () => {
   const [form] = Form.useForm();
@@ -15,12 +15,13 @@ const EditProfile = () => {
   const [imageFile, setImageFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
 
+  const currentUser = JSON.parse(localStorage.getItem("user"))?.user;
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const currentUser = JSON.parse(localStorage.getItem('user'))?.user;
         if (!currentUser) {
-          navigate('/login');
+          navigate("/login");
           return;
         }
 
@@ -37,7 +38,7 @@ const EditProfile = () => {
           setPreviewImage(userData.imgUrl);
         }
       } catch (error) {
-        toast.error('Không thể tải thông tin người dùng');
+        toast.error("Không thể tải thông tin người dùng");
       }
     };
 
@@ -47,8 +48,6 @@ const EditProfile = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const currentUser = JSON.parse(localStorage.getItem('user'))?.user;
-      
       // Tạo object với thông tin mới từ form
       const updatedUser = {
         username: currentUser.username,
@@ -58,21 +57,21 @@ const EditProfile = () => {
         role: currentUser.role,
       };
 
-      const response = await updateUserProfile(updatedUser, imageFile);
-      
+      const response = await updateUserProfile({ userData: updatedUser, imageFile: imageFile });
+
       if (response.success && response.code === 200) {
-        toast.success('Cập nhật thông tin thành công!');
+        toast.success("Cập nhật thông tin thành công!");
         // Cập nhật lại thông tin user trong localStorage
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem("user"));
         user.user = { ...user.user, ...response.data };
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user));
         window.dispatchEvent(new Event("storage"));
         // navigate(-1);
       } else {
-        toast.error(response?.message || 'Có lỗi xảy ra khi cập nhật thông tin');
+        toast.error("1 Có lỗi xảy ra khi cập nhật thông tin");
       }
     } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật thông tin');
+      toast.error("2 Có lỗi xảy ra khi cập nhật thông tin");
     } finally {
       setLoading(false);
     }
@@ -92,7 +91,11 @@ const EditProfile = () => {
     <div className="edit-profile-container">
       <div className="edit-profile-card">
         <h1>Sửa thông tin cá nhân</h1>
-        <Link to="/recipes" className="back-button" onClick={() => navigate(-1)}>
+        <Link
+          to="/recipes"
+          className="back-button"
+          onClick={() => navigate(-1)}
+        >
           <FaArrowLeft />
           Quay lại
         </Link>
@@ -107,16 +110,22 @@ const EditProfile = () => {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              style={{ marginBottom: '10px' }}
+              style={{ marginBottom: "10px" }}
             />
             {previewImage && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "10px",
+                }}
+              >
                 <Image
                   src={previewImage}
                   alt="Preview"
                   width={200}
                   height={200}
-                  style={{ borderRadius: '50%' }}
+                  style={{ borderRadius: "50%" }}
                 />
               </div>
             )}
@@ -124,32 +133,21 @@ const EditProfile = () => {
           <Form.Item
             label="Họ và tên"
             name="fullName"
-            rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+            rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
           >
             <Input placeholder="Nhập họ và tên" />
           </Form.Item>
 
-          <Form.Item
-            label="Email"
-            name="email"
-          >
+          <Form.Item label="Email" name="email">
             <Input required={false} placeholder="Nhập email" />
           </Form.Item>
 
-          <Form.Item
-            label="Mô tả"
-            name="description"
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Giới thiệu về bản thân"
-            />
+          <Form.Item label="Mô tả" name="description">
+            <Input.TextArea rows={4} placeholder="Giới thiệu về bản thân" />
           </Form.Item>
 
           <div className="button-group">
-            <Button onClick={() => navigate(-1)}>
-              Hủy
-            </Button>
+            <Button onClick={() => navigate(-1)}>Hủy</Button>
             <Button type="primary" htmlType="submit" loading={loading}>
               Cập nhật
             </Button>

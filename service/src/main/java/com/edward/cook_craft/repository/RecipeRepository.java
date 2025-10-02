@@ -40,8 +40,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     @Query(value = "SELECT r " +
             "FROM Recipe r " +
-            "WHERE r.categoryId = :categoryId " +
-            "AND r.status = 1")
+            "WHERE r.categoryId = :categoryId ")
+//            "AND r.status = 1")
     List<Recipe> findAllByCategoryId(@Param("categoryId") Long categoryId);
 
     @Query(value = "SELECT DISTINCT r " +
