@@ -40,7 +40,8 @@ export default function NewsFeed() {
     totalUser: 0,
     activeUser: 0,
     totalRecipe: 0,
-    newRecipeOfWeek: 0
+    newRecipeOfWeek: 0,
+    totalReview: 0,
   });
 
   const [trendingCategories, setTrendingCategories] = useState([]);

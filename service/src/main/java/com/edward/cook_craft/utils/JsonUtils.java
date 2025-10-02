@@ -20,10 +20,8 @@ public final class JsonUtils {
 
     public static <T> T jsonMapper(String object, Class<T> clazz) {
         try {
-            log.info("JSON: {}", object);
             return mapper.readValue(object, clazz);
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
             throw new CustomException("fail.to.parse.json");
         }
     }

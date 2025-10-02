@@ -30,6 +30,14 @@ const UnitAdmin = () => {
     setSelectedUnit(null);
     setOpenPopup(true);
   };
+  
+  const handleSortChange = (value) => {
+    setSort(value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setUnitsRequest((prev) => ({ ...prev, status: value }));
+  };
 
   const handleUpdateUnit = async (updatedData) => {
     try {
@@ -129,6 +137,27 @@ const UnitAdmin = () => {
             }
             style={{ maxWidth: 240 }}
           />
+
+          <Select
+            defaultValue={sort}
+            onChange={handleSortChange}
+            style={{ width: "100%", maxWidth: 200 }}
+          >
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
+            <Option value="name,asc">Tên A-Z</Option>
+            <Option value="name,desc">Tên Z-A</Option>
+          </Select>
+
+          <Select
+            placeholder="Lọc theo trạng thái"
+            onChange={(value) => handleStatusFilterChange(value)}
+            style={{ width: "100%", maxWidth: 200 }}
+            allowClear
+          >
+            <Option value="1">Hoạt động</Option>
+            <Option value="0">Ngưng hoạt động</Option>
+          </Select>
 
           <Button type="primary" onClick={handleOpenCreatePopup} style={{ background: "#52c41a" }}>
             Thêm mới

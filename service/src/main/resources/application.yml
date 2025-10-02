@@ -48,3 +48,11 @@ image:
     category: http://localhost:9000/images/default-category.jpg
     recipe: http://localhost:9000/images/default-recipe.jpg
     ingredient: http://localhost:9000/images/default-ingredient.jpg
+
+logging:
+  level:
+    org.springframework.transaction: DEBUG
+    org.hibernate.transaction: DEBUG
+    org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE

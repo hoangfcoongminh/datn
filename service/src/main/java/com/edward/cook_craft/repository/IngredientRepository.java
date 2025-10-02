@@ -21,7 +21,8 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
     @Query(value = "SELECT i " +
             "FROM Ingredient i " +
-            "WHERE (:search IS NULL OR LOWER(CONCAT(i.name, '#', i.description)) LIKE CONCAT('%', :search, '%')) " +
+            "WHERE (:search IS NULL OR LOWER(i.name) LIKE CONCAT('%', :search, '%') " +
+            "OR LOWER(i.description) LIKE CONCAT('%', :search, '%')) " +
             "AND (:unitIds IS NULL OR i.unitId IN :unitIds) " +
             "AND i.status = 1")
     Page<Ingredient> filter(@Param("search") String search,
@@ -44,11 +45,17 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
                                      @Param("unitId") Long unitId,
                                      @Param("id") Long id);
 
-    @Query(value = "SELECT i " +
-            "FROM Ingredient i " +
-            "WHERE (COALESCE(:search, '') = '' OR CONCAT(LOWER(i.name),'#',LOWER(i.description)) LIKE CONCAT('%',LOWER(:search),'%')) " +
-            "AND (:status IS NULL OR i.status = :status)")
+    @Query("""
+            SELECT i
+            FROM Ingredient i
+            WHERE (:search IS NULL
+                   OR :search = ''
+                   OR LOWER(i.name) LIKE LOWER(CONCAT('%', :search, '%'))
+                   OR LOWER(i.description) LIKE LOWER(CONCAT('%', :search, '%')))
+            AND (:status IS NULL OR i.status = :status)
+            """)
     Page<Ingredient> getAllIngredientsForAdmin(@Param("search") String search,
                                                @Param("status") Integer status,
                                                Pageable pageable);
+
 }

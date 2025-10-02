@@ -38,6 +38,14 @@ const IngredientAdmin = () => {
     setOpenPopup(true);
   };
 
+  const handleSortChange = (value) => {
+    setSort(value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setIngredientsRequest((prev) => ({ ...prev, status: value }));
+  };
+
   const handleUpdateIngredient = async (updatedData, img) => {
     try {
       const response = await updateIngredient({ ingredient: updatedData, imageFile: img });
@@ -50,7 +58,7 @@ const IngredientAdmin = () => {
     }
   };
 
-  const handleAddIngredient = async (newData, img) => {    
+  const handleAddIngredient = async (newData, img) => {
     try {
       const response = await addIngredient({ addingIngredient: newData, imageFile: img });
       toast.success("Thêm nguyên liệu thành công");
@@ -74,10 +82,13 @@ const IngredientAdmin = () => {
         setTotal(ingredientsRes.total);
 
         const unitsRes = await fetchUnits();
-        setUnits(Array.isArray(unitsRes.data) ? unitsRes.data : []); // Đảm bảo units luôn là mảng
-        
-      } catch (error) {
-        toast.error("Failed to fetch ingredients");
+        const rawData = Array.isArray(unitsRes.data) ? unitsRes.data : [];
+
+        const formattedUnits = rawData.map(item => ({
+          value: item.id,
+          label: item.name
+        }));
+        setUnits(formattedUnits);
       } finally {
         setLoading(false);
       }
@@ -164,6 +175,27 @@ const IngredientAdmin = () => {
             }
             style={{ maxWidth: 240 }}
           />
+
+          <Select
+            defaultValue={sort}
+            onChange={handleSortChange}
+            style={{ width: "100%", maxWidth: 200 }}
+          >
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
+            <Option value="name,asc">Tên A-Z</Option>
+            <Option value="name,desc">Tên Z-A</Option>
+          </Select>
+
+          <Select
+            placeholder="Lọc theo trạng thái"
+            onChange={(value) => handleStatusFilterChange(value)}
+            style={{ width: "100%", maxWidth: 200 }}
+            allowClear
+          >
+            <Option value="1">Hoạt động</Option>
+            <Option value="0">Ngưng hoạt động</Option>
+          </Select>
 
           <Button type="primary" onClick={handleOpenCreatePopup} style={{ background: "#52c41a" }}>
             Thêm mới

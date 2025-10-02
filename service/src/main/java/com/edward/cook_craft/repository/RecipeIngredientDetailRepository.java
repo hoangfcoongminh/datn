@@ -14,4 +14,6 @@ public interface RecipeIngredientDetailRepository extends JpaRepository<RecipeIn
             "WHERE r.recipeId = :recipeId " +
             "AND r.status = 1")
     List<RecipeIngredientDetail> findByRecipeId(@Param("recipeId") Long recipeId);
+
+    List<RecipeIngredientDetail> findByIngredientId(Long ingredientId);
 }

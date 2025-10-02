@@ -7,11 +7,14 @@ import com.edward.cook_craft.enums.EntityStatus;
 import com.edward.cook_craft.exception.CustomException;
 import com.edward.cook_craft.mapper.IngredientMapper;
 import com.edward.cook_craft.model.Ingredient;
+import com.edward.cook_craft.model.RecipeIngredientDetail;
 import com.edward.cook_craft.repository.IngredientRepository;
+import com.edward.cook_craft.repository.RecipeIngredientDetailRepository;
 import com.edward.cook_craft.repository.UnitRepository;
 import com.edward.cook_craft.service.minio.MinioService;
 import com.edward.cook_craft.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,10 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IngredientService {
 
+    private final RecipeIngredientDetailRepository recipeIngredientDetailRepository;
     @Value("${image.default.ingredient}")
     private String defaultIngredient;
 
@@ -75,7 +80,8 @@ public class IngredientService {
     public IngredientResponse update(String jsonRequest, MultipartFile file) {
         IngredientRequest request = JsonUtils.jsonMapper(jsonRequest, IngredientRequest.class);
         validate(request);
-        Ingredient existed = repository.findById(request.getId()).get();
+        Ingredient existed = repository.findById(request.getId())
+                .orElseThrow(() -> new CustomException("ingredient.not.found"));
 
         existed.setName(request.getName());
         existed.setUnitId(request.getUnitId());
@@ -87,7 +93,13 @@ public class IngredientService {
             }
             existed.setImgUrl(minioService.uploadFile(file, Constants.FILE_TYPE_IMAGE));
         }
-        return ingredientMapper.toResponse(repository.save(existed));
+        existed = repository.save(existed);
+
+        List<RecipeIngredientDetail> detailList = recipeIngredientDetailRepository.findByIngredientId(existed.getId());
+        detailList.forEach(detail -> detail.setStatus(request.getStatus() == null ? EntityStatus.ACTIVE.getStatus() : request.getStatus()));
+        recipeIngredientDetailRepository.saveAll(detailList);
+
+        return ingredientMapper.toResponse(existed);
     }
 
     private void validate(IngredientRequest request) {

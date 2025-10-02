@@ -19,7 +19,7 @@ const RecipeAdmin = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [total, setTotal] = useState(0);
-  const [sort, setSort] = useState("id,asc");
+  const [sort, setSort] = useState("id,desc");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -199,8 +199,8 @@ const RecipeAdmin = () => {
           />
 
           <Select defaultValue={sort} onChange={handleSortChange} style={{ width: "100%", maxWidth: 200 }}>
-            <Option value="id,asc">ID Tăng dần</Option>
-            <Option value="id,desc">ID Giảm dần</Option>
+            <Option value="id,desc">Mới nhất</Option>
+            <Option value="id,asc">Cũ nhất</Option>
             <Option value="title,asc">Tên A-Z</Option>
             <Option value="title,desc">Tên Z-A</Option>
             <Option value="cookingTime,asc">Thời gian nấu ngắn nhất</Option>

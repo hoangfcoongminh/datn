@@ -11,4 +11,5 @@ public class NewsfeedResponse {
     private int activeUser;
     private int totalRecipe;
     private int newRecipeOfWeek;
+    private int totalReview;
 }

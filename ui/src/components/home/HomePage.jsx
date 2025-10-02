@@ -29,6 +29,7 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
     activeUser: 0,
     totalRecipe: 0,
     newRecipeOfWeek: 0,
+    totalReview: 0,
   });
 
   useEffect(() => {
@@ -138,7 +139,7 @@ const HomePage = ({ user, onLoginClick, onSignupClick, onLogout }) => {
   const stats = [
     { number: weeklyStats.totalRecipe, label: "Công thức", icon: <FaUtensils /> },
     { number: weeklyStats.totalUser, label: "Thành viên", icon: <FaUsers /> },
-    { number: weeklyStats.totalRating || 0, label: "Đánh giá", icon: <FaStar /> },
+    { number: weeklyStats.totalReview || 0, label: "Đánh giá", icon: <FaStar /> },
     { number: weeklyStats.newRecipeOfWeek, label: "Công thức mới", icon: <FaThumbsUp /> },
   ];
 
