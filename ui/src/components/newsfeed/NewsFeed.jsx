@@ -456,7 +456,7 @@ export default function NewsFeed() {
                     alignItems: 'center'
                   }}
                 >
-                  {category.growth > 0 ? '+' : ''}
+                  {category.growth > 0 ? '+' : '-'}
                   <CountUp
                     end={Math.abs(category.growth)}
                     duration={2}

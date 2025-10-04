@@ -134,8 +134,8 @@ const IngredientAdmin = () => {
       title: "Đơn vị chuẩn",
       dataIndex: "unitId",
       render: (unitId) => {
-        const unit = units.find((u) => u.id === unitId);
-        return <Tag color="orange">{unit?.name || "Không xác định"}</Tag>;
+        const unit = units.find((u) => u.value === unitId);
+        return <Tag color="orange">{unit?.label || "Không xác định"}</Tag>;
       },
     },
     {
